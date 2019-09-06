@@ -11,6 +11,7 @@ import android.os.Handler;
 import java.util.ArrayList;
 
 import static com.greatsokol.fluckr.PaginationListener.PAGE_START;
+import static com.greatsokol.fluckr.FlickrApi.FLICKR_PER_PAGE;
 
 
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
@@ -72,7 +73,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
             @Override
             public void run() {
-                for (int i = 0; i < 30; i++) {
+                FlickrApi.LoadPage(1);
+
+                for (int i = 0; i < FLICKR_PER_PAGE; i++) {
                     itemCount++;
                     FlickrImageListItem item = new FlickrImageListItem();
                     item.setTitle(String.valueOf(itemCount));
