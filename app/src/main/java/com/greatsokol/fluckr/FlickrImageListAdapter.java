@@ -16,9 +16,9 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
     private static final int VIEW_TYPE_LOADING = 0;
     private static final int VIEW_TYPE_NORMAL = 1;
     private boolean isLoaderVisible = false;
-    private List<FlickrImageListItem> mItems;
+    private List<FlickrApi.FlickrImageListItem> mItems;
 
-    public FlickrImageListAdapter(ArrayList<FlickrImageListItem> items) {
+    public FlickrImageListAdapter(ArrayList<FlickrApi.FlickrImageListItem> items) {
         this.mItems = items;
     }
 
@@ -56,21 +56,21 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
         return mItems==null? 0 : mItems.size();
     }
 
-    public void addItems(List<FlickrImageListItem> items) {
+    public void addItems(List<FlickrApi.FlickrImageListItem> items) {
         mItems.addAll(items);
         notifyDataSetChanged();
     }
 
     public void addLoading() {
         isLoaderVisible = true;
-        mItems.add(new FlickrImageListItem());
+        mItems.add(new FlickrApi.FlickrImageListItem());
         notifyItemInserted(mItems.size() - 1);
     }
 
     public void removeLoading() {
         isLoaderVisible = false;
         int position = mItems.size() - 1;
-        FlickrImageListItem item = getItem(position);
+        FlickrApi.FlickrImageListItem item = getItem(position);
         if (item != null) {
             mItems.remove(position);
             notifyItemRemoved(position);
@@ -82,7 +82,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
         notifyDataSetChanged();
     }
 
-    FlickrImageListItem getItem(int position) {
+    FlickrApi.FlickrImageListItem getItem(int position) {
         return mItems.get(position);
     }
 

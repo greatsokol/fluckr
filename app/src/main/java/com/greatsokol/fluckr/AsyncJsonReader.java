@@ -1,19 +1,23 @@
 package com.greatsokol.fluckr;
 
 import android.os.AsyncTask;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.ref.WeakReference;
+import java.net.URL;
+import java.nio.charset.Charset;
 
 public class AsyncJsonReader extends AsyncTask<String, Void, JSONObject> {
 
     private WeakReference<OnAnswerListener> mListener;
 
-    public abstract class OnAnswerListener{
+    public abstract static class OnAnswerListener{
         public abstract void OnAnswerReady(JSONObject jsonObject);
     }
 
@@ -27,7 +31,7 @@ public class AsyncJsonReader extends AsyncTask<String, Void, JSONObject> {
     protected JSONObject doInBackground(String... strings) {
         try {
             String request = strings[0];
-            return JsonReader.readJsonFromUrl(request);
+            return readJsonFromUrl(request);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
@@ -42,5 +46,26 @@ public class AsyncJsonReader extends AsyncTask<String, Void, JSONObject> {
         OnAnswerListener l = mListener.get();
         if (l!=null)
             l.OnAnswerReady(jsonObject);
+    }
+
+
+    private static String readAll(Reader rd) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int cp;
+        while ((cp = rd.read()) != -1) {
+            sb.append((char) cp);
+        }
+        return sb.toString();
+    }
+
+    private static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
+        InputStream is = new URL(url).openStream();
+        try {
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            String jsonText = readAll(rd);
+            return new JSONObject(jsonText);
+        } finally {
+            is.close();
+        }
     }
 }

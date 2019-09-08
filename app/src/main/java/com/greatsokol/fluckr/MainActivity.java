@@ -8,6 +8,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.os.Bundle;
 import android.os.Handler;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 import static com.greatsokol.fluckr.PaginationListener.PAGE_START;
@@ -22,7 +24,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private boolean isLastPage = false;
     private int totalPage = 10;
     private boolean isLoading = false;
-    int itemCount = 0;
 
 
     @Override
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
-        adapter = new FlickrImageListAdapter(new ArrayList<FlickrImageListItem>());
+        adapter = new FlickrImageListAdapter(new ArrayList<FlickrApi.FlickrImageListItem>());
         mRecyclerView.setAdapter(adapter);
         doApiCall();
         mRecyclerView.addOnScrollListener(new PaginationListener(layoutManager) {
@@ -60,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     @Override
     public void onRefresh() {
-        itemCount = 0;
         currentPage = PAGE_START;
         isLastPage = false;
         adapter.clear();
@@ -68,22 +68,23 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     private void doApiCall() {
-        final ArrayList<FlickrImageListItem> items = new ArrayList<>();
-        new Handler().postDelayed(new Runnable() {
+        final ArrayList<FlickrApi.FlickrImageListItem> items = new ArrayList<>();
+
+
+
+
+        new Handler().post(new Runnable() {
 
             @Override
             public void run() {
-                FlickrApi.LoadPage(1);
-
-                for (int i = 0; i < FLICKR_PER_PAGE; i++) {
+                /*for (int i = 0; i < FLICKR_PER_PAGE; i++) {
                     itemCount++;
-                    FlickrImageListItem item = new FlickrImageListItem();
+                    FlickrApi.FlickrImageListItem item = new FlickrApi.FlickrImageListItem();
                     item.setTitle(String.valueOf(itemCount));
                     items.add(item);
-                }
-                /**
-                 * manage progress view
-                 */
+                }*/
+                FlickrApi.LoadPicturesList(adapter, items, currentPage);
+
                 if (currentPage != PAGE_START) adapter.removeLoading();
                 adapter.addItems(items);
                 swipeRefresh.setRefreshing(false);
@@ -96,6 +97,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 }
                 isLoading = false;
             }
-        }, 500);
+        });
     }
 }
