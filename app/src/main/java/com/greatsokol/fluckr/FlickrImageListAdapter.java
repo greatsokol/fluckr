@@ -13,12 +13,20 @@ import java.util.List;
 
 public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
 
-    private static final int VIEW_TYPE_LOADING = 0;
-    private static final int VIEW_TYPE_NORMAL = 1;
+    static final int VIEW_TYPE_LOADING = 0;
+    static final int VIEW_TYPE_NORMAL = 1;
     private boolean isLoaderVisible = false;
     private List<FlickrApi.FlickrImageListItem> mItems;
+    boolean isLoadingNow = false;
+    private int mCurrentPage = 1;
 
-    public FlickrImageListAdapter(ArrayList<FlickrApi.FlickrImageListItem> items) {
+    int getCurrentPage(){return mCurrentPage;}
+    void setCurrentPage(int number){mCurrentPage = number;};
+
+    private static int totalPage = 10; // todo сделать правильное ограничение
+    boolean isLastPage(){return mCurrentPage>totalPage;}
+
+    FlickrImageListAdapter(ArrayList<FlickrApi.FlickrImageListItem> items) {
         this.mItems = items;
     }
 
@@ -56,29 +64,35 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
         return mItems==null? 0 : mItems.size();
     }
 
-    public void addItems(List<FlickrApi.FlickrImageListItem> items) {
+    void addItems(List<FlickrApi.FlickrImageListItem> items) {
         mItems.addAll(items);
         notifyDataSetChanged();
     }
 
-    public void addLoading() {
+    void addLoading() {
         isLoaderVisible = true;
         mItems.add(new FlickrApi.FlickrImageListItem());
         notifyItemInserted(mItems.size() - 1);
     }
 
-    public void removeLoading() {
+    void removeLoading() {
+        /*for(int i=0; i<mItems.size()-1; i++){
+            if(getItemViewType(i)==VIEW_TYPE_LOADING){
+                mItems.remove(i);
+                notifyItemRemoved(i);
+            }
+        } */
+
+        int position = mItems.size()-1;
+        mItems.remove(position);
+        notifyItemRemoved(position);
+        isLoadingNow = false;
         isLoaderVisible = false;
-        int position = mItems.size() - 1;
-        FlickrApi.FlickrImageListItem item = getItem(position);
-        if (item != null) {
-            mItems.remove(position);
-            notifyItemRemoved(position);
-        }
     }
 
-    public void clear() {
+    void clear() {
         mItems.clear();
+        setCurrentPage(1);
         notifyDataSetChanged();
     }
 
@@ -88,7 +102,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
 
     public class ViewHolder extends BaseViewHolder {
         TextView textViewTitle;
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             textViewTitle = itemView.findViewById(R.id.textTitle);
             //Load picture from cache or internet ??
@@ -106,7 +120,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
     }
 
     public class ProgressHolder extends BaseViewHolder {
-        public ProgressHolder(View itemView) {
+        ProgressHolder(View itemView) {
             super(itemView);
         }
 

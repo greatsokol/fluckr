@@ -1,15 +1,17 @@
 package com.greatsokol.fluckr;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import static com.greatsokol.fluckr.FlickrApi.FLICKR_PER_PAGE;
+
 public abstract class PaginationListener extends RecyclerView.OnScrollListener {
-    private static final int PAGE_SIZE = 10;
+
 
     @NonNull
-    private LinearLayoutManager layoutManager;
-    public PaginationListener(@NonNull LinearLayoutManager layoutManager) {
+    private GridLayoutManager layoutManager;
+    public PaginationListener(@NonNull GridLayoutManager layoutManager) {
         this.layoutManager = layoutManager;
     }
 
@@ -20,11 +22,13 @@ public abstract class PaginationListener extends RecyclerView.OnScrollListener {
         int visibleItemCount = layoutManager.getChildCount();
         int totalItemCount = layoutManager.getItemCount();
         int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+        boolean isloading = isLoading();
+        boolean islast = isLastPage();
 
-        if (!isLoading() && !isLastPage()) {
+        if (!isloading && !islast) {
             if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
                     && firstVisibleItemPosition >= 0
-                    && totalItemCount >= PAGE_SIZE) {
+                    && totalItemCount >= FLICKR_PER_PAGE) {
                 loadMoreItems();
             }
         }

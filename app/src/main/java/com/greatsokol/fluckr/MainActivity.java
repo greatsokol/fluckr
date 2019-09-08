@@ -1,33 +1,19 @@
 package com.greatsokol.fluckr;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.os.Bundle;
 import android.os.Handler;
 
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-
-import static com.greatsokol.fluckr.FlickrApi.FLICKR_PER_PAGE;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
     RecyclerView mRecyclerView;
     SwipeRefreshLayout swipeRefresh;
 
-
-    private boolean isLastPage = false;
-    private int totalPage = 10;
-    private boolean isLoading = false;
-
     FlickrImageListAdapter getAdapter(){ return ((FluckrApplication)getApplication()).getAdapter();}
-    int getCurrentPage(){ return ((FluckrApplication)getApplication()).getCurrentPage();}
-    void setCurrentPage(int number){((FluckrApplication)getApplication()).setCurrentPage(number);}
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,59 +23,46 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         swipeRefresh.setOnRefreshListener(this);
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        final FlickrImageListAdapter adapter = getAdapter();
+        final GridLayoutManager layoutManager = new FluckrGridLayoutManager(this, adapter, getSpanCount());
         mRecyclerView.setLayoutManager(layoutManager);
-
         mRecyclerView.setAdapter(getAdapter());
-        doApiCall();
         mRecyclerView.addOnScrollListener(new PaginationListener(layoutManager) {
             @Override
             protected void loadMoreItems() {
-                isLoading = true;
-                setCurrentPage(getCurrentPage() + 1);
                 doApiCall();
             }
 
             @Override
             public boolean isLastPage() {
-                return isLastPage;
+                return adapter.isLastPage();
             }
 
             @Override
             public boolean isLoading() {
-                return isLoading;
+                return adapter.isLoadingNow;
             }
         });
+
+        doApiCall();
+    }
+
+    protected int getSpanCount(){
+        return getResources().getInteger(R.integer.span_for_grid);
     }
 
     @Override
     public void onRefresh() {
-        setCurrentPage(1);
-        isLastPage = false;
         getAdapter().clear();
         doApiCall();
     }
 
     private void doApiCall() {
-        final ArrayList<FlickrApi.FlickrImageListItem> items = new ArrayList<>();
         new Handler().post(new Runnable() {
             @Override
             public void run() {
-                FlickrImageListAdapter adapter = getAdapter();
-                int currentPage = getCurrentPage();
-                FlickrApi.LoadPicturesList(adapter, items, currentPage);
-
-                if (currentPage != 1) adapter.removeLoading();
-                adapter.addItems(items);
+                FlickrApi.LoadPicturesList(getAdapter());
                 swipeRefresh.setRefreshing(false);
-
-                // check weather is last page or not
-                if (currentPage < totalPage) {
-                    adapter.addLoading();
-                } else {
-                    isLastPage = true;
-                }
-                isLoading = false;
             }
         });
     }

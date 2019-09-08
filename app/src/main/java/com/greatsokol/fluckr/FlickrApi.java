@@ -4,7 +4,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -19,12 +18,12 @@ class FlickrApi {
                         "&format=json" +
                         "&nojsoncallback=1";
 
-    static final int FLICKR_PER_PAGE = 20;
+    static final int FLICKR_PER_PAGE = 40;
 
     static class FlickrImageListItem {
         String mTitle;
         FlickrImageListItem(){}
-        FlickrImageListItem(String title){setTitle(title);}
+        FlickrImageListItem(String title){setTitle("Title = "+title);}
         void setTitle(String title) {
             mTitle = title;
         }
@@ -34,13 +33,20 @@ class FlickrApi {
     }
 
 
-    static void LoadPicturesList(final FlickrImageListAdapter adapter, final ArrayList<FlickrImageListItem> list, int page_number){
+
+    static void LoadPicturesList(final FlickrImageListAdapter adapter){
+        adapter.isLoadingNow = true;
+
+        final int page_number = adapter.getCurrentPage();
+        if (adapter.isLastPage()) return;
+        adapter.addLoading();
         final String request = String.format(Locale.getDefault(), API_REQUEST, API_KEY, FLICKR_PER_PAGE, page_number);
         AsyncJsonReader reader = new AsyncJsonReader(new AsyncJsonReader.OnAnswerListener(){
             @Override
             public void OnAnswerReady(JSONObject jsonObject) {
                 if(jsonObject != null){
                     try {
+                        final ArrayList<FlickrApi.FlickrImageListItem> items = new ArrayList<>();
                         JSONArray jsonArray = jsonObject.getJSONObject("photos").getJSONArray("photo");
                         for (int i=0; i < jsonArray.length(); i++){
                             JSONObject onePicObject = (JSONObject) jsonArray.get(i);
@@ -50,13 +56,17 @@ class FlickrApi {
                             String server = onePicObject.getString("server");
                             String farm = onePicObject.getString("farm");
                             String title = onePicObject.getString("title");
-                            list.add(new FlickrImageListItem(title));
+                            items.add(new FlickrImageListItem(title));
                         }
-                        adapter.addItems(list);
+                        adapter.removeLoading();
+                        adapter.addItems(items);
+                        adapter.setCurrentPage(page_number+1);
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        adapter.removeLoading();
                     }
                 }
+
             }
         }, request);
     }
