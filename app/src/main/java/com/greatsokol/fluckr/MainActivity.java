@@ -19,11 +19,13 @@ import static com.greatsokol.fluckr.FlickrApi.FLICKR_PER_PAGE;
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
     RecyclerView mRecyclerView;
     SwipeRefreshLayout swipeRefresh;
-    private FlickrImageListAdapter adapter;
+
     private int currentPage = PAGE_START;
     private boolean isLastPage = false;
     private int totalPage = 10;
     private boolean isLoading = false;
+
+    FlickrImageListAdapter getAdapter(){ return ((FluckrApplication)getApplication()).getAdapter();}
 
 
     @Override
@@ -36,8 +38,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
-        adapter = new FlickrImageListAdapter(new ArrayList<FlickrApi.FlickrImageListItem>());
-        mRecyclerView.setAdapter(adapter);
+
+        mRecyclerView.setAdapter(getAdapter());
         doApiCall();
         mRecyclerView.addOnScrollListener(new PaginationListener(layoutManager) {
             @Override
@@ -63,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     public void onRefresh() {
         currentPage = PAGE_START;
         isLastPage = false;
-        adapter.clear();
+        getAdapter().clear();
         doApiCall();
     }
 
@@ -77,12 +79,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
             @Override
             public void run() {
-                /*for (int i = 0; i < FLICKR_PER_PAGE; i++) {
-                    itemCount++;
-                    FlickrApi.FlickrImageListItem item = new FlickrApi.FlickrImageListItem();
-                    item.setTitle(String.valueOf(itemCount));
-                    items.add(item);
-                }*/
+                FlickrImageListAdapter adapter = getAdapter();
                 FlickrApi.LoadPicturesList(adapter, items, currentPage);
 
                 if (currentPage != PAGE_START) adapter.removeLoading();
