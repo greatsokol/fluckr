@@ -20,23 +20,10 @@ class FlickrApi {
 
     static final int FLICKR_PER_PAGE = 40;
 
-    static class FlickrImageListItem {
-        String mTitle;
-        FlickrImageListItem(){}
-        FlickrImageListItem(String title){setTitle("Title = "+title);}
-        void setTitle(String title) {
-            mTitle = title;
-        }
-        String getTitle() {
-            return mTitle;
-        }
-    }
-
-
 
     static void LoadPicturesList(final FlickrImageListAdapter adapter){
         if (adapter.isLastPage() || adapter.isLoadingNow()) return;
-        adapter.addLoading();
+        adapter.startLoading();
         final int page_number = adapter.getCurrentPage();
         final String request = String.format(Locale.getDefault(), API_REQUEST, API_KEY, FLICKR_PER_PAGE, page_number);
         AsyncJsonReader reader = new AsyncJsonReader(new AsyncJsonReader.OnAnswerListener(){
@@ -44,7 +31,7 @@ class FlickrApi {
             public void OnAnswerReady(JSONObject jsonObject) {
                 if(jsonObject != null){
                     try {
-                        final ArrayList<FlickrApi.FlickrImageListItem> items = new ArrayList<>();
+                        final ArrayList<FlickrImageListItem> items = new ArrayList<>();
                         JSONObject jsonRoot = jsonObject.getJSONObject("photos");
                         adapter.setTotalPage(jsonRoot.getInt("pages"));
                         JSONArray jsonArray = jsonRoot.getJSONArray("photo");
@@ -58,14 +45,13 @@ class FlickrApi {
                             String title = onePicObject.getString("title");
                             items.add(new FlickrImageListItem(title));
                         }
-                        adapter.removeLoading();
                         adapter.addItems(items);
                         adapter.setCurrentPage(page_number+1);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
-                else adapter.removeLoading();
+                adapter.stopLoading();
             }
         }, request);
     }

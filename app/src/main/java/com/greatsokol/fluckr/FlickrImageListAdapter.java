@@ -13,38 +13,34 @@ import java.util.List;
 
 public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
 
-    static final int VIEW_TYPE_LOADING = 0;
-    static final int VIEW_TYPE_NORMAL = 1;
-    private List<FlickrApi.FlickrImageListItem> mItems;
+
+    private List<FlickrImageListItem> mItems;
     private boolean mIsLoadingNow = false;
     private int mCurrentPage = 1;
 
     boolean isLoadingNow(){return mIsLoadingNow;}
     int getCurrentPage(){return mCurrentPage;}
-    void setCurrentPage(int number){mCurrentPage = number;};
+    void setCurrentPage(int number){mCurrentPage = number;}
 
     private static int mTotalPage = 10; // todo сделать правильное ограничение
     boolean isLastPage(){return mCurrentPage>mTotalPage;}
     void setTotalPage(int totalPage){mTotalPage = totalPage;}
 
 
-    FlickrImageListAdapter(ArrayList<FlickrApi.FlickrImageListItem> items) {
+    FlickrImageListAdapter(ArrayList<FlickrImageListItem> items) {
         this.mItems = items;
     }
 
     @NonNull
     @Override
     public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        switch (viewType) {
-            case VIEW_TYPE_NORMAL:
-                return new ViewHolder(
-                        LayoutInflater.from(parent.getContext()).inflate(R.layout.listitem, parent, false));
-            case VIEW_TYPE_LOADING:
+        if(viewType == FlickrImageListItem.VIEW_TYPE_LOADING)
                 return new ProgressHolder(
-                        LayoutInflater.from(parent.getContext()).inflate(R.layout.listitem_loading, parent, false));
-            default:
-                return null;
-        }
+                        LayoutInflater.from(parent.getContext()).
+                                inflate(R.layout.listitem_loading, parent, false));
+        else return new ViewHolder(
+                        LayoutInflater.from(parent.getContext()).
+                                inflate(R.layout.listitem, parent, false));
     }
 
     @Override
@@ -54,11 +50,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
 
     @Override
     public int getItemViewType(int position) {
-        if (isLoadingNow()) {
-            return position == mItems.size() - 1 ? VIEW_TYPE_LOADING : VIEW_TYPE_NORMAL;
-        } else {
-            return VIEW_TYPE_NORMAL;
-        }
+        return getItem(position).getViewType();
     }
 
     @Override
@@ -66,28 +58,30 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
         return mItems==null? 0 : mItems.size();
     }
 
-    void addItems(List<FlickrApi.FlickrImageListItem> items) {
+    void addItems(List<FlickrImageListItem> items) {
         mItems.addAll(items);
         notifyDataSetChanged();
     }
 
-    void addLoading() {
+    void startLoading() {
         mIsLoadingNow = true;
-        mItems.add(new FlickrApi.FlickrImageListItem());
+        mItems.add(new FlickrImageListItem(FlickrImageListItem.VIEW_TYPE_LOADING));
         notifyItemInserted(mItems.size() - 1);
     }
 
-    void removeLoading() {
-        /*for(int i=0; i<mItems.size()-1; i++){
-            if(getItemViewType(i)==VIEW_TYPE_LOADING){
-                mItems.remove(i);
-                notifyItemRemoved(i);
+    void stopLoading() {
+        ArrayList<Integer> list_to_remove = new ArrayList<>();
+        for(int i=0; i<mItems.size(); i++){
+            if (getItemViewType(i)==FlickrImageListItem.VIEW_TYPE_LOADING){
+                list_to_remove.add(i);
             }
-        } */
+        }
 
-        int position = mItems.size()-1;
-        mItems.remove(position);
-        notifyItemRemoved(position);
+        for(int i=0; i<list_to_remove.size(); i++){
+            int num_to_remove = list_to_remove.get(i);
+            mItems.remove(num_to_remove);
+            notifyItemRemoved(num_to_remove);
+        }
         mIsLoadingNow = false;
     }
 
@@ -97,7 +91,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
         notifyDataSetChanged();
     }
 
-    FlickrApi.FlickrImageListItem getItem(int position) {
+    private FlickrImageListItem getItem(int position) {
         return mItems.get(position);
     }
 

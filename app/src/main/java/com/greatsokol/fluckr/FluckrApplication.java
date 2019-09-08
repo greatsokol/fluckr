@@ -13,6 +13,6 @@ public class FluckrApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        mAdapter = new FlickrImageListAdapter(new ArrayList<FlickrApi.FlickrImageListItem>());
+        mAdapter = new FlickrImageListAdapter(new ArrayList<FlickrImageListItem>());
     }
 }
