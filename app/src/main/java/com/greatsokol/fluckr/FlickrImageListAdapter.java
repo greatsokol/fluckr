@@ -15,16 +15,18 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
 
     static final int VIEW_TYPE_LOADING = 0;
     static final int VIEW_TYPE_NORMAL = 1;
-    private boolean isLoaderVisible = false;
     private List<FlickrApi.FlickrImageListItem> mItems;
-    boolean isLoadingNow = false;
+    private boolean mIsLoadingNow = false;
     private int mCurrentPage = 1;
 
+    boolean isLoadingNow(){return mIsLoadingNow;}
     int getCurrentPage(){return mCurrentPage;}
     void setCurrentPage(int number){mCurrentPage = number;};
 
-    private static int totalPage = 10; // todo сделать правильное ограничение
-    boolean isLastPage(){return mCurrentPage>totalPage;}
+    private static int mTotalPage = 10; // todo сделать правильное ограничение
+    boolean isLastPage(){return mCurrentPage>mTotalPage;}
+    void setTotalPage(int totalPage){mTotalPage = totalPage;}
+
 
     FlickrImageListAdapter(ArrayList<FlickrApi.FlickrImageListItem> items) {
         this.mItems = items;
@@ -52,7 +54,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
 
     @Override
     public int getItemViewType(int position) {
-        if (isLoaderVisible) {
+        if (isLoadingNow()) {
             return position == mItems.size() - 1 ? VIEW_TYPE_LOADING : VIEW_TYPE_NORMAL;
         } else {
             return VIEW_TYPE_NORMAL;
@@ -70,7 +72,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
     }
 
     void addLoading() {
-        isLoaderVisible = true;
+        mIsLoadingNow = true;
         mItems.add(new FlickrApi.FlickrImageListItem());
         notifyItemInserted(mItems.size() - 1);
     }
@@ -86,8 +88,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
         int position = mItems.size()-1;
         mItems.remove(position);
         notifyItemRemoved(position);
-        isLoadingNow = false;
-        isLoaderVisible = false;
+        mIsLoadingNow = false;
     }
 
     void clear() {

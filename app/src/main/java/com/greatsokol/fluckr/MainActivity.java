@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
             @Override
             public boolean isLoading() {
-                return adapter.isLoadingNow;
+                return adapter.isLoadingNow();
             }
         });
 

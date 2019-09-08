@@ -33,9 +33,7 @@ public class AsyncJsonReader extends AsyncTask<String, Void, JSONObject> {
         try {
             String request = strings[0];
             return readJsonFromUrl(request);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
+        } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
         return null;

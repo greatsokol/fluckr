@@ -35,11 +35,9 @@ class FlickrApi {
 
 
     static void LoadPicturesList(final FlickrImageListAdapter adapter){
-        adapter.isLoadingNow = true;
-
-        final int page_number = adapter.getCurrentPage();
-        if (adapter.isLastPage()) return;
+        if (adapter.isLastPage() || adapter.isLoadingNow()) return;
         adapter.addLoading();
+        final int page_number = adapter.getCurrentPage();
         final String request = String.format(Locale.getDefault(), API_REQUEST, API_KEY, FLICKR_PER_PAGE, page_number);
         AsyncJsonReader reader = new AsyncJsonReader(new AsyncJsonReader.OnAnswerListener(){
             @Override
@@ -47,7 +45,9 @@ class FlickrApi {
                 if(jsonObject != null){
                     try {
                         final ArrayList<FlickrApi.FlickrImageListItem> items = new ArrayList<>();
-                        JSONArray jsonArray = jsonObject.getJSONObject("photos").getJSONArray("photo");
+                        JSONObject jsonRoot = jsonObject.getJSONObject("photos");
+                        adapter.setTotalPage(jsonRoot.getInt("pages"));
+                        JSONArray jsonArray = jsonRoot.getJSONArray("photo");
                         for (int i=0; i < jsonArray.length(); i++){
                             JSONObject onePicObject = (JSONObject) jsonArray.get(i);
                             String id = onePicObject.getString("id");
@@ -63,10 +63,9 @@ class FlickrApi {
                         adapter.setCurrentPage(page_number+1);
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        adapter.removeLoading();
                     }
                 }
-
+                else adapter.removeLoading();
             }
         }, request);
     }
