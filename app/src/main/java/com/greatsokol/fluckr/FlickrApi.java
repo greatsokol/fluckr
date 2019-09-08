@@ -1,9 +1,16 @@
 package com.greatsokol.fluckr;
 
+import android.content.Context;
+import android.text.Layout;
+import android.view.View;
+
+import com.google.android.material.snackbar.Snackbar;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -21,8 +28,9 @@ class FlickrApi {
     static final int FLICKR_PER_PAGE = 40;
 
 
-    static void LoadPicturesList(final FlickrImageListAdapter adapter){
+    static void LoadPicturesList(final View viewToShowSnackbar, final FlickrImageListAdapter adapter){
         if (adapter.isLastPage() || adapter.isLoadingNow()) return;
+        final WeakReference<View> refViewToShowSnackbar = new WeakReference<>(viewToShowSnackbar);
         adapter.startLoading();
         final int page_number = adapter.getCurrentPage();
         final String request = String.format(Locale.getDefault(), API_REQUEST, API_KEY, FLICKR_PER_PAGE, page_number);
@@ -49,9 +57,21 @@ class FlickrApi {
                         adapter.setCurrentPage(page_number+1);
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        if (refViewToShowSnackbar.get()!=null)
+                            Snackbar.make(refViewToShowSnackbar.get(),
+                                    "This is JSON error",
+                                    Snackbar.LENGTH_LONG).show();
                     }
                 }
                 adapter.stopLoading();
+            }
+
+            @Override
+            public void OnError() {
+                if (refViewToShowSnackbar.get()!=null)
+                    Snackbar.make(refViewToShowSnackbar.get(),
+                            "This is network error",
+                            Snackbar.LENGTH_LONG).show();
             }
         }, request);
     }

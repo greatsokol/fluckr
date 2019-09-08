@@ -20,10 +20,11 @@ public class AsyncJsonReader extends AsyncTask<String, Void, JSONObject> {
 
     public abstract static class OnAnswerListener{
         public abstract void OnAnswerReady(JSONObject jsonObject);
+        public abstract void OnError();
     }
 
 
-    public AsyncJsonReader(AsyncJsonReader.OnAnswerListener listener, String requestUrl){
+    AsyncJsonReader(AsyncJsonReader.OnAnswerListener listener, String requestUrl){
         mListener = new WeakReference<>(listener);
         execute(requestUrl);
     }
@@ -35,6 +36,9 @@ public class AsyncJsonReader extends AsyncTask<String, Void, JSONObject> {
             return readJsonFromUrl(request);
         } catch (IOException | JSONException e) {
             e.printStackTrace();
+            OnAnswerListener l = mListener.get();
+            if (l!=null)
+                l.OnError();
         }
         return null;
     }
@@ -58,13 +62,9 @@ public class AsyncJsonReader extends AsyncTask<String, Void, JSONObject> {
     }
 
     private static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
-        InputStream is = new URL(url).openStream();
-        try {
+        try (InputStream is = new URL(url).openStream()) {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-            String jsonText = readAll(rd);
-            return new JSONObject(jsonText);
-        } finally {
-            is.close();
+            return new JSONObject(readAll(rd));
         }
     }
 }

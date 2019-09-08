@@ -2,6 +2,7 @@ package com.greatsokol.fluckr;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -61,7 +62,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         new Handler().post(new Runnable() {
             @Override
             public void run() {
-                FlickrApi.LoadPicturesList(getAdapter());
+                View viewToShowSnackbar = findViewById(R.id.swipeRefresh);
+                FlickrApi.LoadPicturesList(viewToShowSnackbar, getAdapter());
                 swipeRefresh.setRefreshing(false);
             }
         });
