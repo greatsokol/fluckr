@@ -12,7 +12,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import static com.greatsokol.fluckr.PaginationListener.PAGE_START;
 import static com.greatsokol.fluckr.FlickrApi.FLICKR_PER_PAGE;
 
 
@@ -20,12 +19,14 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     RecyclerView mRecyclerView;
     SwipeRefreshLayout swipeRefresh;
 
-    private int currentPage = PAGE_START;
+
     private boolean isLastPage = false;
     private int totalPage = 10;
     private boolean isLoading = false;
 
     FlickrImageListAdapter getAdapter(){ return ((FluckrApplication)getApplication()).getAdapter();}
+    int getCurrentPage(){ return ((FluckrApplication)getApplication()).getCurrentPage();}
+    void setCurrentPage(int number){((FluckrApplication)getApplication()).setCurrentPage(number);}
 
 
     @Override
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             @Override
             protected void loadMoreItems() {
                 isLoading = true;
-                currentPage++;
+                setCurrentPage(getCurrentPage() + 1);
                 doApiCall();
             }
 
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     @Override
     public void onRefresh() {
-        currentPage = PAGE_START;
+        setCurrentPage(1);
         isLastPage = false;
         getAdapter().clear();
         doApiCall();
@@ -71,18 +72,14 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     private void doApiCall() {
         final ArrayList<FlickrApi.FlickrImageListItem> items = new ArrayList<>();
-
-
-
-
         new Handler().post(new Runnable() {
-
             @Override
             public void run() {
                 FlickrImageListAdapter adapter = getAdapter();
+                int currentPage = getCurrentPage();
                 FlickrApi.LoadPicturesList(adapter, items, currentPage);
 
-                if (currentPage != PAGE_START) adapter.removeLoading();
+                if (currentPage != 1) adapter.removeLoading();
                 adapter.addItems(items);
                 swipeRefresh.setRefreshing(false);
 
