@@ -22,7 +22,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
     int getCurrentPage(){return mCurrentPage;}
     void setCurrentPage(int number){mCurrentPage = number;}
 
-    private static int mTotalPage = 10; // todo сделать правильное ограничение
+    private static int mTotalPage = 1; // обновится после LoadNextPicturesList
     boolean isLastPage(){return mCurrentPage>mTotalPage;}
     void setTotalPage(int totalPage){mTotalPage = totalPage;}
 
@@ -86,6 +86,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
     }
 
     void clear() {
+        if (isLoadingNow()) return;
         mItems.clear();
         setCurrentPage(1);
         notifyDataSetChanged();

@@ -2,6 +2,7 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="@dimen/card_view_margin"
     android:id="@+id/listitem">
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -12,7 +13,6 @@
     <TextView
         android:id="@+id/textTitle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:layout_height="wrap_content"/>
 
 </androidx.cardview.widget.CardView>

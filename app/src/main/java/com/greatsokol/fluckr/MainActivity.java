@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             @Override
             public void run() {
                 View viewToShowSnackbar = findViewById(R.id.swipeRefresh);
-                FlickrApi.LoadPicturesList(viewToShowSnackbar, getAdapter());
+                FlickrApi.LoadNextPicturesList(viewToShowSnackbar, getAdapter());
                 swipeRefresh.setRefreshing(false);
             }
         });

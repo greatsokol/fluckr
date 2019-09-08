@@ -28,7 +28,7 @@ class FlickrApi {
     static final int FLICKR_PER_PAGE = 40;
 
 
-    static void LoadPicturesList(final View viewToShowSnackbar, final FlickrImageListAdapter adapter){
+    static void LoadNextPicturesList(final View viewToShowSnackbar, final FlickrImageListAdapter adapter){
         if (adapter.isLastPage() || adapter.isLoadingNow()) return;
         final WeakReference<View> refViewToShowSnackbar = new WeakReference<>(viewToShowSnackbar);
         adapter.startLoading();
