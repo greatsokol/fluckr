@@ -1,5 +1,6 @@
 package com.greatsokol.fluckr;
 
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -146,8 +147,11 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
             FlickrImageListItem listItem = getItem(position);
             if(textViewTitle!=null)
                 textViewTitle.setText(listItem.getTitle());
-            if(textViewDetails!=null)
+            if(textViewDetails!=null) {
+                //textViewDetails.setMovementMethod(LinkMovementMethod.getInstance());
                 textViewDetails.setText(listItem.getDetails());
+
+            }
             imageView.setImageBitmap(listItem.getBitmapThumbnail());
         }
     }
