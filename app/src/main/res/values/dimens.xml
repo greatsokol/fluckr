@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="span_for_grid">3</integer>
-    <dimen name="card_view_margin">3dp</dimen>
+    <dimen name="textviews_paddings">10dp</dimen>
+    <dimen name="card_view_margin">0dp</dimen>
 </resources>

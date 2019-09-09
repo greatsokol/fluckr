@@ -2,6 +2,7 @@ package com.greatsokol.fluckr;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.greatsokol.fluckr.FlickrApi.FLICKR_PER_PAGE;
@@ -10,8 +11,8 @@ public abstract class PaginationListener extends RecyclerView.OnScrollListener {
 
 
     @NonNull
-    private GridLayoutManager layoutManager;
-    PaginationListener(@NonNull GridLayoutManager layoutManager) {
+    private LinearLayoutManager layoutManager;
+    PaginationListener(@NonNull LinearLayoutManager layoutManager) {
         this.layoutManager = layoutManager;
     }
 

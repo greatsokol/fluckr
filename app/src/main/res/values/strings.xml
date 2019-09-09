@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Fluckr</string>
+    <string name="app_name">Flickr popular today</string>
+    <string name="menuItemViewasGrid">Change list view</string>
 </resources>

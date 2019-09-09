@@ -3,6 +3,10 @@ package com.greatsokol.fluckr;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,15 +16,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
-
-
     private List<FlickrImageListItem> mItems;
     private boolean mIsLoadingNow = false;
     private int mCurrentPage = 1;
+    private boolean mViewAsGrid = true;
 
     boolean isLoadingNow(){return mIsLoadingNow;}
     int getCurrentPage(){return mCurrentPage;}
     void setCurrentPage(int number){mCurrentPage = number;}
+    void setViewAsGrid(boolean viewAsGrid){mViewAsGrid = viewAsGrid;}
 
     private static int mTotalPage = 1; // обновится после LoadNextPicturesList
     boolean isLastPage(){return mCurrentPage>mTotalPage;}
@@ -31,6 +35,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
         this.mItems = items;
     }
 
+
     @NonNull
     @Override
     public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -38,14 +43,37 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
                 return new ProgressHolder(
                         LayoutInflater.from(parent.getContext()).
                                 inflate(R.layout.listitem_loading, parent, false));
-        else return new ViewHolder(
-                        LayoutInflater.from(parent.getContext()).
-                                inflate(R.layout.listitem, parent, false));
+        else {
+
+            return new ViewHolder(
+                    LayoutInflater.from(parent.getContext()).
+                            inflate(mViewAsGrid?
+                                    R.layout.listitem_grid :
+                                    R.layout.listitem_linear,
+                                    parent, false));
+        }
     }
 
     @Override
     public void onBindViewHolder(@NonNull BaseViewHolder holder, int position) {
         holder.onBind(position);
+        setFadeAnimation(holder.itemView);
+    }
+
+    private static int FADE_DURATION = 500;
+    private void setFadeAnimation(View view) {
+        AlphaAnimation anim = new AlphaAnimation(0.0f, 1.0f);
+        anim.setDuration(FADE_DURATION);
+        view.startAnimation(anim);
+    }
+
+    private void setScaleAnimation(View view) {
+        ScaleAnimation anim = new ScaleAnimation(
+                0.0f, 1.0f, 0.0f, 1.0f,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f);
+        anim.setDuration(FADE_DURATION);
+        view.startAnimation(anim);
     }
 
     @Override
@@ -60,7 +88,8 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
 
     void addItems(List<FlickrImageListItem> items) {
         mItems.addAll(items);
-        notifyDataSetChanged();
+        //notifyDataSetChanged();
+        notifyItemRangeInserted(mItems.size()-items.size(), mItems.size());
     }
 
     void startLoading() {
@@ -98,10 +127,14 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
 
     public class ViewHolder extends BaseViewHolder {
         TextView textViewTitle;
+        TextView textViewDetails;
+        ImageView imageView;
+
         ViewHolder(View itemView) {
             super(itemView);
-            textViewTitle = itemView.findViewById(R.id.textTitle);
-            //Load picture from cache or internet ??
+            textViewTitle = itemView.findViewById(R.id.textviewTitle);
+            textViewDetails = itemView.findViewById(R.id.textviewDetails);
+            imageView = itemView.findViewById(R.id.imageview);
         }
 
         @Override
@@ -110,8 +143,12 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
         @Override
         public void onBind(int position) {
             super.onBind(position);
-            textViewTitle.setText(getItem(position).getTitle());
-            //Load picture from cache or internet ??
+            FlickrImageListItem listItem = getItem(position);
+            if(textViewTitle!=null)
+                textViewTitle.setText(listItem.getTitle());
+            if(textViewDetails!=null)
+                textViewDetails.setText(listItem.getDetails());
+            imageView.setImageBitmap(listItem.getBitmapThumbnail());
         }
     }
 

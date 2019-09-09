@@ -1,11 +1,15 @@
 package com.greatsokol.fluckr;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -24,11 +28,23 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         swipeRefresh.setOnRefreshListener(this);
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
+        setLayout();
+        doApiCall();
+    }
+
+    private void setLayout(){
         final FlickrImageListAdapter adapter = getAdapter();
-        final GridLayoutManager layoutManager = new FluckrGridLayoutManager(this, adapter, getSpanCount());
+        RecyclerView.LayoutManager layoutManager;
+        boolean viewAsGrid = getViewAsGrid();
+        adapter.setViewAsGrid(viewAsGrid);
+        if (viewAsGrid)
+            layoutManager = new FluckrGridLayoutManager(this, adapter, getSpanCount());
+        else
+            layoutManager = new LinearLayoutManager(this);
+
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(getAdapter());
-        mRecyclerView.addOnScrollListener(new PaginationListener(layoutManager) {
+        mRecyclerView.addOnScrollListener(new PaginationListener((LinearLayoutManager)layoutManager) {
             @Override
             protected void loadMoreItems() {
                 doApiCall();
@@ -44,8 +60,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 return adapter.isLoadingNow();
             }
         });
-
-        doApiCall();
     }
 
     protected int getSpanCount(){
@@ -68,4 +82,35 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             }
         });
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        final int id = item.getItemId();
+        if (id == R.id.viewSwitch) {
+            setViewAsGrid(!getViewAsGrid());
+            setLayout();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    private static String settingNameViewAsGrid = "ViewAsGrid";
+    private boolean getViewAsGrid(){
+        return getPreferences(MODE_PRIVATE).getBoolean(settingNameViewAsGrid, true);
+    }
+
+    private void setViewAsGrid(boolean bAsGrid){
+        SharedPreferences activityPreferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = activityPreferences.edit();
+        editor.putBoolean(settingNameViewAsGrid, bAsGrid);
+        editor.apply();
+    }
+
 }
