@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Популярное на Flickr</string>
+    <string name="app_name">Интересное на Flickr</string>
     <string name="menuItemViewasGrid">Изменить вид списка</string>
 </resources>

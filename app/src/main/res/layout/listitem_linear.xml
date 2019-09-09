@@ -24,8 +24,9 @@
         android:layout_gravity="top"
         android:layout_toEndOf="@id/imageview"
         android:ellipsize="end"
+        android:maxLines="2"
         android:padding="@dimen/textviews_paddings"
-        android:singleLine="true"
+        android:singleLine="false"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textStyle="bold" />
 
