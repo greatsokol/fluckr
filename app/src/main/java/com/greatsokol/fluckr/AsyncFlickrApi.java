@@ -49,8 +49,9 @@ class AsyncFlickrApi extends AsyncTask<Void, Void, ArrayList<FlickrImageListItem
                         "&api_key=%s" +
                         "&per_page=%d" +
                         "&page=%d" +
+                        "&extras=%s"+
                         "&format=json" +
-                        "&nojsoncallback=1", mApiKey, mPerPage, mCurrentPage);
+                        "&nojsoncallback=1", mApiKey, mPerPage, mCurrentPage, "description");
         JSONObject jsonObject;
         try {
             jsonObject = JSONReader.readJsonFromUrl(list_request);
@@ -74,28 +75,8 @@ class AsyncFlickrApi extends AsyncTask<Void, Void, ArrayList<FlickrImageListItem
                 String server = onePicObject.getString("server");
                 String farm = onePicObject.getString("farm");
                 String title = onePicObject.getString("title");
-                String details;
-
-                String details_request =
-                        String.format(Locale.getDefault(),
-                                "https://www.flickr.com/services/rest/?method=" +
-                                        "flickr.photos.getInfo&api_key=%s" +
-                                        "&photo_id=%s" +
-                                        "&secret=%s" +
-                                        "&format=json" +
-                                        "&nojsoncallback=1", mApiKey, id, secret);
-
-                JSONObject jsonDetailsObject;
-                try {
-                    jsonDetailsObject = JSONReader.readJsonFromUrl(details_request);
-                    JSONObject jsonPhoto = jsonDetailsObject.getJSONObject("photo");
-                    JSONObject jsonDetails = jsonPhoto.getJSONObject("description");
-                    details = jsonDetails.getString("_content");
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
-                    mListener.OnError();
-                    return null;
-                }
+                JSONObject jsonDetails = onePicObject.getJSONObject("description");
+                String details = jsonDetails.getString("_content");
 
                 String pic_request =
                         String.format("https://farm%s.staticflickr.com/%s/%s_%s_%s.jpg",
