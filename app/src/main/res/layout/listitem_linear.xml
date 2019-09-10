@@ -19,7 +19,7 @@
 
     <TextView
         android:id="@+id/textviewTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
         android:layout_toEndOf="@id/imageview"
@@ -32,15 +32,14 @@
 
     <TextView
         android:id="@+id/textviewDetails"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_below="@id/textviewTitle"
         android:layout_gravity="bottom"
         android:layout_toEndOf="@id/imageview"
         android:autoLink="all|web|map|email"
         android:ellipsize="end"
         android:linksClickable="true"
-        android:maxLines="6"
         android:padding="@dimen/textviews_paddings"
         android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
