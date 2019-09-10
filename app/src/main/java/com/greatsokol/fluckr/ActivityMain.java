@@ -11,6 +11,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.app.SharedElementCallback;
 import androidx.core.view.ViewCompat;
@@ -21,9 +22,9 @@ import java.util.List;
 import java.util.Map;
 
 
-public class ActivityMain extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
+public class ActivityMain extends AppCompatActivity implements /*SwipeRefreshLayout.OnRefreshListener,*/ View.OnClickListener {
     RecyclerView mRecyclerView;
-    SwipeRefreshLayout swipeRefresh;
+    //SwipeRefreshLayout swipeRefresh;
     private int mTransitionPosition;
     private
     FlickrImageListAdapter getAdapter(){ return ((FluckrApplication)getApplication()).getAdapter();}
@@ -33,8 +34,11 @@ public class ActivityMain extends AppCompatActivity implements SwipeRefreshLayou
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        swipeRefresh = findViewById(R.id.swipeRefresh);
-        swipeRefresh.setOnRefreshListener(this);
+        Toolbar mActionBarToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
+        setSupportActionBar(mActionBarToolbar);
+
+        //swipeRefresh = findViewById(R.id.swipeRefresh);
+        //swipeRefresh.setOnRefreshListener(this);
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
         setLayout();
@@ -112,19 +116,19 @@ public class ActivityMain extends AppCompatActivity implements SwipeRefreshLayou
                 getInteger(viewAsGrid ? R.integer.span_for_grid : R.integer.span_for_linear);
     }
 
-    @Override
+    /*@Override
     public void onRefresh() {
         getAdapter().clear();
         doApiCall();
-    }
+    }*/
 
     private void doApiCall() {
         new Handler().post(new Runnable() {
             @Override
             public void run() {
-                View viewToShowSnackbar = findViewById(R.id.swipeRefresh);
+                View viewToShowSnackbar = findViewById(R.id.recyclerView);
                 FlickrApi.LoadNextPicturesList(viewToShowSnackbar, getAdapter());
-                swipeRefresh.setRefreshing(false);
+                //swipeRefresh.setRefreshing(false);
             }
         });
     }

@@ -2,5 +2,5 @@
     <string name="app_name">Flickr popular today</string>
     <string name="menuItemViewasGrid">Change list view</string>
     <string name="sharedTransitionName">transition_between_imageviews</string>
-
+    <string name="search_hint">search</string>
 </resources>
