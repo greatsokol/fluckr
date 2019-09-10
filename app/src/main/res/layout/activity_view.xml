@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ActivityView">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/imageViewBig"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="8dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="TODO"
+        android:transitionName="@string/sharedTransitionName"
+        app:srcCompat="@drawable/ic_launcher_foreground" />
+
+    <TextView
+        android:id="@+id/textviewDetails"
+        app:layout_constraintBottom_toBottomOf="@id/imageViewBig"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:autoLink="all|web|map|email"
+        android:ellipsize="end"
+        android:linksClickable="true"
+        android:padding="@dimen/textviews_paddings"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+</androidx.constraintlayout.widget.ConstraintLayout>

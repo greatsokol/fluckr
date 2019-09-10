@@ -3,9 +3,6 @@ package com.greatsokol.fluckr;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
-import android.os.AsyncTask;
-
-import androidx.annotation.NonNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -13,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.Date;
 
@@ -39,7 +35,7 @@ class ImageLoader {
         return loadPictureFromCache(cacheFileName, checkIsFileOverdue);
     }
 
-    private static Bitmap loadPictureFromCache(final String path, boolean checkIsFileOverdue) {
+    static Bitmap loadPictureFromCache(final String path, boolean checkIsFileOverdue) {
         if (!checkIsFileOverdue || __isFileNotOverdue(path)) {
             Bitmap bitmap = loadPictureFromFile(path);
             if (!checkIsFileOverdue && bitmap == null) {

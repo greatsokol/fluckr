@@ -85,15 +85,14 @@ class AsyncFlickrApi extends AsyncTask<Void, Void, ArrayList<FlickrImageListItem
                                 id,
                                 secret,
                                 "n");
-                Bitmap bmp = ImageLoader.loadPicture(
-                        pic_request,
-                        mCacheDir + "/" +
-                                pic_request.replace(':', '_').
-                                        replace('?','_').
-                                        replace('&','_').
-                                        replace('/','_').
-                                        replace('.','_'));
-                items.add(new FlickrImageListItem(title, details, /*id, secret, server, farm,*/ bmp));
+                String cacheFilePath = mCacheDir + "/" +
+                        pic_request.replace(':', '_').
+                                replace('?','_').
+                                replace('&','_').
+                                replace('/','_').
+                                replace('.','_');
+                Bitmap bmp = ImageLoader.loadPicture(pic_request, cacheFilePath);
+                items.add(new FlickrImageListItem(title, details, bmp, cacheFilePath));
             }
             return items;
         } catch (Exception e) {

@@ -35,7 +35,7 @@ class FlickrApi {
                     public void OnError() {
                         if (refViewToShowSnackbar.get() != null)
                             Snackbar.make(refViewToShowSnackbar.get(),
-                                    "Error text here",
+                                    "Network error",
                                     Snackbar.LENGTH_LONG).show();
                         adapter.stopLoading();
                     }

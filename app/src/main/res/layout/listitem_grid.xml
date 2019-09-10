@@ -3,14 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/card_view_margin"
-    android:id="@+id/listitem">
+    android:id="@+id/listitem"
+    android:clickable="true"
+    android:focusable="true">
 
     <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/imageview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
-        android:id="@+id/imageview"
 
-    />
+        android:transitionName="@string/sharedTransitionName" />
 
 </androidx.cardview.widget.CardView>

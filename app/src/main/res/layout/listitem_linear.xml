@@ -3,47 +3,50 @@
     android:layout_width="match_parent"
     android:layout_height="200dp"
     android:layout_margin="@dimen/card_view_margin"
-    android:id="@+id/listitem">
-<RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
-    <androidx.appcompat.widget.AppCompatImageView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:adjustViewBounds="true"
-        android:id="@+id/imageview"
-        android:layout_gravity="start"
-
-        />
-
-    <TextView
-        android:id="@+id/textviewTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:layout_toEndOf="@id/imageview"
-        android:ellipsize="end"
-        android:maxLines="2"
-        android:padding="@dimen/textviews_paddings"
-        android:singleLine="false"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/textviewDetails"
+    android:id="@+id/listitem"
+    android:clickable="true"
+    android:focusable="true">
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/textviewTitle"
-        android:layout_gravity="bottom"
-        android:layout_toEndOf="@id/imageview"
-        android:autoLink="all|web|map|email"
-        android:ellipsize="end"
-        android:linksClickable="true"
-        android:padding="@dimen/textviews_paddings"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+        >
 
-</RelativeLayout>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imageview"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:adjustViewBounds="true"
+
+            android:transitionName="@string/sharedTransitionName" />
+
+        <TextView
+            android:id="@+id/textviewTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:layout_toEndOf="@id/imageview"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:padding="@dimen/textviews_paddings"
+            android:singleLine="false"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textviewDetails"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/textviewTitle"
+            android:layout_gravity="bottom"
+            android:layout_toEndOf="@id/imageview"
+            android:autoLink="all|web|map|email"
+            android:ellipsize="end"
+            android:linksClickable="true"
+            android:padding="@dimen/textviews_paddings"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+    </RelativeLayout>
 
 
 </androidx.cardview.widget.CardView>

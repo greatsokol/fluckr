@@ -1,16 +1,17 @@
 package com.greatsokol.fluckr;
 
+import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -32,10 +33,16 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
     void setTotalPage(int totalPage){mTotalPage = totalPage;}
 
 
+    private View.OnClickListener mItemClickListener;
+
+
     FlickrImageListAdapter(ArrayList<FlickrImageListItem> items) {
-        this.mItems = items;
+        mItems = items;
     }
 
+    void setOnItemClickListener(View.OnClickListener listener){
+        mItemClickListener = listener;
+    }
 
     @NonNull
     @Override
@@ -68,6 +75,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
         view.startAnimation(anim);
     }
 
+    /*
     private void setScaleAnimation(View view) {
         ScaleAnimation anim = new ScaleAnimation(
                 0.0f, 1.0f, 0.0f, 1.0f,
@@ -75,7 +83,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
                 Animation.RELATIVE_TO_SELF, 0.5f);
         anim.setDuration(FADE_DURATION);
         view.startAnimation(anim);
-    }
+    }*/
 
     @Override
     public int getItemViewType(int position) {
@@ -126,16 +134,19 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
         return mItems.get(position);
     }
 
-    public class ViewHolder extends BaseViewHolder {
+    public class ViewHolder extends BaseViewHolder implements View.OnTouchListener {
         TextView textViewTitle;
         TextView textViewDetails;
         ImageView imageView;
+        int mItemPosition;
+
 
         ViewHolder(View itemView) {
             super(itemView);
             textViewTitle = itemView.findViewById(R.id.textviewTitle);
             textViewDetails = itemView.findViewById(R.id.textviewDetails);
             imageView = itemView.findViewById(R.id.imageview);
+            itemView.setOnTouchListener(this);
         }
 
         @Override
@@ -144,11 +155,11 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
         @Override
         public void onBind(int position) {
             super.onBind(position);
+            mItemPosition = position;
             FlickrImageListItem listItem = getItem(position);
             if(textViewTitle!=null)
                 textViewTitle.setText(listItem.getTitle());
             if(textViewDetails!=null) {
-                //textViewDetails.setText(listItem.getDetails());
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     textViewDetails.setText(Html.fromHtml(listItem.getDetails(),Html.FROM_HTML_MODE_LEGACY));
                 } else {
@@ -156,6 +167,30 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
                 }
             }
             imageView.setImageBitmap(listItem.getBitmapThumbnail());
+            final String transitionName = "itemImage" + "_" + getClass().getName() + "_" + position;
+            ViewCompat.setTransitionName(imageView, transitionName);
+        }
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if(motionEvent.getAction() == MotionEvent.ACTION_CANCEL)
+            {
+                view.setPressed(false);
+            } else
+            if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                view.setPressed(false);
+                if(mItemClickListener!=null) {
+                    FlickrImageListItem listItem = getItem(mItemPosition);
+                    Bundle args = new Bundle();
+                    args.putInt(Consts.TAG_TR_POSITION, mItemPosition);
+                    args.putString(Consts.TAG_TITLE, listItem.getTitle());
+                    args.putString(Consts.TAG_DETAILS, listItem.getDetails());
+                    args.putString(Consts.TAG_PATH, listItem.getCacheFilePath());
+                    view.setTag(args);
+                    mItemClickListener.onClick(view);
+                }
+            } else view.setPressed(true);
+            return false;
         }
     }
 
