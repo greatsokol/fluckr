@@ -16,6 +16,7 @@ import java.util.Locale;
 class AsyncFlickrApi extends AsyncTask<Void, Void, ArrayList<FlickrImageListItem>> {
     private String mCacheDir;
     private AsyncFlickrApi.OnAnswerListener mListener;
+    private String mSearchForString;
     private String mApiKey;
     private int mPerPage;
     private int mCurrentPage;
@@ -26,9 +27,10 @@ class AsyncFlickrApi extends AsyncTask<Void, Void, ArrayList<FlickrImageListItem
         public abstract void OnError();
     }
 
-    AsyncFlickrApi(@NonNull final AsyncFlickrApi.OnAnswerListener listener,
+    AsyncFlickrApi(@NonNull final AsyncFlickrApi.OnAnswerListener listener, String searchFor,
                    String ApiKey, int NumberPerPage, int CurrentPage, String cacheDir) {
         mListener = listener;
+        mSearchForString = searchFor;
         mCacheDir = cacheDir;
         mApiKey = ApiKey;
         mPerPage = NumberPerPage;
@@ -42,16 +44,31 @@ class AsyncFlickrApi extends AsyncTask<Void, Void, ArrayList<FlickrImageListItem
 
     @Override
     protected ArrayList<FlickrImageListItem> doInBackground(Void... voids) {
+        String list_request;
+        if(mSearchForString.equals(""))
+            list_request = String.format( Locale.getDefault(),
+                    "https://www.flickr.com/services/rest/?method=" +
+                            "flickr.interestingness.getList" +
+                            "&api_key=%s" +
+                            "&per_page=%d" +
+                            "&page=%d" +
+                            "&extras=%s"+
+                            "&format=json" +
+                            "&nojsoncallback=1",
+                    mApiKey, mPerPage, mCurrentPage, "description");
+        else
+            list_request = String.format( Locale.getDefault(),
+                    "https://www.flickr.com/services/rest/?method=" +
+                            "flickr.photos.search" +
+                            "&api_key=%s" +
+                            "&per_page=%d" +
+                            "&page=%d" +
+                            "&extras=%s"+
+                            "&format=json" +
+                            "&nojsoncallback=1"+
+                            "&text=%s",
+                    mApiKey, mPerPage, mCurrentPage, "description", mSearchForString);
 
-        String list_request = String.format( Locale.getDefault(),
-                "https://www.flickr.com/services/rest/?method=" +
-                        "flickr.interestingness.getList" +
-                        "&api_key=%s" +
-                        "&per_page=%d" +
-                        "&page=%d" +
-                        "&extras=%s"+
-                        "&format=json" +
-                        "&nojsoncallback=1", mApiKey, mPerPage, mCurrentPage, "description");
         JSONObject jsonObject;
         try {
             jsonObject = JSONReader.readJsonFromUrl(list_request);

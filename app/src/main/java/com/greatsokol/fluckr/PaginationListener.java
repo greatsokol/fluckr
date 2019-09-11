@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import static com.greatsokol.fluckr.FlickrApi.FLICKR_PER_PAGE;
+import static com.greatsokol.fluckr.FlickrRequest.FLICKR_PER_PAGE;
 
 public abstract class PaginationListener extends RecyclerView.OnScrollListener {
 

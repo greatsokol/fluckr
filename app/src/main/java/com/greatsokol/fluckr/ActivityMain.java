@@ -11,6 +11,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.app.SharedElementCallback;
@@ -20,25 +21,31 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
-public class ActivityMain extends AppCompatActivity implements /*SwipeRefreshLayout.OnRefreshListener,*/ View.OnClickListener {
+public class ActivityMain extends AppCompatActivity
+        implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
     RecyclerView mRecyclerView;
-    //SwipeRefreshLayout swipeRefresh;
+    SwipeRefreshLayout mSwipeRefresh;
     private int mTransitionPosition;
-    private
-    FlickrImageListAdapter getAdapter(){ return ((FluckrApplication)getApplication()).getAdapter();}
+    private FlickrRequest mFlickrRequest;
+
+    private FlickrImageListAdapter getTodayListAdapter(){ return ((FluckrApplication)getApplication()).getAdapter();}
+    private FlickrImageListAdapter getSearchAdapter(){ return ((FluckrApplication)getApplication()).getSearchAdapter();}
+    private FlickrImageListAdapter getActiveAdapter(){ return
+            mSearchFor == null ||
+            mSearchFor.equals("") ? ((FluckrApplication)getApplication()).getAdapter() :
+                                    ((FluckrApplication)getApplication()).getSearchAdapter();}
+    private String mSearchFor = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Toolbar mActionBarToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
-        setSupportActionBar(mActionBarToolbar);
-
-        //swipeRefresh = findViewById(R.id.swipeRefresh);
-        //swipeRefresh.setOnRefreshListener(this);
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar_actionbar));
+        mSwipeRefresh = findViewById(R.id.swipeRefresh);
+        mSwipeRefresh.setOnRefreshListener(this);
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
         setLayout();
@@ -49,13 +56,13 @@ public class ActivityMain extends AppCompatActivity implements /*SwipeRefreshLay
         if (savedInstanceState != null) {
             mTransitionPosition = savedInstanceState.getInt(Consts.TAG_TR_POSITION);
 
-            new Handler().postDelayed(new Runnable() {
+            /*new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    //mRecyclerView.scrollToPosition(mTransitionPosition);
-                    //startPostponedEnterTransition();
+                    mRecyclerView.scrollToPosition(mTransitionPosition);
+                    startPostponedEnterTransition();
                 }
-            }, 500);
+            }, 500); */
         }
 
         setExitSharedElementCallback(new SharedElementCallback() {
@@ -63,7 +70,9 @@ public class ActivityMain extends AppCompatActivity implements /*SwipeRefreshLay
             public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
                 super.onMapSharedElements(names, sharedElements);
                 if (sharedElements.isEmpty()) {
-                    View view = mRecyclerView.getLayoutManager().findViewByPosition(mTransitionPosition);
+                    View view = Objects.
+                            requireNonNull(mRecyclerView.getLayoutManager()).
+                            findViewByPosition(mTransitionPosition);
                     if (view != null && names.size()>0) {
                         sharedElements.put(names.get(0), view);
                     }
@@ -82,14 +91,14 @@ public class ActivityMain extends AppCompatActivity implements /*SwipeRefreshLay
         RecyclerView.LayoutManager lm = mRecyclerView.getLayoutManager();
         Parcelable recycle_state = lm!=null ? lm.onSaveInstanceState() : null;
 
-        final FlickrImageListAdapter adapter = getAdapter();
+        final FlickrImageListAdapter adapter = getActiveAdapter();
         boolean viewAsGrid = getViewAsGrid();
         adapter.setViewAsGrid(viewAsGrid);
         FluckrGridLayoutManager layoutManager
                 = new FluckrGridLayoutManager(this, adapter, getSpanCount(viewAsGrid));
 
         mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setAdapter(getAdapter());
+        mRecyclerView.setAdapter(getActiveAdapter());
         mRecyclerView.addOnScrollListener(new PaginationListener(layoutManager) {
             @Override
             protected void loadMoreItems() {
@@ -116,19 +125,30 @@ public class ActivityMain extends AppCompatActivity implements /*SwipeRefreshLay
                 getInteger(viewAsGrid ? R.integer.span_for_grid : R.integer.span_for_linear);
     }
 
-    /*@Override
+    private void stopRequestLoading(boolean clear){
+        if(mFlickrRequest!=null) mFlickrRequest.Stop();
+        getActiveAdapter().stopLoading();
+        if(clear)getActiveAdapter().clear();
+    }
+
+    @Override
     public void onRefresh() {
-        getAdapter().clear();
+        stopRequestLoading(true);
         doApiCall();
-    }*/
+    }
 
     private void doApiCall() {
         new Handler().post(new Runnable() {
             @Override
             public void run() {
-                View viewToShowSnackbar = findViewById(R.id.recyclerView);
-                FlickrApi.LoadNextPicturesList(viewToShowSnackbar, getAdapter());
-                //swipeRefresh.setRefreshing(false);
+                mSwipeRefresh.setRefreshing(false);
+                if(mFlickrRequest!=null) mFlickrRequest.Stop();
+                mFlickrRequest = new FlickrRequest();
+                mFlickrRequest.prepareLoadNextPicturesListRequest(
+                        mSwipeRefresh,
+                        getActiveAdapter(),
+                        mSearchFor);
+                mFlickrRequest.Execute();
             }
         });
     }
@@ -136,6 +156,40 @@ public class ActivityMain extends AppCompatActivity implements /*SwipeRefreshLay
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        MenuItem searchViewMenuItem = menu.findItem(R.id.action_search);
+        searchViewMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                stopRequestLoading(true);
+                mSearchFor = "";
+                setLayout();
+                return true;
+            }
+        });
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String queryText) {
+                if(queryText.trim().equals("")) return false;
+                stopRequestLoading(false);
+                mSearchFor = queryText;
+                getSearchAdapter().clear();
+                setLayout();
+                doApiCall();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
         return true;
     }
 
@@ -166,13 +220,15 @@ public class ActivityMain extends AppCompatActivity implements /*SwipeRefreshLay
     @Override
     protected void onStart() {
         super.onStart();
-        getAdapter().setOnItemClickListener(this);
+        getTodayListAdapter().setOnItemClickListener(this);
+        getSearchAdapter().setOnItemClickListener(this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        getAdapter().setOnItemClickListener(null);
+        getTodayListAdapter().setOnItemClickListener(null);
+        getSearchAdapter().setOnItemClickListener(null);
     }
 
     @Override
@@ -184,6 +240,7 @@ public class ActivityMain extends AppCompatActivity implements /*SwipeRefreshLay
             if (imageView != null) {
                 Intent intent = new Intent(ActivityMain.this, ActivityView.class);
                 String transitionName = ViewCompat.getTransitionName(imageView);
+                assert transitionName != null;
                 ActivityOptionsCompat options = ActivityOptionsCompat.
                         makeSceneTransitionAnimation(ActivityMain.this,
                                 imageView,

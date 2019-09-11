@@ -23,7 +23,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
     private int mCurrentPage = 1;
     private boolean mViewAsGrid = true;
 
-    boolean isLoadingNow(){return mIsLoadingNow;}
+    boolean isLoadingNow(){return mIsLoadingNow; }
     int getCurrentPage(){return mCurrentPage;}
     void setCurrentPage(int number){mCurrentPage = number;}
     void setViewAsGrid(boolean viewAsGrid){mViewAsGrid = viewAsGrid;}
