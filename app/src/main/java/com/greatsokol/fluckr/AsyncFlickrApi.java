@@ -78,44 +78,53 @@ class AsyncFlickrApi extends AsyncTask<Void, Void, ArrayList<FlickrImageListItem
             return null;
         }
 
-
+        boolean bWasError = false;
         try {
             final ArrayList<FlickrImageListItem> items = new ArrayList<>();
             JSONObject jsonRoot = jsonObject.getJSONObject("photos");
             mListener.OnGetPagesNumber(jsonRoot.getInt("pages"));
             JSONArray jsonArray = jsonRoot.getJSONArray("photo");
-            for (int i=0; i < jsonArray.length(); i++){
-                JSONObject onePicObject = (JSONObject) jsonArray.get(i);
-                String id = onePicObject.getString("id");
-                //String owner = onePicObject.getString("owner");
-                String secret = onePicObject.getString("secret");
-                String server = onePicObject.getString("server");
-                String farm = onePicObject.getString("farm");
-                String title = onePicObject.getString("title");
-                JSONObject jsonDetails = onePicObject.getJSONObject("description");
-                String details = jsonDetails.getString("_content");
 
-                String pic_request =
-                        String.format("https://farm%s.staticflickr.com/%s/%s_%s_%s.jpg",
-                                farm,
-                                server,
-                                id,
-                                secret,
-                                "n");
-                String cacheFilePath = mCacheDir + "/" +
-                        pic_request.replace(':', '_').
-                                replace('?','_').
-                                replace('&','_').
-                                replace('/','_').
-                                replace('.','_');
-                Bitmap bmp = ImageLoader.loadPicture(pic_request, cacheFilePath);
-                items.add(new FlickrImageListItem(title, details, bmp, cacheFilePath));
+            for (int i=0; i < jsonArray.length(); i++){
+                try{
+                    JSONObject onePicObject = (JSONObject) jsonArray.get(i);
+                    String id = onePicObject.getString("id");
+                    //String owner = onePicObject.getString("owner");
+                    String secret = onePicObject.getString("secret");
+                    String server = onePicObject.getString("server");
+                    String farm = onePicObject.getString("farm");
+                    String title = onePicObject.getString("title");
+                    JSONObject jsonDetails = onePicObject.getJSONObject("description");
+                    String details = jsonDetails.getString("_content");
+
+                    String pic_request =
+                            String.format("https://farm%s.staticflickr.com/%s/%s_%s_%s.jpg",
+                                    farm,
+                                    server,
+                                    id,
+                                    secret,
+                                    "n");
+                    String cacheFilePath = mCacheDir + "/" +
+                            pic_request.replace(':', '_').
+                                    replace('?','_').
+                                    replace('&','_').
+                                    replace('/','_').
+                                    replace('.','_');
+                    Bitmap bmp = ImageLoader.loadPicture(pic_request, cacheFilePath);
+                    items.add(new FlickrImageListItem(title, details, bmp, cacheFilePath));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    // иногда ссылка на картинку неправильная,
+                    // но это не повод не прокачивать остальные картинки
+                    bWasError = true;
+                }
             }
+            //if(bWasError)mListener.OnError(); // ошибку показывать не буду
             return items;
         } catch (Exception e) {
+            e.printStackTrace();
             mListener.OnError();
         }
-
         return null;
     }
 
