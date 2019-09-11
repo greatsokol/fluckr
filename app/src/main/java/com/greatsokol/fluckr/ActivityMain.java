@@ -55,14 +55,6 @@ public class ActivityMain extends AppCompatActivity
         // Workaround for orientation change issue
         if (savedInstanceState != null) {
             mTransitionPosition = savedInstanceState.getInt(Consts.TAG_TR_POSITION);
-
-            /*new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mRecyclerView.scrollToPosition(mTransitionPosition);
-                    startPostponedEnterTransition();
-                }
-            }, 500); */
         }
 
         setExitSharedElementCallback(new SharedElementCallback() {
@@ -81,11 +73,6 @@ public class ActivityMain extends AppCompatActivity
         });
     }
 
-    @Override
-    public void onActivityReenter(int resultCode, Intent data) {
-        super.onActivityReenter(resultCode, data);
-        //postponeEnterTransition();
-    }
 
     private void setLayout(){
         RecyclerView.LayoutManager lm = mRecyclerView.getLayoutManager();
@@ -166,7 +153,7 @@ public class ActivityMain extends AppCompatActivity
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem menuItem) {
-                stopRequestLoading(true);
+                stopRequestLoading(!mSearchFor.equals(""));
                 mSearchFor = "";
                 setLayout();
                 return true;

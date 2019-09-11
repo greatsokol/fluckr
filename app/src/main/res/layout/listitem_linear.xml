@@ -16,9 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:adjustViewBounds="true"
-
-            android:transitionName="@string/sharedTransitionName" />
+            android:adjustViewBounds="true" />
 
         <TextView
             android:id="@+id/textviewTitle"

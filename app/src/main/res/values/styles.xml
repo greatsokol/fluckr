@@ -1,6 +1,4 @@
 <resources>
-
-
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
@@ -8,16 +6,6 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowContentTransitions">true</item>
-        <item name="searchViewStyle">@style/AppSearchViewStyle</item>
-    </style>
-
-    <style name="AppSearchViewStyle" parent="Widget.AppCompat.SearchView">
-        <!-- item name="android:textCursorDrawable">@android:dr/</item -->
-        <item name="queryBackground">@android:color/transparent</item>
-        <item name="searchIcon">@android:drawable/ic_menu_search</item>
-        <item name="closeIcon">@android:drawable/ic_menu_close_clear_cancel</item>
-        <item name="queryHint">@string/search_hint</item>
-        <item name="android:imeActionId">6</item>
     </style>
 
 </resources>

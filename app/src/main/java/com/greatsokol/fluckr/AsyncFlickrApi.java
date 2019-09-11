@@ -37,10 +37,6 @@ class AsyncFlickrApi extends AsyncTask<Void, Void, ArrayList<FlickrImageListItem
         mCurrentPage = CurrentPage;
     }
 
-    void ExecuteRequest(){
-            execute();
-        }
-
 
     @Override
     protected ArrayList<FlickrImageListItem> doInBackground(Void... voids) {
@@ -78,7 +74,7 @@ class AsyncFlickrApi extends AsyncTask<Void, Void, ArrayList<FlickrImageListItem
             return null;
         }
 
-        boolean bWasError = false;
+        //boolean bWasError = false;
         try {
             final ArrayList<FlickrImageListItem> items = new ArrayList<>();
             JSONObject jsonRoot = jsonObject.getJSONObject("photos");
@@ -116,7 +112,7 @@ class AsyncFlickrApi extends AsyncTask<Void, Void, ArrayList<FlickrImageListItem
                     e.printStackTrace();
                     // иногда ссылка на картинку неправильная,
                     // но это не повод не прокачивать остальные картинки
-                    bWasError = true;
+                    //bWasError = true;
                 }
             }
             //if(bWasError)mListener.OnError(); // ошибку показывать не буду

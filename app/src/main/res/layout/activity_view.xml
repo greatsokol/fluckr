@@ -6,25 +6,47 @@
     android:layout_height="match_parent"
     tools:context=".ActivityView">
 
+    <com.google.android.material.appbar.AppBarLayout
+
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_actionbar_view"
+            android:layout_width="match_parent"
+            android:layout_height="?android:actionBarSize"
+            android:background="@color/colorPrimaryDark"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    </com.google.android.material.appbar.AppBarLayout >
+
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imageViewBig"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="8dp"
+        android:layout_height="wrap_content"
         android:adjustViewBounds="true"
-        android:contentDescription="TODO"
-        android:transitionName="@string/sharedTransitionName"
+        android:contentDescription="@string/imageviewcontentexplaination"
+        app:layout_constraintTop_toBottomOf="@+id/appbar"
         app:srcCompat="@drawable/ic_launcher_foreground" />
 
     <TextView
         android:id="@+id/textviewDetails"
-        app:layout_constraintBottom_toBottomOf="@id/imageViewBig"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
+        android:layout_height="0dp"
         android:autoLink="all|web|map|email"
         android:ellipsize="end"
+        android:gravity="bottom"
         android:linksClickable="true"
+        android:maxLines="20"
         android:padding="@dimen/textviews_paddings"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageViewBig" />
 </androidx.constraintlayout.widget.ConstraintLayout>

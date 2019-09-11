@@ -48,7 +48,7 @@ class FlickrRequest {
 
     void Execute(){
         if(mFlickrRequest!=null)
-            mFlickrRequest.ExecuteRequest();
+            mFlickrRequest.execute();
     }
 
     void Stop(){
