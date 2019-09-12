@@ -165,10 +165,12 @@ public class ActivityMain extends AppCompatActivity
             @Override
             public boolean onQueryTextSubmit(String queryText) {
                 // hide keyboard:
-                if(getCurrentFocus()!=null){
+                View v = getCurrentFocus();
+                if(v!=null){
                     InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                     assert imm != null;
-                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
+                    v.clearFocus();
                 }
 
                 if(queryText.trim().equals("")) return false;
