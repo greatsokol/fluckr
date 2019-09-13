@@ -29,11 +29,8 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
     void setViewAsGrid(boolean viewAsGrid){mViewAsGrid = viewAsGrid;}
 
     private int mTotalPage = 1; // обновится после LoadNextPicturesList
-    boolean isLastPage(){
-        return mCurrentPage>mTotalPage;}
-    void setTotalPage(int totalPage){
-        mTotalPage = totalPage;
-    }
+    boolean isLastPage(){return mCurrentPage>mTotalPage;}
+    void setTotalPage(int totalPage){mTotalPage = totalPage;}
 
 
     private View.OnClickListener mItemClickListener;

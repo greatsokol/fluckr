@@ -13,7 +13,7 @@ class FlickrRequest {
     private AsyncFlickrApi mFlickrRequest;
 
     void prepareLoadNextPicturesListRequest(final View viewToShowSnackbar, final FlickrImageListAdapter adapter, String searchFor){
-        if (adapter.isLastPage() || adapter.isLoadingNow()) return;
+        if (adapter.isLoadingNow()) return;
         final WeakReference<View> refViewToShowSnackbar = new WeakReference<>(viewToShowSnackbar);
         adapter.startLoading();
         final int page_number = adapter.getCurrentPage();
@@ -22,10 +22,11 @@ class FlickrRequest {
                     @Override
                     public void OnAnswerReady(ArrayList<FlickrImageListItem> items) {
                         adapter.addItems(items);
-                        adapter.setCurrentPage(page_number + 1);
                         adapter.stopLoading();
                         if (adapter.getItemCount()==0)
                             _showSnack(refViewToShowSnackbar, "No results");
+                        else
+                            adapter.setCurrentPage(page_number + 1);
                     }
 
                     @Override
