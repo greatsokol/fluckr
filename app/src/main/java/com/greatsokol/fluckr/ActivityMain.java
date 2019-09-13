@@ -87,7 +87,7 @@ public class ActivityMain extends AppCompatActivity
                 = new FluckrGridLayoutManager(this, adapter, getSpanCount(viewAsGrid));
 
         mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setAdapter(getActiveAdapter());
+        mRecyclerView.setAdapter(adapter);
         mRecyclerView.addOnScrollListener(new PaginationListener(layoutManager) {
             @Override
             protected void loadMoreItems() {
@@ -96,12 +96,12 @@ public class ActivityMain extends AppCompatActivity
 
             @Override
             public boolean isLastPage() {
-                return adapter.isLastPage();
+                return getActiveAdapter().isLastPage();
             }
 
             @Override
             public boolean isLoading() {
-                return adapter.isLoadingNow();
+                return getActiveAdapter().isLoadingNow();
             }
         });
 

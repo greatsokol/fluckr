@@ -26,8 +26,8 @@ public abstract class PaginationListener extends RecyclerView.OnScrollListener {
 
         if (!isloading && !islast) {
             if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
-                    && firstVisibleItemPosition >= 0
-                    && totalItemCount >= FLICKR_PER_PAGE) {
+                    /*&& firstVisibleItemPosition >= 0
+                    && totalItemCount >= FLICKR_PER_PAGE*/) {
                 loadMoreItems();
             }
         }
