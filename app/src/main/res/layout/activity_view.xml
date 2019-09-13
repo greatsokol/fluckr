@@ -40,7 +40,8 @@
         android:layout_height="0dp"
         android:autoLink="all|web|map|email"
         android:ellipsize="end"
-        android:gravity="bottom"
+
+        android:gravity="top"
         android:linksClickable="true"
         android:maxLines="20"
         android:padding="@dimen/textviews_paddings"

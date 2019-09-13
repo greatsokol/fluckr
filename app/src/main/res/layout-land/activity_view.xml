@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="false"
     tools:context=".ActivityView">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -41,14 +40,13 @@
     <TextView
         android:id="@+id/textviewDetails"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:autoLink="all|web|map|email"
         android:ellipsize="end"
-        android:gravity="bottom"
+        android:gravity="top"
         android:linksClickable="true"
         android:maxLines="20"
         android:padding="@dimen/textviews_paddings"
-        android:paddingTop="?android:actionBarSize"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
