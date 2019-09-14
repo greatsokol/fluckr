@@ -61,7 +61,7 @@ public class ActivityMain extends AppCompatActivity
 
         // Workaround for orientation change issue
         if (savedInstanceState != null) {
-            mTransitionPosition = savedInstanceState.getInt(Consts.TAG_TR_POSITION);
+            mTransitionPosition = savedInstanceState.getInt(ConstsAndUtils.TAG_TR_POSITION);
         }
 
         setExitSharedElementCallback(new SharedElementCallback() {
@@ -81,9 +81,7 @@ public class ActivityMain extends AppCompatActivity
     }
 
 
-    private int pxFromDp(float dp) {
-        return (int)(dp * getResources().getDisplayMetrics().density);
-    }
+
 
     private void setInsets(){
         findViewById(R.id.constraint).setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -100,9 +98,9 @@ public class ActivityMain extends AppCompatActivity
             public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
 
                 ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
-                lp.setMargins(  lp.leftMargin,
+                lp.setMargins(  insets.getSystemWindowInsetLeft(),
                                 insets.getSystemWindowInsetTop(),
-                                lp.rightMargin,
+                                insets.getSystemWindowInsetRight(),
                                 lp.bottomMargin);
                 v.setLayoutParams(lp);
                 return insets;
@@ -112,10 +110,11 @@ public class ActivityMain extends AppCompatActivity
         ViewCompat.setOnApplyWindowInsetsListener(recyclerView, new OnApplyWindowInsetsListener() {
             @Override
             public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
-                v.setPadding(v.getPaddingLeft(),
-                        toolbarHeight + insets.getSystemWindowInsetTop(),
-                        v.getPaddingRight(),
-                        insets.getSystemWindowInsetBottom());
+                v.setPadding(
+                        insets.getSystemWindowInsetLeft() + v.getPaddingLeft(),
+                        insets.getSystemWindowInsetTop() + toolbarHeight ,
+                        insets.getSystemWindowInsetRight() + v.getPaddingRight(),
+                        v.getPaddingBottom() + insets.getSystemWindowInsetBottom());
                 return insets;
             }
         });
@@ -123,9 +122,10 @@ public class ActivityMain extends AppCompatActivity
         ViewCompat.setOnApplyWindowInsetsListener(refreshLayout, new OnApplyWindowInsetsListener() {
             @Override
             public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+                int offsetStart = toolbarHeight + insets.getSystemWindowInsetTop();
                 ((SwipeRefreshLayout)v).setProgressViewOffset(true,
-                        toolbarHeight + insets.getSystemWindowInsetTop(),
-                        toolbarHeight + insets.getSystemWindowInsetTop()+pxFromDp(100));
+                        offsetStart,
+                        offsetStart+ConstsAndUtils.pxFromDp(getResources(), 100));
                 return insets;
             }
         });
@@ -260,13 +260,13 @@ public class ActivityMain extends AppCompatActivity
 
 
     private boolean getViewAsGrid(){
-        return getPreferences(MODE_PRIVATE).getBoolean(Consts.TAG_VIEWASGRID, true);
+        return getPreferences(MODE_PRIVATE).getBoolean(ConstsAndUtils.TAG_VIEWASGRID, true);
     }
 
     private void setViewAsGrid(boolean bAsGrid){
         SharedPreferences activityPreferences = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor editor = activityPreferences.edit();
-        editor.putBoolean(Consts.TAG_VIEWASGRID, bAsGrid);
+        editor.putBoolean(ConstsAndUtils.TAG_VIEWASGRID, bAsGrid);
         editor.apply();
     }
 
@@ -289,7 +289,7 @@ public class ActivityMain extends AppCompatActivity
     public void onClick(View view) {
         Bundle args = (Bundle) view.getTag();
         if (args!=null) {
-            mTransitionPosition = args.getInt(Consts.TAG_TR_POSITION);
+            mTransitionPosition = args.getInt(ConstsAndUtils.TAG_TR_POSITION);
             View imageView = view.findViewById(R.id.imageview);
             if (imageView != null) {
                 Intent intent = new Intent(ActivityMain.this, ActivityView.class);
@@ -299,8 +299,8 @@ public class ActivityMain extends AppCompatActivity
                         makeSceneTransitionAnimation(ActivityMain.this,
                                 imageView,
                                 transitionName);
-                intent.putExtra(Consts.TAG_TR_NAME, transitionName);
-                intent.putExtra(Consts.TAG_ARGS, args);
+                intent.putExtra(ConstsAndUtils.TAG_TR_NAME, transitionName);
+                intent.putExtra(ConstsAndUtils.TAG_ARGS, args);
                 startActivity(intent, options.toBundle());
             }
         }
@@ -308,7 +308,7 @@ public class ActivityMain extends AppCompatActivity
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putInt(Consts.TAG_TR_POSITION, mTransitionPosition);
+        outState.putInt(ConstsAndUtils.TAG_TR_POSITION, mTransitionPosition);
         super.onSaveInstanceState(outState);
     }
 }

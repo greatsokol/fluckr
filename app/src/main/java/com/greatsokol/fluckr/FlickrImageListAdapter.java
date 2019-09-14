@@ -189,10 +189,10 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
                     FlickrImageListItem listItem = getItem(mItemPosition);
                     assert listItem != null;
                     Bundle args = new Bundle();
-                    args.putInt(Consts.TAG_TR_POSITION, mItemPosition);
-                    args.putString(Consts.TAG_TITLE, listItem.getTitle());
-                    args.putString(Consts.TAG_DETAILS, listItem.getDetails());
-                    args.putString(Consts.TAG_PATH, listItem.getCacheFilePath());
+                    args.putInt(ConstsAndUtils.TAG_TR_POSITION, mItemPosition);
+                    args.putString(ConstsAndUtils.TAG_TITLE, listItem.getTitle());
+                    args.putString(ConstsAndUtils.TAG_DETAILS, listItem.getDetails());
+                    args.putString(ConstsAndUtils.TAG_PATH, listItem.getCacheFilePath());
                     view.setTag(args);
                     mItemClickListener.onClick(view);
                 }

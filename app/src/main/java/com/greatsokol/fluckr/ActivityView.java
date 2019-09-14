@@ -1,16 +1,13 @@
 package com.greatsokol.fluckr;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -22,8 +19,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import java.util.Objects;
-
-import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 
 public class ActivityView extends AppCompatActivity {
 
@@ -37,17 +32,17 @@ public class ActivityView extends AppCompatActivity {
 
         ImageView imageView = findViewById(R.id.imageViewBig);
         Intent intent = getIntent();
-        ViewCompat.setTransitionName(imageView, intent.getStringExtra(Consts.TAG_TR_NAME));
+        ViewCompat.setTransitionName(imageView, intent.getStringExtra(ConstsAndUtils.TAG_TR_NAME));
 
-        Bundle args = intent.getBundleExtra(Consts.TAG_ARGS);
+        Bundle args = intent.getBundleExtra(ConstsAndUtils.TAG_ARGS);
         assert args != null;
-        String cacheFileName = args.getString(Consts.TAG_PATH);
+        String cacheFileName = args.getString(ConstsAndUtils.TAG_PATH);
         Bitmap bmp = ImageLoader.loadPictureFromCache(cacheFileName, false);
         imageView.setImageBitmap(bmp);
 
-        setTitle(args.getString(Consts.TAG_TITLE));
+        setTitle(args.getString(ConstsAndUtils.TAG_TITLE));
 
-        String details = args.getString(Consts.TAG_DETAILS);
+        String details = args.getString(ConstsAndUtils.TAG_DETAILS);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             ((TextView)findViewById(R.id.textviewDetails)).
                     setText(Html.fromHtml(details,Html.FROM_HTML_MODE_LEGACY));
@@ -69,10 +64,10 @@ public class ActivityView extends AppCompatActivity {
             public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
 
                 ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
-                lp.setMargins(  lp.leftMargin,
-                        insets.getSystemWindowInsetTop(),
-                        lp.rightMargin,
-                        lp.bottomMargin);
+                lp.setMargins(  insets.getSystemWindowInsetLeft(),
+                                insets.getSystemWindowInsetTop(),
+                                insets.getSystemWindowInsetRight(),
+                                lp.bottomMargin);
                 v.setLayoutParams(lp);
                 return insets;
             }
@@ -84,10 +79,11 @@ public class ActivityView extends AppCompatActivity {
         ViewCompat.setOnApplyWindowInsetsListener(scrollView, new OnApplyWindowInsetsListener() {
             @Override
             public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+                boolean land = ConstsAndUtils.isLandscape(getResources());
                 v.setPadding(v.getPaddingLeft(),
-                        isLandscape() ? toolbarHeight + insets.getSystemWindowInsetTop() : v.getPaddingTop(),
-                        isLandscape() ? insets.getSystemWindowInsetRight() : v.getPaddingRight(),
-                        isLandscape() ? v.getPaddingBottom() : insets.getSystemWindowInsetBottom());
+                        land ? toolbarHeight + insets.getSystemWindowInsetTop() : v.getPaddingTop(),
+                        land ? insets.getSystemWindowInsetRight() : v.getPaddingRight(),
+                        land ? v.getPaddingBottom() : insets.getSystemWindowInsetBottom());
                 return insets;
             }
         });
@@ -110,9 +106,5 @@ public class ActivityView extends AppCompatActivity {
 
 
 
-    public boolean isLandscape(){
-        final int orientation = getResources().getConfiguration().orientation;
-        return orientation == Surface.ROTATION_180 ||
-               orientation == Surface.ROTATION_270;
-    }
+
 }
