@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#D81B60</color>
     <color name="design_snackbar_background_color" tools:override="true">#FF0000</color>
+    <color name="appbar_backgroundcolor">#B3000000</color>
 </resources>

@@ -6,12 +6,16 @@ import android.os.Bundle;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import java.util.Objects;
 
@@ -21,9 +25,9 @@ public class ActivityView extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view);
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar_actionbar_view));
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar_actionbar));
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-
+        setInsets();
 
         ImageView imageView = findViewById(R.id.imageViewBig);
         Intent intent = getIntent();
@@ -45,6 +49,27 @@ public class ActivityView extends AppCompatActivity {
             ((TextView)findViewById(R.id.textviewDetails)).
                     setText(Html.fromHtml(details));
         }
+    }
+
+    private void setInsets() {
+        findViewById(R.id.constraint).setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+
+        Toolbar toolbar = findViewById(R.id.toolbar_actionbar);
+        ViewCompat.setOnApplyWindowInsetsListener(toolbar, new OnApplyWindowInsetsListener(){
+            @Override
+            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+                lp.setMargins(  lp.leftMargin,
+                        insets.getSystemWindowInsetTop(),
+                        lp.rightMargin,
+                        lp.bottomMargin);
+                v.setLayoutParams(lp);
+                //insets.consumeSystemWindowInsets();
+                return insets;
+            }
+        });
     }
 
     @Override
