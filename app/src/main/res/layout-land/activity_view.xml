@@ -18,7 +18,6 @@
             android:id="@+id/toolbar_actionbar"
             android:layout_width="match_parent"
             android:layout_height="?android:actionBarSize"
-            android:background="@color/colorPrimaryDark"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     </com.google.android.material.appbar.AppBarLayout >
@@ -35,19 +34,26 @@
         app:srcCompat="@drawable/ic_launcher_foreground"
         android:paddingTop="?android:actionBarSize"/>
 
-    <TextView
-        android:id="@+id/textviewDetails"
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:autoLink="all|web|map|email"
-        android:ellipsize="end"
-        android:gravity="top"
-        android:linksClickable="true"
-        android:maxLines="20"
-        android:padding="@dimen/textviews_paddings"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/imageViewBig"
-        app:layout_constraintTop_toBottomOf="@id/appbar" />
+        >
+
+        <TextView
+            android:id="@+id/textviewDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoLink="all|web|map|email"
+            android:linksClickable="true"
+            android:padding="@dimen/textviews_paddings"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+    </ScrollView>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -105,7 +105,6 @@ public class ActivityMain extends AppCompatActivity
                                 lp.rightMargin,
                                 lp.bottomMargin);
                 v.setLayoutParams(lp);
-                //insets.consumeSystemWindowInsets();
                 return insets;
             }
         });

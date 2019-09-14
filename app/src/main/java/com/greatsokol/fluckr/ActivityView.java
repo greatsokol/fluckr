@@ -1,14 +1,18 @@
 package com.greatsokol.fluckr;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +22,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import java.util.Objects;
+
+import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 
 public class ActivityView extends AppCompatActivity {
 
@@ -56,6 +62,8 @@ public class ActivityView extends AppCompatActivity {
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
 
         Toolbar toolbar = findViewById(R.id.toolbar_actionbar);
+        final int toolbarHeight = toolbar.getLayoutParams().height;
+
         ViewCompat.setOnApplyWindowInsetsListener(toolbar, new OnApplyWindowInsetsListener(){
             @Override
             public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
@@ -66,7 +74,20 @@ public class ActivityView extends AppCompatActivity {
                         lp.rightMargin,
                         lp.bottomMargin);
                 v.setLayoutParams(lp);
-                //insets.consumeSystemWindowInsets();
+                return insets;
+            }
+        });
+
+
+
+        ScrollView scrollView = findViewById(R.id.scrollView);
+        ViewCompat.setOnApplyWindowInsetsListener(scrollView, new OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+                v.setPadding(v.getPaddingLeft(),
+                        isLandscape() ? toolbarHeight + insets.getSystemWindowInsetTop() : v.getPaddingTop(),
+                        isLandscape() ? insets.getSystemWindowInsetRight() : v.getPaddingRight(),
+                        isLandscape() ? v.getPaddingBottom() : insets.getSystemWindowInsetBottom());
                 return insets;
             }
         });
@@ -85,5 +106,13 @@ public class ActivityView extends AppCompatActivity {
             finishAfterTransition();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+
+    public boolean isLandscape(){
+        final int orientation = getResources().getConfiguration().orientation;
+        return orientation == Surface.ROTATION_180 ||
+               orientation == Surface.ROTATION_270;
     }
 }
