@@ -87,7 +87,10 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
 
     @Override
     public int getItemViewType(int position) {
-        return getItem(position).getViewType();
+        FlickrImageListItem item = getItem(position);
+        return item != null  ?
+                item.getViewType() :
+                FlickrImageListItem.VIEW_TYPE_UNKNOWN;
     }
 
     @Override
@@ -117,8 +120,10 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
 
         for(int i=0; i<list_to_remove.size(); i++){
             int num_to_remove = list_to_remove.get(i);
-            mItems.remove(num_to_remove);
-            notifyItemRemoved(num_to_remove);
+            if(mItems.size() > num_to_remove) {
+                mItems.remove(num_to_remove);
+                notifyItemRemoved(num_to_remove);
+            }
         }
         mIsLoadingNow = false;
     }
@@ -131,7 +136,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
     }
 
     private FlickrImageListItem getItem(int position) {
-        return mItems.get(position);
+        return mItems.isEmpty() ? null : mItems.get(position);
     }
 
     public class ViewHolder extends BaseViewHolder implements View.OnTouchListener {
@@ -157,6 +162,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
             super.onBind(position);
             mItemPosition = position;
             FlickrImageListItem listItem = getItem(position);
+            assert listItem != null;
             if(textViewTitle!=null)
                 textViewTitle.setText(listItem.getTitle());
             if(textViewDetails!=null) {
@@ -181,6 +187,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
                 view.setPressed(false);
                 if(mItemClickListener!=null) {
                     FlickrImageListItem listItem = getItem(mItemPosition);
+                    assert listItem != null;
                     Bundle args = new Bundle();
                     args.putInt(Consts.TAG_TR_POSITION, mItemPosition);
                     args.putString(Consts.TAG_TITLE, listItem.getTitle());

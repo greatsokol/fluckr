@@ -3,6 +3,8 @@ package com.greatsokol.fluckr;
 import android.graphics.Bitmap;
 
 class FlickrImageListItem {
+
+    static final int VIEW_TYPE_UNKNOWN = -1;
     static final int VIEW_TYPE_LOADING = 0;
     static final int VIEW_TYPE_NORMAL = 1;
 

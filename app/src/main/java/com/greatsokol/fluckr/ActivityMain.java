@@ -9,6 +9,7 @@ import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
@@ -17,7 +18,9 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.app.SharedElementCallback;
+import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -45,11 +48,13 @@ public class ActivityMain extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar_actionbar));
+        Toolbar toolbar = findViewById(R.id.toolbar_actionbar);
+        setSupportActionBar(toolbar);
         mSwipeRefresh = findViewById(R.id.swipeRefresh);
         mSwipeRefresh.setOnRefreshListener(this);
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
+        setInsets();
         setLayout();
         doApiCall();
 
@@ -75,6 +80,58 @@ public class ActivityMain extends AppCompatActivity
         });
     }
 
+
+    private int pxFromDp(float dp) {
+        return (int)(dp * getResources().getDisplayMetrics().density);
+    }
+
+    private void setInsets(){
+        findViewById(R.id.constraint).setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+
+        Toolbar toolbar = findViewById(R.id.toolbar_actionbar);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        SwipeRefreshLayout refreshLayout = findViewById(R.id.swipeRefresh);
+        final int toolbarHeight = toolbar.getLayoutParams().height;
+
+
+        ViewCompat.setOnApplyWindowInsetsListener(toolbar, new OnApplyWindowInsetsListener(){
+            @Override
+            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+                lp.setMargins(  lp.leftMargin,
+                                insets.getSystemWindowInsetTop(),
+                                lp.rightMargin,
+                                lp.bottomMargin);
+                v.setLayoutParams(lp);
+                //insets.consumeSystemWindowInsets();
+                return insets;
+            }
+        });
+
+        ViewCompat.setOnApplyWindowInsetsListener(recyclerView, new OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+                v.setPadding(v.getPaddingLeft(),
+                        toolbarHeight + insets.getSystemWindowInsetTop(),
+                        v.getPaddingRight(),
+                        insets.getSystemWindowInsetBottom());
+                return insets;
+            }
+        });
+
+        ViewCompat.setOnApplyWindowInsetsListener(refreshLayout, new OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+                ((SwipeRefreshLayout)v).setProgressViewOffset(true,
+                        toolbarHeight + insets.getSystemWindowInsetTop(),
+                        toolbarHeight + insets.getSystemWindowInsetTop()+pxFromDp(100));
+                return insets;
+            }
+        });
+
+    }
 
     private void setLayout(){
         RecyclerView.LayoutManager lm = mRecyclerView.getLayoutManager();
