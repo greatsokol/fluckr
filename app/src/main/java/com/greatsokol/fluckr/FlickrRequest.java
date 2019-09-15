@@ -9,11 +9,11 @@ import java.util.ArrayList;
 
 class FlickrRequest {
     private static final String API_KEY = "dcfa7bcdfe436387cefa172c2d3dc2ae";
-    static final int FLICKR_PER_PAGE = 30;
+    private static final int FLICKR_PER_PAGE = 30;
     private AsyncFlickrApi mFlickrRequest;
 
     void prepareLoadNextPicturesListRequest(final View viewToShowSnackbar, final FlickrImageListAdapter adapter, String searchFor){
-        if (adapter.isLoadingNow()) return;
+        if (adapter.isLoadingNow() || adapter.isLastPage()) return;
         final WeakReference<View> refViewToShowSnackbar = new WeakReference<>(viewToShowSnackbar);
         adapter.startLoading();
         final int page_number = adapter.getCurrentPage();
