@@ -147,14 +147,11 @@ public class ActivityView extends AppCompatActivity {
                 new AsyncFlickrImageRequest(new AsyncFlickrImageRequest.OnAnswerListener() {
                         @Override
                         public void OnAnswerReady(Bitmap bitmap) {
-                            mImageView.setImageBitmap(bitmap);
-                            mProgress.setVisibility(View.INVISIBLE);
-                        }
-
-                        @Override
-                        public void OnError() {
-                            Snackbar.make(findViewById(R.id.constraint),
+                            if (bitmap!=null) {
+                                mImageView.setImageBitmap(bitmap);
+                            }else Snackbar.make(findViewById(R.id.constraint),
                                     "Picture download error", Snackbar.LENGTH_LONG).show();
+                             mProgress.setVisibility(View.INVISIBLE);
                         }
                     }, fullSizeUrl, mCacheDir, 2048);
         fullsizeImageRequest.execute();

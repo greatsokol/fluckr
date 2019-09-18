@@ -1,6 +1,7 @@
 package com.greatsokol.fluckr;
 
 import android.graphics.Bitmap;
+import android.media.MediaSync;
 import android.os.AsyncTask;
 
 import java.util.ArrayList;
@@ -9,7 +10,6 @@ public class AsyncFlickrImageRequest extends AsyncTask<Void, Void, Bitmap> {
 
     public abstract static class OnAnswerListener{
         public abstract void OnAnswerReady(Bitmap bitmap);
-        public abstract void OnError();
     }
 
     private OnAnswerListener mListener;
