@@ -10,7 +10,7 @@ import java.util.ArrayList;
 class FlickrRequest {
     private static final String API_KEY = "dcfa7bcdfe436387cefa172c2d3dc2ae";
     private static final int FLICKR_PER_PAGE = 30;
-    private AsyncFlickrApi mFlickrRequest;
+    private AsyncFlickrInterestingListRequest mFlickrRequest;
 
     void prepareLoadNextPicturesListRequest(final View viewToShowSnackbar, final FlickrImageListAdapter adapter, String searchFor){
         if (adapter.isLoadingNow() || adapter.isLastPage()) return;
@@ -18,7 +18,7 @@ class FlickrRequest {
         adapter.startLoading();
         final int page_number = adapter.getCurrentPage();
 
-        mFlickrRequest = new AsyncFlickrApi(new AsyncFlickrApi.OnAnswerListener() {
+        mFlickrRequest = new AsyncFlickrInterestingListRequest(new AsyncFlickrInterestingListRequest.OnAnswerListener() {
                     @Override
                     public void OnAnswerReady(ArrayList<FlickrImageListItem> items) {
                         adapter.addItems(items);

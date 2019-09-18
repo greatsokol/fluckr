@@ -11,15 +11,19 @@ class FlickrImageListItem {
     private String mTitle;
     private String mDetails;
     private Bitmap mBitmapThumbnail;
-    private String mCacheFilePath;
+    private String mThumbnailUrl;
+    private String mFullsizeUrl;
+
 
     private int mViewType = VIEW_TYPE_NORMAL;
     FlickrImageListItem(int viewtype){mViewType = viewtype;}
-    FlickrImageListItem(String title, String details, Bitmap thumbnail, String cacheFilePath) {
+    FlickrImageListItem(String title, String details, Bitmap thumbnail,
+                        String thumbnailUrl, String fullsizeUrl) {
         mTitle = title;
         mDetails = details;
         mBitmapThumbnail = thumbnail;
-        mCacheFilePath = cacheFilePath;
+        mThumbnailUrl = thumbnailUrl;
+        mFullsizeUrl = fullsizeUrl;
     }
 
     int getViewType(){return mViewType;}
@@ -28,5 +32,6 @@ class FlickrImageListItem {
     }
     String getDetails() {return mDetails;}
     Bitmap getBitmapThumbnail(){return mBitmapThumbnail;}
-    String getCacheFilePath(){return mCacheFilePath;}
+    String getThumbnailUrl(){return mThumbnailUrl;}
+    String getFullsizeUrl(){return mFullsizeUrl;}
 }

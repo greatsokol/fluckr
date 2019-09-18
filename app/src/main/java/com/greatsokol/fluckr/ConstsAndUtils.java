@@ -10,8 +10,10 @@ abstract class ConstsAndUtils {
     final static String TAG_TR_NAME = "TR_NAME";
     final static String TAG_TITLE = "TITLE";
     final static String TAG_DETAILS = "DETAILS";
-    final static String TAG_PATH = "PATH";
+    final static String TAG_THUMBURL = "THUMBURL";
+    final static String TAG_FULLSIZEURL = "FULLSIZEURL";
     final static String TAG_VIEWASGRID = "VIEWASGRID";
+    final static String TAG_READY = "READY";
 
 
     static boolean isLandscape(Resources res){

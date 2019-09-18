@@ -16,7 +16,7 @@ import java.util.Date;
 
 class ImageLoader {
     private static final String OLD = "old";
-    private static final int THUMB_SIZE = 350;
+    //private static final int THUMB_SIZE = 350;
     private static final long CACHE_TIME = 2 * 24 *  60 * 60; // 2 days * 24 hours * 60 minutes * 60 sec
 
 
@@ -24,18 +24,28 @@ class ImageLoader {
     }
 
 
-    static Bitmap loadPicture(final String url, String cacheFileName) throws Exception {
-        Bitmap bitmap = __loadPictureLocal(true, cacheFileName);
+    static Bitmap loadPicture(final String url, final String cacheDir, final int resize) throws Exception {
+        String cacheFileName = convertUrlToCacheFileName(url, cacheDir);
+        Bitmap bitmap = __loadPictureLocal(true, cacheFileName, resize);
         if (bitmap == null)
-           bitmap = loadImageFromUrlAndCacheIt(url, cacheFileName);
+           bitmap = loadImageFromUrlAndCacheIt(url, cacheFileName, resize);
         return bitmap;
     }
 
-    private static Bitmap __loadPictureLocal(boolean checkIsFileOverdue, String cacheFileName) {
-        return loadPictureFromCache(cacheFileName, checkIsFileOverdue);
+    static String convertUrlToCacheFileName(final String url, final String cacheDir){
+        return cacheDir + "/" +
+                url.replace(':', '_').
+                        replace('?','_').
+                        replace('&','_').
+                        replace('/','_').
+                        replace('.','_');
     }
 
-    static Bitmap loadPictureFromCache(final String path, boolean checkIsFileOverdue) {
+    private static Bitmap __loadPictureLocal(boolean checkIsFileOverdue, String cacheFileName, int resize) {
+        return loadPictureFromCache(cacheFileName, checkIsFileOverdue, resize);
+    }
+
+    static Bitmap loadPictureFromCache(final String path, boolean checkIsFileOverdue, int resize) {
         if (!checkIsFileOverdue || __isFileNotOverdue(path)) {
             Bitmap bitmap = loadPictureFromFile(path);
             if (!checkIsFileOverdue && bitmap == null) {
@@ -62,7 +72,7 @@ class ImageLoader {
     }
 
 
-    private static Bitmap loadImageFromUrlAndCacheIt(String urlPath, String cacheFileName) throws Exception {
+    private static Bitmap loadImageFromUrlAndCacheIt(String urlPath, String cacheFileName, int resize) throws Exception {
         try {
             //Log.i(TAG, "LOADING URL BEGIN = " + urlPath);
             File cacheFile = __prepareCacheFile(cacheFileName);
@@ -74,7 +84,7 @@ class ImageLoader {
                     CopyStream(is, bos);
                     Bitmap bitmap = ThumbnailUtils.extractThumbnail(
                             BitmapFactory.decodeByteArray(bos.toByteArray(), 0, bos.size()),
-                            THUMB_SIZE, THUMB_SIZE);
+                            resize, resize);
                     bitmap.compress(Bitmap.CompressFormat.PNG, 0, os);
                     __deleteCacheFile(cacheFileName + OLD);
                     //Log.i(TAG, "LOADING URL FINISHED = " + urlPath);

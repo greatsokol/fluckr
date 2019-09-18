@@ -13,9 +13,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 
-class AsyncFlickrApi extends AsyncTask<Void, Void, ArrayList<FlickrImageListItem>> {
+class AsyncFlickrInterestingListRequest extends AsyncTask<Void, Void, ArrayList<FlickrImageListItem>> {
     private String mCacheDir;
-    private AsyncFlickrApi.OnAnswerListener mListener;
+    private AsyncFlickrInterestingListRequest.OnAnswerListener mListener;
     private String mSearchForString;
     private String mApiKey;
     private int mPerPage;
@@ -27,8 +27,8 @@ class AsyncFlickrApi extends AsyncTask<Void, Void, ArrayList<FlickrImageListItem
         public abstract void OnError();
     }
 
-    AsyncFlickrApi(@NonNull final AsyncFlickrApi.OnAnswerListener listener, String searchFor,
-                   String ApiKey, int NumberPerPage, int CurrentPage, String cacheDir) {
+    AsyncFlickrInterestingListRequest(@NonNull final AsyncFlickrInterestingListRequest.OnAnswerListener listener, String searchFor,
+                                      String ApiKey, int NumberPerPage, int CurrentPage, String cacheDir) {
         mListener = listener;
         mSearchForString = searchFor;
         mCacheDir = cacheDir;
@@ -51,7 +51,7 @@ class AsyncFlickrApi extends AsyncTask<Void, Void, ArrayList<FlickrImageListItem
                             "&extras=%s"+
                             "&format=json" +
                             "&nojsoncallback=1",
-                    mApiKey, mPerPage, mCurrentPage, "description");
+                    mApiKey, mPerPage, mCurrentPage, "description,url_n,url_k");
         else
             list_request = String.format( Locale.getDefault(),
                     "https://www.flickr.com/services/rest/?method=" +
@@ -63,7 +63,7 @@ class AsyncFlickrApi extends AsyncTask<Void, Void, ArrayList<FlickrImageListItem
                             "&format=json" +
                             "&nojsoncallback=1"+
                             "&text=%s",
-                    mApiKey, mPerPage, mCurrentPage, "description", mSearchForString);
+                    mApiKey, mPerPage, mCurrentPage, "description,url_n,url_k", mSearchForString);
 
         JSONObject jsonObject;
         try {
@@ -82,30 +82,16 @@ class AsyncFlickrApi extends AsyncTask<Void, Void, ArrayList<FlickrImageListItem
             for (int i=0; i < jsonArray.length(); i++){
                 try{
                     JSONObject onePicObject = (JSONObject) jsonArray.get(i);
-                    String id = onePicObject.getString("id");
-                    //String owner = onePicObject.getString("owner");
-                    String secret = onePicObject.getString("secret");
-                    String server = onePicObject.getString("server");
-                    String farm = onePicObject.getString("farm");
                     String title = onePicObject.getString("title");
                     JSONObject jsonDetails = onePicObject.getJSONObject("description");
                     String details = jsonDetails.getString("_content");
+                    String thumbnailUrl = onePicObject.getString("url_n");
+                    String fullsizeUrl = onePicObject.getString("url_k");
 
-                    String pic_request =
-                            String.format("https://farm%s.staticflickr.com/%s/%s_%s_%s.jpg",
-                                    farm,
-                                    server,
-                                    id,
-                                    secret,
-                                    "n");
-                    String cacheFilePath = mCacheDir + "/" +
-                            pic_request.replace(':', '_').
-                                    replace('?','_').
-                                    replace('&','_').
-                                    replace('/','_').
-                                    replace('.','_');
-                    Bitmap bmp = ImageLoader.loadPicture(pic_request, cacheFilePath);
-                    items.add(new FlickrImageListItem(title, details, bmp, cacheFilePath));
+                    Bitmap bmp = ImageLoader.loadPicture(thumbnailUrl, mCacheDir, 320);
+                    items.add(new FlickrImageListItem(
+                                    title, details,
+                                    bmp, thumbnailUrl, fullsizeUrl));
                 } catch (Exception e) {
                     e.printStackTrace();
                     // иногда ссылка на картинку неправильная,
