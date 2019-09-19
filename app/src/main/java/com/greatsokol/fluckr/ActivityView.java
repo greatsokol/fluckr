@@ -53,6 +53,7 @@ public class ActivityView extends AppCompatActivity {
         assert mArgs != null;
         mCacheDir = getCacheDir().getAbsolutePath();
         final String thumbnailPath = mArgs.getString(ConstsAndUtils.TAG_THUMBURL);
+        assert thumbnailPath != null;
         Bitmap bmp = ImageLoader.loadPictureFromCache(
                             ImageLoader.convertUrlToCacheFileName(thumbnailPath, mCacheDir),false, 320);
         mImageView.setImageBitmap(bmp);
@@ -78,25 +79,15 @@ public class ActivityView extends AppCompatActivity {
             // load after shared element transition ends
             getWindow().getSharedElementEnterTransition().addListener(new Transition.TransitionListener() {
                 @Override
-                public void onTransitionStart(Transition transition) {
-                }
-
+                public void onTransitionStart(Transition transition) {}
                 @Override
-                public void onTransitionEnd(Transition transition) {
-                    loadHigherResolution();
-                }
-
+                public void onTransitionEnd(Transition transition) {loadHigherResolution();}
                 @Override
-                public void onTransitionCancel(Transition transition) {
-                }
-
+                public void onTransitionCancel(Transition transition) {}
                 @Override
-                public void onTransitionPause(Transition transition) {
-                }
-
+                public void onTransitionPause(Transition transition) {}
                 @Override
-                public void onTransitionResume(Transition transition) {
-                }
+                public void onTransitionResume(Transition transition) {}
             });
         }
 
@@ -141,7 +132,7 @@ public class ActivityView extends AppCompatActivity {
 
     void loadHigherResolution(){
         Intent intent = getIntent();
-
+        mProgress.setVisibility(View.VISIBLE);
         final String fullSizeUrl = mArgs.getString(ConstsAndUtils.TAG_FULLSIZEURL);
         AsyncFlickrImageRequest fullsizeImageRequest =
                 new AsyncFlickrImageRequest(new AsyncFlickrImageRequest.OnAnswerListener() {
@@ -151,7 +142,7 @@ public class ActivityView extends AppCompatActivity {
                                 mImageView.setImageBitmap(bitmap);
                             }else Snackbar.make(findViewById(R.id.constraint),
                                     "Picture download error", Snackbar.LENGTH_LONG).show();
-                             mProgress.setVisibility(View.INVISIBLE);
+                             mProgress.setVisibility(View.GONE);
                         }
                     }, fullSizeUrl, mCacheDir, 2048);
         fullsizeImageRequest.execute();
