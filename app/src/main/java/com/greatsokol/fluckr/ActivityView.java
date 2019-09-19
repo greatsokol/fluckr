@@ -31,6 +31,7 @@ public class ActivityView extends AppCompatActivity {
     ProgressBar mProgress;
     Bundle mArgs;
     String mCacheDir;
+    private final static int FLAG_ALREADY_LOADED_HIGH_RES = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,9 +70,8 @@ public class ActivityView extends AppCompatActivity {
 
         // run higher resolution picture
         if (savedInstanceState!=null){
-            if(savedInstanceState.getInt(ConstsAndUtils.TAG_READY,0)==1){
+            if(savedInstanceState.getInt(ConstsAndUtils.TAG_READY,0) == FLAG_ALREADY_LOADED_HIGH_RES)
                 loadHigherResolution(); // load without waiting for shared element transition ends
-            }
         } else {
             // load after shared element transition ends
             final Transition windowTransition = getWindow().getSharedElementEnterTransition();
@@ -167,7 +167,7 @@ public class ActivityView extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         // save flag to load picture without waiting shared elements transition
-        outState.putInt(ConstsAndUtils.TAG_READY, 1);
+        outState.putInt(ConstsAndUtils.TAG_READY, FLAG_ALREADY_LOADED_HIGH_RES);
         super.onSaveInstanceState(outState);
     }
 
