@@ -1,11 +1,9 @@
 package com.greatsokol.fluckr;
 
-import android.animation.LayoutTransition;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Html;
-
 import android.transition.Transition;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,7 +20,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.transition.TransitionListenerAdapter;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -77,13 +74,14 @@ public class ActivityView extends AppCompatActivity {
             }
         } else {
             // load after shared element transition ends
-            getWindow().getSharedElementEnterTransition().addListener(new Transition.TransitionListener() {
+            final Transition windowTransition = getWindow().getSharedElementEnterTransition();
+            windowTransition.addListener(new Transition.TransitionListener() {
                 @Override
                 public void onTransitionStart(Transition transition) {}
                 @Override
                 public void onTransitionEnd(Transition transition) {
                     loadHigherResolution();
-                    getWindow().getSharedElementEnterTransition().removeListener(this);
+                    windowTransition.removeListener(this);
                 }
                 @Override
                 public void onTransitionCancel(Transition transition) {}
