@@ -81,7 +81,10 @@ public class ActivityView extends AppCompatActivity {
                 @Override
                 public void onTransitionStart(Transition transition) {}
                 @Override
-                public void onTransitionEnd(Transition transition) {loadHigherResolution();}
+                public void onTransitionEnd(Transition transition) {
+                    loadHigherResolution();
+                    getWindow().getSharedElementEnterTransition().removeListener(this);
+                }
                 @Override
                 public void onTransitionCancel(Transition transition) {}
                 @Override
