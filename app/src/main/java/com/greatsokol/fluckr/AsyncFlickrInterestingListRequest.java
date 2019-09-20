@@ -87,9 +87,9 @@ class AsyncFlickrInterestingListRequest extends AsyncTask<Void, Void, ArrayList<
                     JSONObject jsonDetails = onePicObject.getJSONObject("description");
                     String details = jsonDetails.optString("_content","");
 
-                    String thumbnailUrl = getJsonString(onePicObject,
+                    String thumbnailUrl = jsonGetFirstAvailableAttribute(onePicObject,
                             new String [] {"url_n", "url_m", "url_t"});
-                    String fullsizeUrl = getJsonString(onePicObject,
+                    String fullsizeUrl = jsonGetFirstAvailableAttribute(onePicObject,
                             new String [] {"url_k", "url_h", "url_b"});
 
 
@@ -118,7 +118,7 @@ class AsyncFlickrInterestingListRequest extends AsyncTask<Void, Void, ArrayList<
         else mListener.OnError();
     }
 
-    private String getJsonString(JSONObject jsonObject, String[] attrNames){
+    private String jsonGetFirstAvailableAttribute(JSONObject jsonObject, String[] attrNames){
         for(String attrname : attrNames){
           String strAttribute = jsonObject.optString(attrname, "");
           if(!strAttribute.equals(""))
