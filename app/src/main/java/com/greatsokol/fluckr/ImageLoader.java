@@ -3,6 +3,7 @@ package com.greatsokol.fluckr;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -15,14 +16,26 @@ import java.util.Date;
 
 
 class ImageLoader {
+    private static final String TAG = "ImageLoader";
     private static final String OLD = "old";
-    //private static final int THUMB_SIZE = 350;
-    private static final long CACHE_TIME = 2 * 24 *  60 * 60; // 2 days * 24 hours * 60 minutes * 60 sec
+    private static final long CACHE_TIME = 24 *  60 * 60; // 1 days * 24 hours * 60 minutes * 60 sec
 
 
     ImageLoader(){
     }
 
+
+    static void cleanCache(final String cacheDir){
+        File directory = new File(cacheDir);
+        File[] files = directory.listFiles();
+        assert files != null;
+        for(File file : files){
+            final String filePath = file.getPath();
+            if (!__isFileNotOverdue(filePath))
+                if (__deleteCacheFile(filePath))
+                    Log.d(TAG, String.format("Cleaned cache file %s",filePath));
+        }
+    }
 
     static Bitmap loadPicture(final String url, final String cacheDir, final int resize) throws Exception {
         String cacheFileName = convertUrlToCacheFileName(url, cacheDir);

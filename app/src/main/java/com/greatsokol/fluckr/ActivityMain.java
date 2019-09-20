@@ -31,10 +31,11 @@ import java.util.Objects;
 
 public class ActivityMain extends AppCompatActivity
         implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
-    RecyclerView mRecyclerView;
-    SwipeRefreshLayout mSwipeRefresh;
+    private RecyclerView mRecyclerView;
+    private SwipeRefreshLayout mSwipeRefresh;
     private int mTransitionPosition;
     private FlickrRequest mFlickrRequest;
+    private Toolbar mToolbar;
 
     private FlickrImageListAdapter getTodayListAdapter(){ return ((FluckrApplication)getApplication()).getAdapter();}
     private FlickrImageListAdapter getSearchAdapter(){ return ((FluckrApplication)getApplication()).getSearchAdapter();}
@@ -48,12 +49,13 @@ public class ActivityMain extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar_actionbar);
-        setSupportActionBar(toolbar);
+        mToolbar = findViewById(R.id.toolbar_actionbar);
+        setSupportActionBar(mToolbar);
         mSwipeRefresh = findViewById(R.id.swipeRefresh);
         mSwipeRefresh.setOnRefreshListener(this);
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
+
         setInsets();
         setLayout();
         doApiCall();
@@ -78,6 +80,9 @@ public class ActivityMain extends AppCompatActivity
                 }
             }
         });
+
+        // clean older than 1 day cached files
+        ImageLoader.cleanCache(getCacheDir().getAbsolutePath());
     }
 
 
@@ -86,14 +91,9 @@ public class ActivityMain extends AppCompatActivity
     private void setInsets(){
         findViewById(R.id.constraint).setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        final int toolbarHeight = mToolbar.getLayoutParams().height;
 
-        Toolbar toolbar = findViewById(R.id.toolbar_actionbar);
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        SwipeRefreshLayout refreshLayout = findViewById(R.id.swipeRefresh);
-        final int toolbarHeight = toolbar.getLayoutParams().height;
-
-
-        ViewCompat.setOnApplyWindowInsetsListener(toolbar, new OnApplyWindowInsetsListener(){
+        ViewCompat.setOnApplyWindowInsetsListener(mToolbar, new OnApplyWindowInsetsListener(){
             @Override
             public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
 
@@ -103,11 +103,12 @@ public class ActivityMain extends AppCompatActivity
                                 insets.getSystemWindowInsetRight(),
                                 lp.bottomMargin);
                 v.setLayoutParams(lp);
+                ViewCompat.setOnApplyWindowInsetsListener(mToolbar, null);
                 return insets;
             }
         });
 
-        ViewCompat.setOnApplyWindowInsetsListener(recyclerView, new OnApplyWindowInsetsListener() {
+        ViewCompat.setOnApplyWindowInsetsListener(mRecyclerView, new OnApplyWindowInsetsListener() {
             @Override
             public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
                 v.setPadding(
@@ -115,17 +116,19 @@ public class ActivityMain extends AppCompatActivity
                         insets.getSystemWindowInsetTop() + toolbarHeight ,
                         insets.getSystemWindowInsetRight() + v.getPaddingRight(),
                         v.getPaddingBottom() + insets.getSystemWindowInsetBottom());
+                ViewCompat.setOnApplyWindowInsetsListener(mRecyclerView, null);
                 return insets;
             }
         });
 
-        ViewCompat.setOnApplyWindowInsetsListener(refreshLayout, new OnApplyWindowInsetsListener() {
+        ViewCompat.setOnApplyWindowInsetsListener(mSwipeRefresh, new OnApplyWindowInsetsListener() {
             @Override
             public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
                 int offsetStart = toolbarHeight + insets.getSystemWindowInsetTop();
                 ((SwipeRefreshLayout)v).setProgressViewOffset(true,
                         offsetStart,
                         offsetStart+ConstsAndUtils.pxFromDp(getResources(), 100));
+                ViewCompat.setOnApplyWindowInsetsListener(mSwipeRefresh, null);
                 return insets;
             }
         });
@@ -145,6 +148,7 @@ public class ActivityMain extends AppCompatActivity
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.clearOnScrollListeners();
+        //mRecyclerView.requestLayout();
         mRecyclerView.addOnScrollListener(new PaginationListener(layoutManager) {
             @Override
             protected void loadMoreItems() {

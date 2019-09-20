@@ -29,6 +29,7 @@ public class ActivityView extends AppCompatActivity {
 
     ImageView mImageView;
     ProgressBar mProgress;
+    Toolbar mToolbar;
     Bundle mArgs;
     String mCacheDir;
     private final static int FLAG_ALREADY_LOADED_HIGH_RES = 1;
@@ -37,7 +38,8 @@ public class ActivityView extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view);
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar_actionbar));
+        mToolbar = findViewById(R.id.toolbar_actionbar);
+        setSupportActionBar(mToolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         setInsets();
 
@@ -98,10 +100,9 @@ public class ActivityView extends AppCompatActivity {
         findViewById(R.id.constraint).setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
 
-        Toolbar toolbar = findViewById(R.id.toolbar_actionbar);
-        final int toolbarHeight = toolbar.getLayoutParams().height;
+        final int toolbarHeight = mToolbar.getLayoutParams().height;
 
-        ViewCompat.setOnApplyWindowInsetsListener(toolbar, new OnApplyWindowInsetsListener(){
+        ViewCompat.setOnApplyWindowInsetsListener(mToolbar, new OnApplyWindowInsetsListener(){
             @Override
             public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
 
@@ -111,13 +112,14 @@ public class ActivityView extends AppCompatActivity {
                                 insets.getSystemWindowInsetRight(),
                                 lp.bottomMargin);
                 v.setLayoutParams(lp);
+                ViewCompat.setOnApplyWindowInsetsListener(mToolbar, null);
                 return insets;
             }
         });
 
 
 
-        ScrollView scrollView = findViewById(R.id.scrollView);
+        final ScrollView scrollView = findViewById(R.id.scrollView);
         ViewCompat.setOnApplyWindowInsetsListener(scrollView, new OnApplyWindowInsetsListener() {
             @Override
             public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
@@ -126,6 +128,7 @@ public class ActivityView extends AppCompatActivity {
                         land ? toolbarHeight + insets.getSystemWindowInsetTop() : v.getPaddingTop(),
                         land ? insets.getSystemWindowInsetRight() : v.getPaddingRight(),
                         land ? v.getPaddingBottom() : insets.getSystemWindowInsetBottom());
+                ViewCompat.setOnApplyWindowInsetsListener(scrollView, null);
                 return insets;
             }
         });

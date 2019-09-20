@@ -2,6 +2,7 @@ package com.greatsokol.fluckr;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 class AsyncFlickrInterestingListRequest extends AsyncTask<Void, Void, ArrayList<FlickrImageListItem>> {
+    private static final String TAG = "AsyncFlickrListRequest";
     private String mCacheDir;
     private AsyncFlickrInterestingListRequest.OnAnswerListener mListener;
     private String mSearchForString;
@@ -80,7 +82,9 @@ class AsyncFlickrInterestingListRequest extends AsyncTask<Void, Void, ArrayList<
             mListener.OnGetPagesNumber(jsonRoot.getInt("pages"));
             JSONArray jsonArray = jsonRoot.getJSONArray("photo");
 
-            for (int i=0; i < jsonArray.length(); i++){
+            int pictures_count = jsonArray.length();
+            Log.d(TAG, String.format("%d pictures arrived in JSON",pictures_count));
+            for (int i=0; i < pictures_count; i++){
                 try{
                     JSONObject onePicObject = (JSONObject) jsonArray.get(i);
                     String title = onePicObject.getString("title");
@@ -95,9 +99,11 @@ class AsyncFlickrInterestingListRequest extends AsyncTask<Void, Void, ArrayList<
 
 
                     Bitmap bmp = ImageLoader.loadPicture(thumbnailUrl, mCacheDir, 320);
-                    items.add(new FlickrImageListItem(
-                                    title, details,
-                                    bmp, thumbnailUrl, fullsizeUrl));
+                    if (bmp!=null) {
+                        items.add(new FlickrImageListItem(
+                                title, details,
+                                bmp, thumbnailUrl, fullsizeUrl));
+                    } else Log.d(TAG, "Cant load picture");
                 } catch (Exception e) {
                     e.printStackTrace();
                     // иногда ссылка на картинку неправильная,
