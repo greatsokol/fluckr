@@ -33,7 +33,7 @@ class AsyncFlickrInterestingListRequest extends AsyncTask<Void, Void, ArrayList<
         mCacheDir = cacheDir;
         mApiKey = ApiKey;
         mPerPage = NumberPerPage;
-        mCurrentPage = CurrentPage;
+        mCurrentPage = CurrentPage+1;
     }
 
 

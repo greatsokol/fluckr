@@ -18,7 +18,7 @@ import java.util.List;
 public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     private List<FlickrImageListItem> mItems;
     private boolean mIsLoadingNow = false;
-    private int mCurrentPage = 1;
+    private int mCurrentPage = 0;
     private boolean mViewAsGrid = true;
 
     boolean isLoadingNow(){return mIsLoadingNow; }
@@ -26,7 +26,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
     void setCurrentPage(int number){mCurrentPage = number;}
     void setViewAsGrid(boolean viewAsGrid){mViewAsGrid = viewAsGrid;}
 
-    private int mTotalPage = 1; // обновится после LoadNextPicturesList
+    private int mTotalPage = 0; // обновится после LoadNextPicturesList
     boolean isLastPage(){return mCurrentPage>mTotalPage;}
     void setTotalPage(int totalPage){mTotalPage = totalPage;}
 
@@ -130,7 +130,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
     void clear() {
         if (isLoadingNow()) return;
         mItems.clear();
-        setCurrentPage(1);
+        setCurrentPage(0);
         notifyDataSetChanged();
     }
 
