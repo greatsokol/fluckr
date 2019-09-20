@@ -137,7 +137,7 @@ public class ActivityMain extends AppCompatActivity
 
     private void setLayout(){
         RecyclerView.LayoutManager lm = mRecyclerView.getLayoutManager();
-        Parcelable recycle_state = lm!=null ? lm.onSaveInstanceState() : null;
+        Parcelable recycleViewSavedState = lm!=null ? lm.onSaveInstanceState() : null;
 
         final FlickrImageListAdapter adapter = getActiveAdapter();
         boolean viewAsGrid = getViewAsGrid();
@@ -148,7 +148,6 @@ public class ActivityMain extends AppCompatActivity
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.clearOnScrollListeners();
-        //mRecyclerView.requestLayout();
         mRecyclerView.addOnScrollListener(new PaginationListener(layoutManager) {
             @Override
             protected void loadMoreItems() {
@@ -166,8 +165,8 @@ public class ActivityMain extends AppCompatActivity
             }
         });
 
-        if (recycle_state!=null)
-            lm.onRestoreInstanceState(recycle_state);
+        if (recycleViewSavedState!=null)
+            layoutManager.onRestoreInstanceState(recycleViewSavedState);
     }
 
     protected int getSpanCount(boolean viewAsGrid){
