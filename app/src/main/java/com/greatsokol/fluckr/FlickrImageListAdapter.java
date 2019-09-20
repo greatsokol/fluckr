@@ -100,8 +100,9 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
 
     void addItems(List<FlickrImageListItem> items) {
         mItems.addAll(items);
-        //notifyDataSetChanged();
-        notifyItemRangeInserted(mItems.size()-items.size(), mItems.size());
+        int itemsSize = items.size();
+        int positionStart = mItems.size() - itemsSize;
+        notifyItemRangeInserted(positionStart, itemsSize);
     }
 
     void startLoading() {
