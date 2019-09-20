@@ -58,9 +58,12 @@ public class ActivityView extends AppCompatActivity {
                             ImageLoader.convertUrlToCacheFileName(thumbnailPath, mCacheDir),false, 320);
         mImageView.setImageBitmap(bmp);
 
-        setTitle(mArgs.getString(ConstsAndUtils.TAG_TITLE));
+        final String title = mArgs.getString(ConstsAndUtils.TAG_TITLE);
+        setTitle(title);
 
         String details = mArgs.getString(ConstsAndUtils.TAG_DETAILS);
+        assert details != null;
+        if (details.trim().equals("")) details = title;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             ((TextView)findViewById(R.id.textviewDetails)).
                     setText(Html.fromHtml(details,Html.FROM_HTML_MODE_LEGACY));
