@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -248,6 +249,8 @@ public class ActivityMain extends AppCompatActivity
             }
         });
 
+        if(!mSearchFor.equals(""))
+            restoreSearchViewState(searchViewMenuItem, mSearchFor);
         return true;
     }
 
@@ -261,7 +264,6 @@ public class ActivityMain extends AppCompatActivity
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     private boolean getViewAsGrid(){
         return getPreferences(MODE_PRIVATE).getBoolean(ConstsAndUtils.TAG_VIEWASGRID, true);
@@ -315,5 +317,14 @@ public class ActivityMain extends AppCompatActivity
         outState.putInt(ConstsAndUtils.TAG_TR_POSITION, mTransitionPosition);
         outState.putString(ConstsAndUtils.TAG_SEARCH_FOR, mSearchFor);
         super.onSaveInstanceState(outState);
+    }
+
+    void restoreSearchViewState(MenuItem searchItem, String query){
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        if (!TextUtils.isEmpty(query)) {
+            searchItem.expandActionView();
+            searchView.setQuery(query, false);
+            searchView.clearFocus();
+        }
     }
 }
