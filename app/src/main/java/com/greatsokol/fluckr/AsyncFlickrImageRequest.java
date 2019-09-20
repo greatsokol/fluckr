@@ -1,10 +1,7 @@
 package com.greatsokol.fluckr;
 
 import android.graphics.Bitmap;
-import android.media.MediaSync;
 import android.os.AsyncTask;
-
-import java.util.ArrayList;
 
 public class AsyncFlickrImageRequest extends AsyncTask<Void, Void, Bitmap> {
 

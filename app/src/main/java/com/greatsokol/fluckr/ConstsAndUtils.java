@@ -1,7 +1,6 @@
 package com.greatsokol.fluckr;
 
 import android.content.res.Resources;
-
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 
 abstract class ConstsAndUtils {

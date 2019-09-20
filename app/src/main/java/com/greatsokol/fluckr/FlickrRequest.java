@@ -1,9 +1,7 @@
 package com.greatsokol.fluckr;
 
 import android.view.View;
-
 import com.google.android.material.snackbar.Snackbar;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
