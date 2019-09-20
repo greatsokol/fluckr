@@ -132,11 +132,10 @@ public class ActivityView extends AppCompatActivity {
     }
 
     void loadHigherResolution(){
-        Intent intent = getIntent();
-        mProgress.setVisibility(View.VISIBLE);
         final String fullSizeUrl = mArgs.getString(ConstsAndUtils.TAG_FULLSIZEURL);
         assert fullSizeUrl != null;
         if (fullSizeUrl.equals(""))return;
+        mProgress.setVisibility(View.VISIBLE);
         AsyncFlickrImageRequest fullsizeImageRequest =
                 new AsyncFlickrImageRequest(new AsyncFlickrImageRequest.OnAnswerListener() {
                         @Override
