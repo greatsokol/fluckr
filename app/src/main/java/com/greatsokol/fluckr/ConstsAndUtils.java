@@ -14,6 +14,7 @@ abstract class ConstsAndUtils {
     final static String TAG_FULLSIZEURL = "FULLSIZEURL";
     final static String TAG_VIEWASGRID = "VIEWASGRID";
     final static String TAG_READY = "READY";
+    final static String TAG_SEARCH_FOR = "SEARCH_FOR";
 
 
     static boolean isLandscape(Resources res){

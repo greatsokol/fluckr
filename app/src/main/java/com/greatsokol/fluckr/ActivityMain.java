@@ -56,14 +56,10 @@ public class ActivityMain extends AppCompatActivity
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
 
-        setInsets();
-        setLayout();
-        doApiCall();
-
-
         // Workaround for orientation change issue
         if (savedInstanceState != null) {
             mTransitionPosition = savedInstanceState.getInt(ConstsAndUtils.TAG_TR_POSITION);
+            mSearchFor = savedInstanceState.getString(ConstsAndUtils.TAG_SEARCH_FOR);
         }
 
         setExitSharedElementCallback(new SharedElementCallback() {
@@ -83,6 +79,10 @@ public class ActivityMain extends AppCompatActivity
 
         // clean older than 1 day cached files
         ImageLoader.cleanCache(getCacheDir().getAbsolutePath());
+
+        setInsets();
+        setLayout();
+        doApiCall();
     }
 
 
@@ -314,6 +314,7 @@ public class ActivityMain extends AppCompatActivity
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putInt(ConstsAndUtils.TAG_TR_POSITION, mTransitionPosition);
+        outState.putString(ConstsAndUtils.TAG_SEARCH_FOR, mSearchFor);
         super.onSaveInstanceState(outState);
     }
 }
