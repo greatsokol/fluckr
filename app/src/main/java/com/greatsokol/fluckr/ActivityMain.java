@@ -144,6 +144,7 @@ public class ActivityMain extends AppCompatActivity
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
+        mRecyclerView.clearOnScrollListeners();
         mRecyclerView.addOnScrollListener(new PaginationListener(layoutManager) {
             @Override
             protected void loadMoreItems() {
@@ -162,7 +163,7 @@ public class ActivityMain extends AppCompatActivity
         });
 
         if (recycle_state!=null)
-            mRecyclerView.getLayoutManager().onRestoreInstanceState(recycle_state);
+            lm.onRestoreInstanceState(recycle_state);
     }
 
     protected int getSpanCount(boolean viewAsGrid){
