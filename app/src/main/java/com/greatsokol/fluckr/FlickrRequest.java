@@ -11,8 +11,9 @@ class FlickrRequest {
     private AsyncFlickrInterestingListRequest mFlickrRequest;
 
     void prepareLoadNextPicturesListRequest(final View viewToShowSnackbar, final FlickrImageListAdapter adapter, String searchFor){
-        if (adapter.isLoadingNow() || adapter.isLastPage())
+        if (adapter.isLoadingNow() || (adapter.isLastPage() && adapter.getItemCount()>0))
             return;
+
         final WeakReference<View> refViewToShowSnackbar = new WeakReference<>(viewToShowSnackbar);
         adapter.startLoading();
         final int page_number = adapter.getCurrentPage();
