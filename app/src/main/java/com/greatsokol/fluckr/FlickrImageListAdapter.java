@@ -27,7 +27,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
     void setViewAsGrid(boolean viewAsGrid){mViewAsGrid = viewAsGrid;}
 
     private int mTotalPage = 0; // обновится после LoadNextPicturesList
-    boolean isLastPage(){return mCurrentPage>mTotalPage;}
+    boolean isLastPage(){return mCurrentPage>(mTotalPage-1) && mItems.size()>0;}
     void setTotalPage(int totalPage){mTotalPage = totalPage;}
 
 
@@ -194,6 +194,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
                     args.putString(ConstsAndUtils.TAG_THUMBURL, listItem.getThumbnailUrl());
                     args.putString(ConstsAndUtils.TAG_FULLSIZEURL, listItem.getFullsizeUrl());
                     view.setTag(args);
+                    view.performClick();
                     mItemClickListener.onClick(view);
                 }
             } else view.setPressed(true);
