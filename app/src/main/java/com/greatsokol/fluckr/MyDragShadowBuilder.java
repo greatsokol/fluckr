@@ -1,17 +1,18 @@
 package com.greatsokol.fluckr;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.view.View;
 
 
 class MyDragShadowBuilder extends View.DragShadowBuilder {
 
-    MyDragShadowBuilder(View view) {
+    private int mX, mY;
+
+    MyDragShadowBuilder(View view, float touchPointX, float touchPointY) {
         super(view);
+        mX = (int)touchPointX;
+        mY = (int)touchPointY;
     }
 
     @Override
@@ -27,7 +28,7 @@ class MyDragShadowBuilder extends View.DragShadowBuilder {
         int height = v.getHeight();
         int width = v.getWidth();
         shadowSize.set(width, height);
-        shadowTouchPoint.set((width / 2), (height / 2));
+        shadowTouchPoint.set(mX, mY);//(width / 2), (height / 2));
     }
 }
 
