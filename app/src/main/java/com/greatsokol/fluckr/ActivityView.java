@@ -1,18 +1,26 @@
 package com.greatsokol.fluckr;
 
+import android.content.ClipData;
+import android.content.ClipDescription;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.transition.Transition;
+import android.util.Log;
+import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -54,7 +62,7 @@ public class ActivityView extends AppCompatActivity {
         final String thumbnailPath = mArgs.getString(ConstsAndUtils.TAG_THUMBURL);
         assert thumbnailPath != null;
         Bitmap bmp = ImageLoader.loadPictureFromCache(
-                            ImageLoader.convertUrlToCacheFileName(thumbnailPath, mCacheDir),false, 320);
+                ImageLoader.convertUrlToCacheFileName(thumbnailPath, mCacheDir), false, 320);
         mImageView.setImageBitmap(bmp);
 
         final String title = mArgs.getString(ConstsAndUtils.TAG_TITLE);
@@ -64,39 +72,116 @@ public class ActivityView extends AppCompatActivity {
         assert details != null;
         if (details.trim().equals("")) details = title;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            ((TextView)findViewById(R.id.textviewDetails)).
-                    setText(Html.fromHtml(details,Html.FROM_HTML_MODE_LEGACY));
+            ((TextView) findViewById(R.id.textviewDetails)).
+                    setText(Html.fromHtml(details, Html.FROM_HTML_MODE_LEGACY));
         } else {
-            ((TextView)findViewById(R.id.textviewDetails)).
+            ((TextView) findViewById(R.id.textviewDetails)).
                     setText(Html.fromHtml(details));
         }
 
 
         // run higher resolution picture
-        if (savedInstanceState!=null){
-            if(savedInstanceState.getInt(ConstsAndUtils.TAG_READY,0) == FLAG_ALREADY_LOADED_HIGH_RES)
+        if (savedInstanceState != null) {
+            if (savedInstanceState.getInt(ConstsAndUtils.TAG_READY, 0) == FLAG_ALREADY_LOADED_HIGH_RES)
                 loadHigherResolution(); // load without waiting for shared element transition ends
         } else {
             // load after shared element transition ends
             final Transition windowTransition = getWindow().getSharedElementEnterTransition();
             windowTransition.addListener(new Transition.TransitionListener() {
                 @Override
-                public void onTransitionStart(Transition transition) {}
+                public void onTransitionStart(Transition transition) {
+                }
+
                 @Override
                 public void onTransitionEnd(Transition transition) {
                     loadHigherResolution();
                     windowTransition.removeListener(this);
                 }
+
                 @Override
-                public void onTransitionCancel(Transition transition) {}
+                public void onTransitionCancel(Transition transition) {
+                }
+
                 @Override
-                public void onTransitionPause(Transition transition) {}
+                public void onTransitionPause(Transition transition) {
+                }
+
                 @Override
-                public void onTransitionResume(Transition transition) {}
+                public void onTransitionResume(Transition transition) {
+                }
             });
         }
 
+        mImageView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                int action = motionEvent.getAction();
+                switch (action & MotionEvent.ACTION_MASK) {
+                    case MotionEvent.ACTION_DOWN: {
+                        ClipData dragData = ClipData.newPlainText("","");
+                        view.startDrag(dragData,  // the data to be dragged
+                                new MyDragShadowBuilder(view),  // the drag shadow builder
+                                view,      // no need to use local data
+                                0          // flags (not currently used, set to 0)
+                        );
+                        return false;
+                    }
+                }
+                return true;
+            }
+        });
+
+
+        mImageView.setOnDragListener(new View.OnDragListener() {
+            int mStartY;
+            @Override
+            public boolean onDrag(View view, DragEvent dragEvent) {
+                final int action = dragEvent.getAction();
+                switch(action) {
+                    case DragEvent.ACTION_DRAG_STARTED:
+                        view.setVisibility(View.INVISIBLE);
+                        mStartY = (int)dragEvent.getY();
+                        return true;
+                    case DragEvent.ACTION_DRAG_ENTERED:
+                    case DragEvent.ACTION_DRAG_LOCATION:
+                        return false;
+                    case DragEvent.ACTION_DRAG_EXITED:
+                        return false;
+                    case DragEvent.ACTION_DROP:
+                        return false;
+                    case DragEvent.ACTION_DRAG_ENDED:
+                        view.setVisibility(View.VISIBLE);
+                        int delta = Math.abs((int)(mStartY-dragEvent.getY()));
+                        int threshold = view.getHeight()/2;
+                        Log.d("DIMENSIONS", String.format("onDrag: %d  - %d = %d  <>   %d", (int)(dragEvent.getY()), mStartY, delta, threshold));
+                        if(delta > threshold)
+                            finishAfterTransition();
+                        return true;
+                }
+
+                return true;
+            }
+        });
+
+/*
+        mImageView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                //ClipData.Item item = new ClipData.Item(view.getTransitionName());
+                ClipData dragData = ClipData.newPlainText("","");
+                view.startDrag(dragData,  // the data to be dragged
+                        new MyDragShadowBuilder(view),  // the drag shadow builder
+                        view,      // no need to use local data
+                        0          // flags (not currently used, set to 0)
+                );
+                return true;
+            }
+        }); */
+
+
     }
+
+
 
     private void setInsets() {
         findViewById(R.id.constraint).setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
