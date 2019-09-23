@@ -113,15 +113,12 @@ public class ActivityView extends AppCompatActivity {
                         return false;
                     }
                     case MotionEvent.ACTION_DOWN: {
-                        ClipData dragData = ClipData.newPlainText("","");
-
-                        view.startDrag(dragData,  // the data to be dragged
+                        ClipData dragData = ClipData.newPlainText("dfsdfsdf","");
+                        view.startDrag(dragData,
                                 new MyDragShadowBuilder(view,
                                         motionEvent.getX(),
-                                        motionEvent.getY()),  // the drag shadow builder
-                                view,      // no need to use local data
-                                0          // flags (not currently used, set to 0)
-                        );
+                                        motionEvent.getY()),
+                                    view,0);
                         return false;
                     }
                 }
@@ -131,34 +128,48 @@ public class ActivityView extends AppCompatActivity {
 
 
         mImageView.setOnDragListener(new View.OnDragListener() {
-            int mStartY;
+            private int mStartY;
+            private int mStartX;
+            private final float coeff = 1.5f;
             @Override
             public boolean onDrag(View view, DragEvent dragEvent) {
                 final int action = dragEvent.getAction();
                 final float height = view.getHeight();
-                final int delta = Math.abs((int)(mStartY-dragEvent.getY()));
+                final float width = view.getWidth();
+                final int deltaY = Math.abs((int)(mStartY-dragEvent.getY()));
+                final int deltaX = Math.abs((int)(mStartX-dragEvent.getX()));
                 switch(action) {
                     case DragEvent.ACTION_DRAG_STARTED:
                         view.setVisibility(View.INVISIBLE);
                         mStartY = (int)dragEvent.getY();
+                        mStartX = (int)dragEvent.getX();
                         return true;
+
                     case DragEvent.ACTION_DRAG_LOCATION:
-                        float coeff = 1.5f;
-                        float delta_a = coeff * delta;
-                        delta_a = delta_a > height ? height : delta_a;
-                        float alpha = 1f - 1f * (delta_a / height);
-                        //Log.d("DIMENSIONS", String.format("onDrag: %f  %f  %d %f", delta_a, alpha, view.getHeight(), dragEvent.getY()));
-                        mRootView.setAlpha(alpha);
+                        float deltaY_coeff = coeff * deltaY;
+                        deltaY_coeff = deltaY_coeff > height ? height : deltaY_coeff;
+                        float alphaY = 1f - 1f * (deltaY_coeff / height);
+
+                        float deltaX_coeff = coeff * deltaX;
+                        deltaX_coeff = deltaX_coeff > height ? height : deltaX_coeff;
+                        float alphaX = 1f - 1f * (deltaX_coeff / width);
+
+
+                        mRootView.setAlpha(alphaY < alphaX? alphaY : alphaX);
                         return true;
+
                     case DragEvent.ACTION_DRAG_ENTERED:
                     case DragEvent.ACTION_DRAG_EXITED:
                     case DragEvent.ACTION_DROP:
                         return false;
+
                     case DragEvent.ACTION_DRAG_ENDED:
                         view.setVisibility(View.VISIBLE);
                         mRootView.setAlpha(1f);
-                        int threshold = (int)(height * 0.5f);
-                        if(delta > threshold) finishAfterTransition();
+                        int thresholdX = (int)(width * 0.5f);
+                        int thresholdY = (int)(height * 0.5f);
+                        if(deltaY > thresholdY || deltaX > thresholdX)
+                            finishAfterTransition();
                         return true;
                 }
 
