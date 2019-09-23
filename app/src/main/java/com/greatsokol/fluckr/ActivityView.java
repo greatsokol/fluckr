@@ -1,14 +1,11 @@
 package com.greatsokol.fluckr;
 
 import android.content.ClipData;
-import android.content.ClipDescription;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.transition.Transition;
-import android.util.Log;
 import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,7 +16,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,7 +29,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.Objects;
 
 public class ActivityView extends AppCompatActivity {
-
+    View mRootView;
     ImageView mImageView;
     ProgressBar mProgress;
     Toolbar mToolbar;
@@ -46,6 +42,7 @@ public class ActivityView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view);
         mToolbar = findViewById(R.id.toolbar_actionbar);
+        mRootView = findViewById(R.id.constraint);
         setSupportActionBar(mToolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         setInsets();
@@ -89,25 +86,18 @@ public class ActivityView extends AppCompatActivity {
             final Transition windowTransition = getWindow().getSharedElementEnterTransition();
             windowTransition.addListener(new Transition.TransitionListener() {
                 @Override
-                public void onTransitionStart(Transition transition) {
-                }
+                public void onTransitionStart(Transition transition) {}
+                @Override
+                public void onTransitionCancel(Transition transition) {}
+                @Override
+                public void onTransitionPause(Transition transition) {}
+                @Override
+                public void onTransitionResume(Transition transition) {}
 
                 @Override
                 public void onTransitionEnd(Transition transition) {
                     loadHigherResolution();
                     windowTransition.removeListener(this);
-                }
-
-                @Override
-                public void onTransitionCancel(Transition transition) {
-                }
-
-                @Override
-                public void onTransitionPause(Transition transition) {
-                }
-
-                @Override
-                public void onTransitionResume(Transition transition) {
                 }
             });
         }
@@ -139,21 +129,19 @@ public class ActivityView extends AppCompatActivity {
                 final int action = dragEvent.getAction();
                 switch(action) {
                     case DragEvent.ACTION_DRAG_STARTED:
-                        view.setVisibility(View.INVISIBLE);
+                        mRootView.setVisibility(View.INVISIBLE);
                         mStartY = (int)dragEvent.getY();
                         return true;
                     case DragEvent.ACTION_DRAG_ENTERED:
                     case DragEvent.ACTION_DRAG_LOCATION:
-                        return false;
                     case DragEvent.ACTION_DRAG_EXITED:
-                        return false;
                     case DragEvent.ACTION_DROP:
                         return false;
                     case DragEvent.ACTION_DRAG_ENDED:
-                        view.setVisibility(View.VISIBLE);
+                        mRootView.setVisibility(View.VISIBLE);
                         int delta = Math.abs((int)(mStartY-dragEvent.getY()));
                         int threshold = view.getHeight()/2;
-                        Log.d("DIMENSIONS", String.format("onDrag: %d  - %d = %d  <>   %d", (int)(dragEvent.getY()), mStartY, delta, threshold));
+                        //Log.d("DIMENSIONS", String.format("onDrag: %d  - %d = %d  <>   %d", (int)(dragEvent.getY()), mStartY, delta, threshold));
                         if(delta > threshold)
                             finishAfterTransition();
                         return true;
