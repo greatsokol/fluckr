@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -294,13 +295,16 @@ public class ActivityMain extends AppCompatActivity
         getSearchAdapter().setOnItemClickListener(null);
     }
 
+    private boolean mActivityViewStarted = false;
     @Override
     public void onClick(View view) {
+
         Bundle args = (Bundle) view.getTag();
-        if (args!=null) {
+        if (args!=null && !mActivityViewStarted) {
             mTransitionPosition = args.getInt(ConstsAndUtils.TAG_TR_POSITION);
             View imageView = view.findViewById(R.id.imageview);
-            if (imageView != null) {
+            if (imageView != null) synchronized (this){
+                mActivityViewStarted = true;
                 Intent intent = new Intent(ActivityMain.this, ActivityView.class);
                 String transitionName = ViewCompat.getTransitionName(imageView);
                 assert transitionName != null;
@@ -314,9 +318,15 @@ public class ActivityMain extends AppCompatActivity
 
                 intent.putExtra(ConstsAndUtils.TAG_TR_NAME, transitionName);
                 intent.putExtra(ConstsAndUtils.TAG_ARGS, args);
-                startActivity(intent, options.toBundle());
+                startActivityForResult(intent, 0, options.toBundle());
             }
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mActivityViewStarted = false;
     }
 
     @Override
