@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Html;
 import android.transition.Transition;
-import android.util.Log;
 import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -176,16 +175,9 @@ public class ActivityView extends AppCompatActivity {
                 return true;
             }
         });
-
-
     }
 
 
-    @Override
-    protected void onDestroy() {
-        mImageView.setImageBitmap(mThumbnail);
-        super.onDestroy();
-    }
 
     private void setInsets() {
         findViewById(R.id.constraint).setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -225,6 +217,14 @@ public class ActivityView extends AppCompatActivity {
         });
     }
 
+
+    @Override
+    public void finishAfterTransition() {
+        mImageView.setImageBitmap(mThumbnail);
+        super.finishAfterTransition();
+    }
+
+
     void loadHigherResolution(){
         final String fullSizeUrl = mArgs.getString(ConstsAndUtils.TAG_FULLSIZEURL);
         assert fullSizeUrl != null;
@@ -240,7 +240,7 @@ public class ActivityView extends AppCompatActivity {
                                     "Picture download error", Snackbar.LENGTH_LONG).show();
                              mProgress.setVisibility(View.GONE);
                         }
-                    }, fullSizeUrl, mCacheDir, 2048);
+                    }, fullSizeUrl, mCacheDir);
         fullsizeImageRequest.execute();
     }
 
