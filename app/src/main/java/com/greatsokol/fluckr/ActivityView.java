@@ -1,6 +1,7 @@
 package com.greatsokol.fluckr;
 
 import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -12,6 +13,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
@@ -235,7 +238,8 @@ public class ActivityView extends AppCompatActivity {
                         @Override
                         public void OnAnswerReady(Bitmap bitmap) {
                             if (bitmap!=null) {
-                                mImageView.setImageBitmap(bitmap);
+                                //mImageView.setImageBitmap(bitmap);
+                                ImageViewAnimatedChange(getBaseContext(),mImageView,bitmap);
                             }else Snackbar.make(findViewById(R.id.constraint),
                                     "Picture download error", Snackbar.LENGTH_LONG).show();
                              mProgress.setVisibility(View.GONE);
@@ -266,5 +270,25 @@ public class ActivityView extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
+    private static void ImageViewAnimatedChange(Context c, final ImageView v, final Bitmap new_image) {
+        final Animation anim_out = AnimationUtils.loadAnimation(c, android.R.anim.fade_out);
+        final Animation anim_in  = AnimationUtils.loadAnimation(c, android.R.anim.fade_in);
+        anim_out.setAnimationListener(new Animation.AnimationListener()
+        {
+            @Override public void onAnimationStart(Animation animation) {}
+            @Override public void onAnimationRepeat(Animation animation) {}
+            @Override public void onAnimationEnd(Animation animation)
+            {
+                v.setImageBitmap(new_image);
+                /*anim_in.setAnimationListener(new Animation.AnimationListener() {
+                    @Override public void onAnimationStart(Animation animation) {}
+                    @Override public void onAnimationRepeat(Animation animation) {}
+                    @Override public void onAnimationEnd(Animation animation) {}
+                }); */
+                v.startAnimation(anim_in);
+            }
+        });
+        v.startAnimation(anim_out);
+    }
 
 }
