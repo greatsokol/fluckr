@@ -38,7 +38,7 @@ class ImageLoader {
 
     static Bitmap loadPicture(final String url, final String cacheDir, final int resize) throws Exception {
         String cacheFileName = convertUrlToCacheFileName(url, cacheDir);
-        Bitmap bitmap = __loadPictureLocal(true, cacheFileName, resize);
+        Bitmap bitmap = __loadPictureLocal(true, cacheFileName);
         if (bitmap == null)
            bitmap = loadImageFromUrlAndCacheIt(url, cacheFileName, resize);
         return bitmap;
@@ -53,11 +53,11 @@ class ImageLoader {
                         replace('.','_');
     }
 
-    private static Bitmap __loadPictureLocal(boolean checkIsFileOverdue, String cacheFileName, int resize) {
-        return loadPictureFromCache(cacheFileName, checkIsFileOverdue, resize);
+    private static Bitmap __loadPictureLocal(boolean checkIsFileOverdue, String cacheFileName) {
+        return loadPictureFromCache(cacheFileName, checkIsFileOverdue);
     }
 
-    static Bitmap loadPictureFromCache(final String path, boolean checkIsFileOverdue, int resize) {
+    static Bitmap loadPictureFromCache(final String path, boolean checkIsFileOverdue) {
         if (!checkIsFileOverdue || __isFileNotOverdue(path)) {
             Bitmap bitmap = loadPictureFromFile(path);
             if (!checkIsFileOverdue && bitmap == null) {
@@ -94,9 +94,8 @@ class ImageLoader {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 try {
                     CopyStream(is, bos);
-                    Bitmap bitmap = ThumbnailUtils.extractThumbnail(
-                            BitmapFactory.decodeByteArray(bos.toByteArray(), 0, bos.size()),
-                            resize, resize);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bos.toByteArray(), 0, bos.size());
+                    if (resize>0) bitmap = ThumbnailUtils.extractThumbnail(bitmap, resize, resize);
                     bitmap.compress(Bitmap.CompressFormat.PNG, 0, os);
                     __deleteCacheFile(cacheFileName + OLD);
                     //Log.i(TAG, "LOADING URL FINISHED = " + urlPath);

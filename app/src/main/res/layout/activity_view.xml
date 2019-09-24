@@ -24,7 +24,7 @@
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:transitionName="appBar"
+        android:transitionName="@string/AppBarTransitionName"
         android:background="@color/appbar_backgroundcolor"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -43,9 +43,11 @@
         android:adjustViewBounds="true"
         android:contentDescription="@string/imageviewcontentexplaination"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appbar"
-        app:srcCompat="@drawable/ic_launcher_foreground" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:srcCompat="@drawable/ic_launcher_foreground"
+        tools:layout_editor_absoluteY="731dp" />
 
     <ScrollView
         android:id="@+id/scrollView"

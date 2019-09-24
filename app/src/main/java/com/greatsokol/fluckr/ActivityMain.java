@@ -12,17 +12,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.app.SharedElementCallback;
+import androidx.core.util.Pair;
 import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,6 +38,7 @@ public class ActivityMain extends AppCompatActivity
     private int mTransitionPosition;
     private FlickrRequest mFlickrRequest;
     private Toolbar mToolbar;
+    private View mAppBar;
 
     private FlickrImageListAdapter getTodayListAdapter(){ return ((FluckrApplication)getApplication()).getAdapter();}
     private FlickrImageListAdapter getSearchAdapter(){ return ((FluckrApplication)getApplication()).getSearchAdapter();}
@@ -48,6 +52,7 @@ public class ActivityMain extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mAppBar = findViewById(R.id.appbar);
         mToolbar = findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(mToolbar);
         mSwipeRefresh = findViewById(R.id.swipeRefresh);
@@ -299,10 +304,14 @@ public class ActivityMain extends AppCompatActivity
                 Intent intent = new Intent(ActivityMain.this, ActivityView.class);
                 String transitionName = ViewCompat.getTransitionName(imageView);
                 assert transitionName != null;
-                ActivityOptionsCompat options = ActivityOptionsCompat.
-                        makeSceneTransitionAnimation(ActivityMain.this,
-                                imageView,
-                                transitionName);
+
+                Pair<View, String> pair1 = Pair.create(mAppBar, getResources().getString(R.string.AppBarTransitionName));
+                Pair<View, String> pair2 = Pair.create(imageView, transitionName);
+                ActivityOptionsCompat options =
+                        ActivityOptionsCompat.makeSceneTransitionAnimation(ActivityMain.this,
+                                                                            pair1 , pair2);
+
+
                 intent.putExtra(ConstsAndUtils.TAG_TR_NAME, transitionName);
                 intent.putExtra(ConstsAndUtils.TAG_ARGS, args);
                 startActivity(intent, options.toBundle());

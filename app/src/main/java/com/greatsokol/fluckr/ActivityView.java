@@ -30,12 +30,13 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.Objects;
 
 public class ActivityView extends AppCompatActivity {
-    View mRootView;
-    ImageView mImageView;
-    ProgressBar mProgress;
-    Toolbar mToolbar;
-    Bundle mArgs;
-    String mCacheDir;
+    private View mRootView;
+    private ImageView mImageView;
+    private ProgressBar mProgress;
+    private Toolbar mToolbar;
+    private Bundle mArgs;
+    private String mCacheDir;
+    private Bitmap mThumbnail;
     private final static int FLAG_ALREADY_LOADED_HIGH_RES = 1;
 
     @Override
@@ -59,9 +60,9 @@ public class ActivityView extends AppCompatActivity {
         mCacheDir = getCacheDir().getAbsolutePath();
         final String thumbnailPath = mArgs.getString(ConstsAndUtils.TAG_THUMBURL);
         assert thumbnailPath != null;
-        Bitmap bmp = ImageLoader.loadPictureFromCache(
-                ImageLoader.convertUrlToCacheFileName(thumbnailPath, mCacheDir), false, 320);
-        mImageView.setImageBitmap(bmp);
+        mThumbnail = ImageLoader.loadPictureFromCache(
+                ImageLoader.convertUrlToCacheFileName(thumbnailPath, mCacheDir), false);
+        mImageView.setImageBitmap(mThumbnail);
 
         final String title = mArgs.getString(ConstsAndUtils.TAG_TITLE);
         setTitle(title);
@@ -94,7 +95,6 @@ public class ActivityView extends AppCompatActivity {
                 public void onTransitionPause(Transition transition) {}
                 @Override
                 public void onTransitionResume(Transition transition) {}
-
                 @Override
                 public void onTransitionEnd(Transition transition) {
                     loadHigherResolution();
@@ -177,25 +177,15 @@ public class ActivityView extends AppCompatActivity {
             }
         });
 
-/*
-        mImageView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                //ClipData.Item item = new ClipData.Item(view.getTransitionName());
-                ClipData dragData = ClipData.newPlainText("","");
-                view.startDrag(dragData,  // the data to be dragged
-                        new MyDragShadowBuilder(view),  // the drag shadow builder
-                        view,      // no need to use local data
-                        0          // flags (not currently used, set to 0)
-                );
-                return true;
-            }
-        }); */
-
 
     }
 
 
+    @Override
+    protected void onDestroy() {
+        mImageView.setImageBitmap(mThumbnail);
+        super.onDestroy();
+    }
 
     private void setInsets() {
         findViewById(R.id.constraint).setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE

@@ -5,6 +5,8 @@ import android.os.AsyncTask;
 
 public class AsyncFlickrImageRequest extends AsyncTask<Void, Void, Bitmap> {
 
+    private static final int NORESIZE = -1;
+
     public abstract static class OnAnswerListener{
         public abstract void OnAnswerReady(Bitmap bitmap);
     }
@@ -20,6 +22,14 @@ public class AsyncFlickrImageRequest extends AsyncTask<Void, Void, Bitmap> {
         mUrl = url;
         mCacheDir = cacheDir;
         mResize = resize;
+    }
+
+    AsyncFlickrImageRequest(final AsyncFlickrImageRequest.OnAnswerListener listener,
+                            final String url, final String cacheDir){
+        mListener = listener;
+        mUrl = url;
+        mCacheDir = cacheDir;
+        mResize = NORESIZE;
     }
 
 
