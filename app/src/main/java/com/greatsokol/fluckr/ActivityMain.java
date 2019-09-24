@@ -305,11 +305,11 @@ public class ActivityMain extends AppCompatActivity
                 String transitionName = ViewCompat.getTransitionName(imageView);
                 assert transitionName != null;
 
-                Pair<View, String> pair1 = Pair.create(mAppBar, getResources().getString(R.string.AppBarTransitionName));
+                //Pair<View, String> pair1 = Pair.create(mAppBar, getResources().getString(R.string.AppBarTransitionName));
                 Pair<View, String> pair2 = Pair.create(imageView, transitionName);
                 ActivityOptionsCompat options =
                         ActivityOptionsCompat.makeSceneTransitionAnimation(ActivityMain.this,
-                                                                            pair1 , pair2);
+                                                                            /*pair1 ,*/ pair2);
 
 
                 intent.putExtra(ConstsAndUtils.TAG_TR_NAME, transitionName);
