@@ -298,12 +298,11 @@ public class ActivityMain extends AppCompatActivity
     private boolean mActivityViewStarted = false;
     @Override
     public void onClick(View view) {
-
         Bundle args = (Bundle) view.getTag();
-        if (args!=null && !mActivityViewStarted) {
-            mTransitionPosition = args.getInt(ConstsAndUtils.TAG_TR_POSITION);
+        if (args!=null && !mActivityViewStarted) synchronized (this) {
             View imageView = view.findViewById(R.id.imageview);
-            if (imageView != null) synchronized (this){
+            if (imageView != null) {
+                mTransitionPosition = args.getInt(ConstsAndUtils.TAG_TR_POSITION);
                 mActivityViewStarted = true;
                 Intent intent = new Intent(ActivityMain.this, ActivityView.class);
                 String transitionName = ViewCompat.getTransitionName(imageView);
