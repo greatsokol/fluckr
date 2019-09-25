@@ -55,7 +55,7 @@ public class ActivityMain extends AppCompatActivity
         mSwipeRefresh = findViewById(R.id.swipeRefresh);
         mSwipeRefresh.setOnRefreshListener(this);
         mRecyclerView = findViewById(R.id.recyclerView);
-        mRecyclerView.setHasFixedSize(true);
+        //mRecyclerView.setHasFixedSize(true);
 
         // Workaround for orientation change issue
         if (savedInstanceState != null) {
