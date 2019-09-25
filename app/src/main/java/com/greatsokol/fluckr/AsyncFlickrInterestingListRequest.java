@@ -95,7 +95,7 @@ class AsyncFlickrInterestingListRequest extends AsyncTask<Void, Void, ArrayList<
 
 
 
-                    Bitmap bmp = ImageLoader.loadPicture(thumbnailUrl, mCacheDir, 320);
+                    Bitmap bmp = ImageLoader.loadPicture(thumbnailUrl, mCacheDir, ImageLoader.THUMB_SIZE);
                     if (bmp!=null) {
                         items.add(new FlickrImageListItem(
                                 title, details,

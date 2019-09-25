@@ -63,7 +63,7 @@ public class ActivityView extends AppCompatActivity {
         final String thumbnailPath = mArgs.getString(ConstsAndUtils.TAG_THUMBURL);
         assert thumbnailPath != null;
         mThumbnail = ImageLoader.loadPictureFromCache(
-                ImageLoader.convertUrlToCacheFileName(thumbnailPath, mCacheDir), false);
+                ImageLoader.convertUrlToCacheFileName(thumbnailPath, mCacheDir, ImageLoader.THUMB_SIZE), false);
         mImageView.setImageBitmap(mThumbnail);
 
         final String title = mArgs.getString(ConstsAndUtils.TAG_TITLE);
@@ -229,7 +229,9 @@ public class ActivityView extends AppCompatActivity {
 
 
     void loadHigherResolution(){
-        final String fullSizeUrl = mArgs.getString(ConstsAndUtils.TAG_FULLSIZEURL);
+        String fullSizeUrl = mArgs.getString(ConstsAndUtils.TAG_FULLSIZEURL);
+        assert fullSizeUrl != null;
+        if(fullSizeUrl.isEmpty()) fullSizeUrl = mArgs.getString(ConstsAndUtils.TAG_THUMBURL);
         assert fullSizeUrl != null;
         if (fullSizeUrl.equals(""))return;
         mProgress.setVisibility(View.VISIBLE);
@@ -238,7 +240,6 @@ public class ActivityView extends AppCompatActivity {
                         @Override
                         public void OnAnswerReady(Bitmap bitmap) {
                             if (bitmap!=null) {
-                                //mImageView.setImageBitmap(bitmap);
                                 ImageViewAnimatedChange(getBaseContext(),mImageView,bitmap);
                             }else Snackbar.make(findViewById(R.id.constraint),
                                     "Picture download error", Snackbar.LENGTH_LONG).show();

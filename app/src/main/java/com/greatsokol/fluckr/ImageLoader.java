@@ -18,6 +18,8 @@ class ImageLoader {
     private static final String TAG = "ImageLoader";
     private static final String OLD = "old";
     private static final long CACHE_TIME = 24 *  60 * 60; // 1 days * 24 hours * 60 minutes * 60 sec
+    static final int NORESIZE = -1;
+    static final int THUMB_SIZE = 320;
 
 
     ImageLoader(){
@@ -37,20 +39,23 @@ class ImageLoader {
     }
 
     static Bitmap loadPicture(final String url, final String cacheDir, final int resize) throws Exception {
-        String cacheFileName = convertUrlToCacheFileName(url, cacheDir);
+        String cacheFileName = convertUrlToCacheFileName(url, cacheDir, resize);
         Bitmap bitmap = __loadPictureLocal(true, cacheFileName);
         if (bitmap == null)
            bitmap = loadImageFromUrlAndCacheIt(url, cacheFileName, resize);
         return bitmap;
     }
 
-    static String convertUrlToCacheFileName(final String url, final String cacheDir){
-        return cacheDir + "/" +
+    static String convertUrlToCacheFileName(final String url, final String cacheDir, int resize){
+        String fileName = cacheDir + "/" +
                 url.replace(':', '_').
                         replace('?','_').
                         replace('&','_').
                         replace('/','_').
                         replace('.','_');
+        if (resize!=NORESIZE)
+            fileName = fileName+"_"+resize;
+        return fileName;
     }
 
     private static Bitmap __loadPictureLocal(boolean checkIsFileOverdue, String cacheFileName) {
