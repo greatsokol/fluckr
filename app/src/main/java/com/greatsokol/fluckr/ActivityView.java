@@ -53,38 +53,28 @@ public class ActivityView extends AppCompatActivity {
 
         mImageView = findViewById(R.id.imageViewBig);
         mProgress = findViewById(R.id.progressBar);
+        mCacheDir = getCacheDir().getAbsolutePath();
 
         Intent intent = getIntent();
         ViewCompat.setTransitionName(mImageView, intent.getStringExtra(ConstsAndUtils.TAG_TR_NAME));
 
         mArgs = intent.getBundleExtra(ConstsAndUtils.TAG_ARGS);
         assert mArgs != null;
-        mCacheDir = getCacheDir().getAbsolutePath();
+        setTextLabels(mArgs);
+
         final String thumbnailPath = mArgs.getString(ConstsAndUtils.TAG_THUMBURL);
         assert thumbnailPath != null;
         mThumbnail = ImageLoader.loadPictureFromCache(
                 ImageLoader.convertUrlToCacheFileName(thumbnailPath, mCacheDir, ImageLoader.THUMB_SIZE), false);
         mImageView.setImageBitmap(mThumbnail);
 
-        final String title = mArgs.getString(ConstsAndUtils.TAG_TITLE);
-        setTitle(title);
 
-        String details = mArgs.getString(ConstsAndUtils.TAG_DETAILS);
-        assert details != null;
-        if (details.trim().equals("")) details = title;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            ((TextView) findViewById(R.id.textviewDetails)).
-                    setText(Html.fromHtml(details, Html.FROM_HTML_MODE_LEGACY));
-        } else {
-            ((TextView) findViewById(R.id.textviewDetails)).
-                    setText(Html.fromHtml(details));
-        }
 
 
         // run higher resolution picture
         if (savedInstanceState != null) {
             if (savedInstanceState.getInt(ConstsAndUtils.TAG_READY, 0) == FLAG_ALREADY_LOADED_HIGH_RES)
-                loadHigherResolution(); // load without waiting for shared element transition ends
+                loadHigherResolution(true); // load without waiting for shared element transition ends
         } else {
             // load after shared element transition ends
             final Transition windowTransition = getWindow().getSharedElementEnterTransition();
@@ -99,7 +89,7 @@ public class ActivityView extends AppCompatActivity {
                 public void onTransitionResume(Transition transition) {}
                 @Override
                 public void onTransitionEnd(Transition transition) {
-                    loadHigherResolution();
+                    loadHigherResolution(false);
                     windowTransition.removeListener(this);
                 }
             });
@@ -181,6 +171,23 @@ public class ActivityView extends AppCompatActivity {
     }
 
 
+    private void setTextLabels(Bundle params){
+        final String title = params.getString(ConstsAndUtils.TAG_TITLE);
+        setTitle(title);
+
+        String details = params.getString(ConstsAndUtils.TAG_DETAILS);
+        assert details != null;
+        if (details.trim().equals("")) details = title;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            ((TextView) findViewById(R.id.textviewDetails)).
+                    setText(Html.fromHtml(details, Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            ((TextView) findViewById(R.id.textviewDetails)).
+                    setText(Html.fromHtml(details));
+        }
+    }
+
+
 
     private void setInsets() {
         findViewById(R.id.constraint).setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -229,24 +236,32 @@ public class ActivityView extends AppCompatActivity {
     }
 
 
-    void loadHigherResolution(){
+    void loadHigherResolution(boolean localFileReady){
         String fullSizeUrl = mArgs.getString(ConstsAndUtils.TAG_FULLSIZEURL);
         assert fullSizeUrl != null;
         if(fullSizeUrl.isEmpty()) fullSizeUrl = mArgs.getString(ConstsAndUtils.TAG_THUMBURL);
         assert fullSizeUrl != null;
         if (fullSizeUrl.equals(""))return;
-        mProgress.setVisibility(View.VISIBLE);
-        AsyncFlickrImageRequest fullsizeImageRequest =
-                new AsyncFlickrImageRequest(new AsyncFlickrImageRequest.OnAnswerListener() {
+
+        if(!localFileReady) {
+            mProgress.setVisibility(View.VISIBLE);
+            AsyncFlickrImageRequest fullsizeImageRequest =
+                    new AsyncFlickrImageRequest(new AsyncFlickrImageRequest.OnAnswerListener() {
                         @Override
                         public void OnAnswerReady(Bitmap bitmap) {
-                            if (bitmap!=null) ImageViewAnimatedChange(getBaseContext(), mImageView, bitmap);
+                            if (bitmap != null)
+                                ImageViewAnimatedChange(getBaseContext(), mImageView, bitmap);
                             else Snackbar.make(findViewById(R.id.constraint),
                                     "Picture download error", Snackbar.LENGTH_LONG).show();
-                             mProgress.setVisibility(View.GONE);
+                            mProgress.setVisibility(View.GONE);
                         }
                     }, fullSizeUrl, mCacheDir);
-        fullsizeImageRequest.execute();
+            fullsizeImageRequest.execute();
+        } else {
+            String fullsizeFileName =
+                    ImageLoader.convertUrlToCacheFileName(fullSizeUrl, mCacheDir, ImageLoader.NORESIZE);
+            mImageView.setImageBitmap(ImageLoader.loadPictureFromCache(fullsizeFileName, false));
+        }
     }
 
     @Override

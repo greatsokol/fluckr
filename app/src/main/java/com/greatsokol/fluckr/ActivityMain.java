@@ -19,27 +19,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityOptionsCompat;
-import androidx.core.app.SharedElementCallback;
-import androidx.core.util.Pair;
 import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 
 public class ActivityMain extends AppCompatActivity
         implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
+    private final static int NO_POSITION = -1;
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefresh;
-    private int mTransitionPosition;
+    private int mTransitionPosition = NO_POSITION;
+    private boolean mActivityViewStarted = false;
     private FlickrRequest mFlickrRequest;
     private Toolbar mToolbar;
-    private View mAppBar;
+    //private View mAppBar;
 
     private FlickrImageListAdapter getTodayListAdapter(){ return ((FluckrApplication)getApplication()).getAdapter();}
     private FlickrImageListAdapter getSearchAdapter(){ return ((FluckrApplication)getApplication()).getSearchAdapter();}
@@ -53,7 +49,7 @@ public class ActivityMain extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mAppBar = findViewById(R.id.appbar);
+        //mAppBar = findViewById(R.id.appbar);
         mToolbar = findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(mToolbar);
         mSwipeRefresh = findViewById(R.id.swipeRefresh);
@@ -67,45 +63,42 @@ public class ActivityMain extends AppCompatActivity
             mSearchFor = savedInstanceState.getString(ConstsAndUtils.TAG_SEARCH_FOR);
         }
 
-        //postponeEnterTransition();
-        setExitSharedElementCallback(new SharedElementCallback() {
-            @Override
-            public void onMapSharedElements(final List<String> names, final Map<String, View> sharedElements) {
-                super.onMapSharedElements(names, sharedElements);
-                if (sharedElements.isEmpty()) {
-                    final RecyclerView.LayoutManager lm = mRecyclerView.getLayoutManager();
-                    if(lm != null) {
-                        lm.scrollToPosition(mTransitionPosition);
-                        final int namessize = names.size();
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                View view = lm.findViewByPosition(mTransitionPosition);
-                                if (view != null && namessize > 0)
-                                    sharedElements.put(names.get(0), view);
-                                startPostponedEnterTransition();
-                            }
-                        }, 500);
-
-                    } else startPostponedEnterTransition();
-                }
-                else startPostponedEnterTransition();
-            }
-        });
-
         // clean older than 1 day cached files
         ImageLoader.cleanCache(getCacheDir().getAbsolutePath());
 
         setInsets();
         setLayout();
         doApiCall();
+
+
+
+        // shared element transition tricks:
+        final RecyclerView.LayoutManager lm = mRecyclerView.getLayoutManager();
+        assert lm != null;
+        if(mTransitionPosition != NO_POSITION) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    lm.scrollToPosition(mTransitionPosition);
+                }
+            }, 500);
+        }
+
+        /*setExitSharedElementCallback(new SharedElementCallback() {
+            @Override
+            public void onMapSharedElements(final List<String> names, final Map<String, View> sharedElements) {
+                super.onMapSharedElements(names, sharedElements);
+                if (sharedElements.isEmpty()) {
+                    ViewGroup view = (ViewGroup) lm.findViewByPosition(mTransitionPosition);
+                    if (view != null && names.size() > 0)
+                        sharedElements.put(names.get(0), view.findViewById(R.id.imageview));
+                }
+            }
+        });*/
+
     }
 
-    @Override
-    public void onActivityReenter(int resultCode, Intent data) {
-        super.onActivityReenter(resultCode, data);
-        //postponeEnterTransition();
-    }
+
 
     private void setInsets(){
         findViewById(R.id.constraint).setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -163,6 +156,7 @@ public class ActivityMain extends AppCompatActivity
         adapter.setViewAsGrid(viewAsGrid);
         FluckrGridLayoutManager layoutManager
                 = new FluckrGridLayoutManager(this, adapter, getSpanCount(viewAsGrid));
+
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
@@ -309,8 +303,7 @@ public class ActivityMain extends AppCompatActivity
         getSearchAdapter().setOnItemClickListener(null);
     }
 
-    private boolean mActivityViewStarted = false;
-    @Override
+        @Override
     public void onClick(View view) {
         Bundle args = (Bundle) view.getTag();
         if (args!=null && !mActivityViewStarted) synchronized (this) {
@@ -323,10 +316,11 @@ public class ActivityMain extends AppCompatActivity
                 assert transitionName != null;
 
                 //Pair<View, String> pair1 = Pair.create(mAppBar, getResources().getString(R.string.AppBarTransitionName));
-                Pair<View, String> pair2 = Pair.create(imageView, transitionName);
+                //Pair<View, String> pair2 = Pair.create(imageView, transitionName);
                 ActivityOptionsCompat options =
-                        ActivityOptionsCompat.makeSceneTransitionAnimation(ActivityMain.this,
-                                                                            /*pair1 ,*/ pair2);
+                        ActivityOptionsCompat.makeSceneTransitionAnimation(
+                                ActivityMain.this,
+                                       imageView, transitionName);
 
 
                 intent.putExtra(ConstsAndUtils.TAG_TR_NAME, transitionName);
@@ -340,6 +334,7 @@ public class ActivityMain extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mActivityViewStarted = false;
+        mTransitionPosition = NO_POSITION;
     }
 
     @Override
