@@ -223,6 +223,7 @@ public class ActivityView extends AppCompatActivity {
 
     @Override
     public void finishAfterTransition() {
+        setResult(0);
         mImageView.setImageBitmap(mThumbnail);
         super.finishAfterTransition();
     }
@@ -239,9 +240,8 @@ public class ActivityView extends AppCompatActivity {
                 new AsyncFlickrImageRequest(new AsyncFlickrImageRequest.OnAnswerListener() {
                         @Override
                         public void OnAnswerReady(Bitmap bitmap) {
-                            if (bitmap!=null) {
-                                ImageViewAnimatedChange(getBaseContext(),mImageView,bitmap);
-                            }else Snackbar.make(findViewById(R.id.constraint),
+                            if (bitmap!=null) ImageViewAnimatedChange(getBaseContext(), mImageView, bitmap);
+                            else Snackbar.make(findViewById(R.id.constraint),
                                     "Picture download error", Snackbar.LENGTH_LONG).show();
                              mProgress.setVisibility(View.GONE);
                         }

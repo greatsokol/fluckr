@@ -67,18 +67,29 @@ public class ActivityMain extends AppCompatActivity
             mSearchFor = savedInstanceState.getString(ConstsAndUtils.TAG_SEARCH_FOR);
         }
 
+        //postponeEnterTransition();
         setExitSharedElementCallback(new SharedElementCallback() {
             @Override
-            public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+            public void onMapSharedElements(final List<String> names, final Map<String, View> sharedElements) {
                 super.onMapSharedElements(names, sharedElements);
                 if (sharedElements.isEmpty()) {
-                    View view = Objects.
-                            requireNonNull(mRecyclerView.getLayoutManager()).
-                            findViewByPosition(mTransitionPosition);
-                    if (view != null && names.size()>0) {
-                        sharedElements.put(names.get(0), view);
-                    }
+                    final RecyclerView.LayoutManager lm = mRecyclerView.getLayoutManager();
+                    if(lm != null) {
+                        lm.scrollToPosition(mTransitionPosition);
+                        final int namessize = names.size();
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                View view = lm.findViewByPosition(mTransitionPosition);
+                                if (view != null && namessize > 0)
+                                    sharedElements.put(names.get(0), view);
+                                startPostponedEnterTransition();
+                            }
+                        }, 500);
+
+                    } else startPostponedEnterTransition();
                 }
+                else startPostponedEnterTransition();
             }
         });
 
@@ -90,8 +101,11 @@ public class ActivityMain extends AppCompatActivity
         doApiCall();
     }
 
-
-
+    @Override
+    public void onActivityReenter(int resultCode, Intent data) {
+        super.onActivityReenter(resultCode, data);
+        //postponeEnterTransition();
+    }
 
     private void setInsets(){
         findViewById(R.id.constraint).setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
