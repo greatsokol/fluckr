@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 
@@ -23,10 +24,25 @@ class JSONReader {
         return result;
     }
 
-    static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
-        try (InputStream is = new URL(url).openStream()) {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-            return new JSONObject(readAll(rd));
+    static JSONObject readJsonFromUrl(String url) {
+        try{
+            HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+            try {
+                conn.setConnectTimeout(5000);
+                conn.setReadTimeout(5000);
+                conn.connect();
+                InputStream is = conn.getInputStream();
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+                return new JSONObject(readAll(rd));
+            }
+            finally {
+                conn.disconnect();
+            }
         }
+        catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
     }
 }

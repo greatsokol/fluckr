@@ -3,7 +3,7 @@ package com.greatsokol.fluckr;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 
-public class AsyncFlickrImageRequest extends AsyncTask<Void, Void, Bitmap> {
+public class AsyncImageRequest extends AsyncTask<Void, Void, Bitmap> {
 
 
 
@@ -16,16 +16,16 @@ public class AsyncFlickrImageRequest extends AsyncTask<Void, Void, Bitmap> {
     private String mCacheDir;
     private int mResize;
 
-    AsyncFlickrImageRequest(final AsyncFlickrImageRequest.OnAnswerListener listener,
-                            final String url, final String cacheDir, int resize){
+    AsyncImageRequest(final AsyncImageRequest.OnAnswerListener listener,
+                      final String url, final String cacheDir, int resize){
         mListener = listener;
         mUrl = url;
         mCacheDir = cacheDir;
         mResize = resize;
     }
 
-    AsyncFlickrImageRequest(final AsyncFlickrImageRequest.OnAnswerListener listener,
-                            final String url, final String cacheDir){
+    AsyncImageRequest(final AsyncImageRequest.OnAnswerListener listener,
+                      final String url, final String cacheDir){
         mListener = listener;
         mUrl = url;
         mCacheDir = cacheDir;

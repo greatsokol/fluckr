@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
-    private List<FlickrImageListItem> mItems;
+public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
+    private List<ImageListItem> mItems;
     private boolean mIsLoadingNow = false;
     private int mCurrentPage = 0;
     private boolean mViewAsGrid = true;
@@ -27,14 +27,16 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
     void setViewAsGrid(boolean viewAsGrid){mViewAsGrid = viewAsGrid;}
 
     private int mTotalPage = 0; // обновится после LoadNextPicturesList
+    private int mSpanCount = 3;
     boolean isLastPage(){return mCurrentPage>(mTotalPage-1);}
     void setTotalPage(int totalPage){mTotalPage = totalPage;}
+    void setSpanCount(int spanCount){mSpanCount = spanCount;}
 
 
     private View.OnClickListener mItemClickListener;
 
 
-    FlickrImageListAdapter(ArrayList<FlickrImageListItem> items) {
+    ImageListAdapter(ArrayList<ImageListItem> items) {
         mItems = items;
     }
 
@@ -45,7 +47,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
     @NonNull
     @Override
     public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if(viewType == FlickrImageListItem.VIEW_TYPE_LOADING)
+        if(viewType == ImageListItem.VIEW_TYPE_LOADING)
                 return new ProgressHolder(
                         LayoutInflater.from(parent.getContext()).
                                 inflate(R.layout.listitem_loading, parent, false));
@@ -84,39 +86,33 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
     }*/
 
     @Override
-    public int getItemViewType(int position) {
-        FlickrImageListItem item = getItem(position);
+    synchronized public int getItemViewType(int position) {
+        ImageListItem item = getItem(position);
         return item != null  ?
                 item.getViewType() :
-                FlickrImageListItem.VIEW_TYPE_UNKNOWN;
+                ImageListItem.VIEW_TYPE_UNKNOWN;
     }
 
     @Override
-    public int getItemCount() {
+    synchronized public int getItemCount() {
         return mItems==null? 0 : mItems.size();
     }
 
-    void addItems(List<FlickrImageListItem> items) {
+    synchronized void addItems(List<ImageListItem> items) {
         mItems.addAll(items);
         int itemsSize = items.size();
         int positionStart = mItems.size() - itemsSize;
         notifyItemRangeInserted(positionStart, itemsSize);
+        //removeObsoletePages();
     }
 
-    void startLoading() {
+    synchronized void startLoading() {
         mIsLoadingNow = true;
-        mItems.add(new FlickrImageListItem(FlickrImageListItem.VIEW_TYPE_LOADING));
+        mItems.add(new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
         notifyItemInserted(mItems.size() - 1);
     }
 
-    void stopLoading() {
-        ArrayList<Integer> list_to_remove = new ArrayList<>();
-        for(int i=0; i<mItems.size(); i++){
-            if (getItemViewType(i)==FlickrImageListItem.VIEW_TYPE_LOADING){
-                list_to_remove.add(i);
-            }
-        }
-
+    private void __removeArrayOfNumbers(ArrayList<Integer> list_to_remove){
         for(int i=0; i<list_to_remove.size(); i++){
             int num_to_remove = list_to_remove.get(i);
             if(mItems.size() > num_to_remove) {
@@ -124,7 +120,49 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
                 notifyItemRemoved(num_to_remove);
             }
         }
+    }
+
+    synchronized void stopLoading() {
+        ArrayList<Integer> list_to_remove = new ArrayList<>();
+        for (int i = 0; i < mItems.size(); i++) {
+            if (getItemViewType(i) == ImageListItem.VIEW_TYPE_LOADING) {
+                list_to_remove.add(i);
+            }
+        }
+        __removeArrayOfNumbers(list_to_remove);
         mIsLoadingNow = false;
+    }
+
+    private synchronized void removeObsoletePages() {
+        int pageNext = getCurrentPage()+1;
+        int pagePrev = getCurrentPage()-1;
+        ArrayList<Integer> list_to_remove = new ArrayList<>();
+
+        for(int i=0; i<mItems.size(); i++){
+            ImageListItem item = mItems.get(i);
+            if(item.getViewType()!=ImageListItem.VIEW_TYPE_LOADING) {
+                int itempage = item.getPageNumber();
+                if (itempage < pagePrev)
+                    list_to_remove.add(i);
+            }
+        }
+
+        //удаление неполного ряда в конце списка
+        int c = list_to_remove.size() % mSpanCount;
+        if(c > 0){
+            int size = list_to_remove.size();
+            list_to_remove.subList(size - c, size).clear();
+        }
+
+        for(int i=0; i<mItems.size(); i++){
+            ImageListItem item = mItems.get(i);
+            if(item.getViewType()!=ImageListItem.VIEW_TYPE_LOADING) {
+                int itempage = item.getPageNumber();
+                if (itempage > pageNext)
+                    list_to_remove.add(i);
+            }
+        }
+        __removeArrayOfNumbers(list_to_remove);
     }
 
     void clear() {
@@ -134,7 +172,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
         notifyDataSetChanged();
     }
 
-    private FlickrImageListItem getItem(int position) {
+    private ImageListItem getItem(int position) {
         return mItems.isEmpty() ? null : mItems.get(position);
     }
 
@@ -160,7 +198,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
         public void onBind(int position) {
             super.onBind(position);
             mItemPosition = position;
-            FlickrImageListItem listItem = getItem(position);
+            ImageListItem listItem = getItem(position);
             assert listItem != null;
             if(textViewTitle!=null)
                 textViewTitle.setText(listItem.getTitle());
@@ -185,7 +223,7 @@ public class FlickrImageListAdapter extends RecyclerView.Adapter<BaseViewHolder>
             if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
                 view.setPressed(false);
                 if(mItemClickListener!=null) {
-                    FlickrImageListItem listItem = getItem(mItemPosition);
+                    ImageListItem listItem = getItem(mItemPosition);
                     assert listItem != null;
                     Bundle args = new Bundle();
                     args.putInt(ConstsAndUtils.TAG_TR_POSITION, mItemPosition);

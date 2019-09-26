@@ -24,15 +24,19 @@ public abstract class PaginationListener extends RecyclerView.OnScrollListener {
         boolean islast = isLastPage();
 
         if (!isloading && !islast) {
-            if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+            if (dy > 0 && (visibleItemCount + firstVisibleItemPosition) >= totalItemCount
                     /*&& firstVisibleItemPosition >= 0
                     && totalItemCount >= FLICKR_PER_PAGE*/) {
-                loadMoreItems();
+                loadNextPage();
+            } else if (dy < 0 && firstVisibleItemPosition == 0) {
+                loadPrevPage();
             }
         }
     }
 
-    protected abstract void loadMoreItems();
+    protected abstract void loadNextPage();
+
+    protected abstract void loadPrevPage();
 
     public abstract boolean isLastPage();
 

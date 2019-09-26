@@ -3,17 +3,17 @@ package com.greatsokol.fluckr;
 import android.content.Context;
 import androidx.recyclerview.widget.GridLayoutManager;
 
-class FluckrGridLayoutManager extends GridLayoutManager {
+class ImageGridLayoutManager extends GridLayoutManager {
 
-    FluckrGridLayoutManager(Context context, final FlickrImageListAdapter adapter, final int spanCount) {
+    ImageGridLayoutManager(Context context, final ImageListAdapter adapter, final int spanCount) {
         super(context, spanCount);
         setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
                 switch (adapter.getItemViewType(position)) {
-                    case FlickrImageListItem.VIEW_TYPE_LOADING:
+                    case ImageListItem.VIEW_TYPE_LOADING:
                         return spanCount;
-                    case FlickrImageListItem.VIEW_TYPE_NORMAL:
+                    case ImageListItem.VIEW_TYPE_NORMAL:
                         return 1;
                 }
                 return 1;

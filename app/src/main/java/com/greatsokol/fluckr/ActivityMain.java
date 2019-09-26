@@ -33,13 +33,13 @@ public class ActivityMain extends AppCompatActivity
     private SwipeRefreshLayout mSwipeRefresh;
     private int mTransitionPosition = NO_POSITION;
     private boolean mActivityViewStarted = false;
-    private FlickrRequest mFlickrRequest;
+    private ListRequest mListRequest;
     private Toolbar mToolbar;
     //private View mAppBar;
 
-    private FlickrImageListAdapter getTodayListAdapter(){ return ((FluckrApplication)getApplication()).getAdapter();}
-    private FlickrImageListAdapter getSearchAdapter(){ return ((FluckrApplication)getApplication()).getSearchAdapter();}
-    private FlickrImageListAdapter getActiveAdapter(){ return
+    private ImageListAdapter getTodayListAdapter(){ return ((FluckrApplication)getApplication()).getAdapter();}
+    private ImageListAdapter getSearchAdapter(){ return ((FluckrApplication)getApplication()).getSearchAdapter();}
+    private ImageListAdapter getActiveAdapter(){ return
             mSearchFor == null ||
             mSearchFor.equals("") ? ((FluckrApplication)getApplication()).getAdapter() :
                                     ((FluckrApplication)getApplication()).getSearchAdapter();}
@@ -151,11 +151,13 @@ public class ActivityMain extends AppCompatActivity
         RecyclerView.LayoutManager lm = mRecyclerView.getLayoutManager();
         Parcelable recycleViewSavedState = lm!=null ? lm.onSaveInstanceState() : null;
 
-        final FlickrImageListAdapter adapter = getActiveAdapter();
-        boolean viewAsGrid = getViewAsGrid();
+        final boolean viewAsGrid = getViewAsGrid();
+        final int spanCount = getSpanCount(viewAsGrid);
+        final ImageListAdapter adapter = getActiveAdapter();
         adapter.setViewAsGrid(viewAsGrid);
-        FluckrGridLayoutManager layoutManager
-                = new FluckrGridLayoutManager(this, adapter, getSpanCount(viewAsGrid));
+        adapter.setSpanCount(spanCount);
+        ImageGridLayoutManager layoutManager
+                = new ImageGridLayoutManager(this, adapter, spanCount);
 
 
         mRecyclerView.setLayoutManager(layoutManager);
@@ -163,9 +165,12 @@ public class ActivityMain extends AppCompatActivity
         mRecyclerView.clearOnScrollListeners();
         mRecyclerView.addOnScrollListener(new PaginationListener(layoutManager) {
             @Override
-            protected void loadMoreItems() {
+            protected void loadNextPage() {
                 doApiCall();
             }
+
+            @Override
+            protected void loadPrevPage() {  }
 
             @Override
             public boolean isLastPage() {
@@ -188,7 +193,8 @@ public class ActivityMain extends AppCompatActivity
     }
 
     private void stopRequestLoading(boolean clear){
-        if(mFlickrRequest!=null) mFlickrRequest.Stop();
+        if(mListRequest !=null)
+            mListRequest.Stop();
         getActiveAdapter().stopLoading();
         if(clear)getActiveAdapter().clear();
     }
@@ -200,19 +206,15 @@ public class ActivityMain extends AppCompatActivity
     }
 
     private void doApiCall() {
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                mSwipeRefresh.setRefreshing(false);
-                if(mFlickrRequest!=null) mFlickrRequest.Stop();
-                mFlickrRequest = new FlickrRequest();
-                mFlickrRequest.prepareLoadNextPicturesListRequest(
-                        mSwipeRefresh,
-                        getActiveAdapter(),
-                        mSearchFor);
-                mFlickrRequest.Execute();
-            }
-        });
+        mSwipeRefresh.setRefreshing(false);
+        if(mListRequest != null)
+            mListRequest.Stop();
+        mListRequest = new ListRequest();
+        mListRequest.prepareLoadNextPicturesListRequest(
+                mSwipeRefresh,
+                getActiveAdapter(),
+                mSearchFor);
+        mListRequest.Execute();
     }
 
     @Override

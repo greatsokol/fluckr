@@ -245,8 +245,8 @@ public class ActivityView extends AppCompatActivity {
 
         if(!localFileReady) {
             mProgress.setVisibility(View.VISIBLE);
-            AsyncFlickrImageRequest fullsizeImageRequest =
-                    new AsyncFlickrImageRequest(new AsyncFlickrImageRequest.OnAnswerListener() {
+            AsyncImageRequest fullsizeImageRequest =
+                    new AsyncImageRequest(new AsyncImageRequest.OnAnswerListener() {
                         @Override
                         public void OnAnswerReady(Bitmap bitmap) {
                             if (bitmap != null)
