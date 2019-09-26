@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 class FlickrRequest {
     private static final String API_KEY = "dcfa7bcdfe436387cefa172c2d3dc2ae";
-    private static final int FLICKR_PER_PAGE = 30;
+    private static final int FLICKR_PER_PAGE = 24;
     private AsyncFlickrInterestingListRequest mFlickrRequest;
 
     void prepareLoadNextPicturesListRequest(final View viewToShowSnackbar, final FlickrImageListAdapter adapter, String searchFor){
