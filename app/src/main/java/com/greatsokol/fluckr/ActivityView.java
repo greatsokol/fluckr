@@ -65,7 +65,8 @@ public class ActivityView extends AppCompatActivity {
         final String thumbnailPath = mArgs.getString(ConstsAndUtils.TAG_THUMBURL);
         assert thumbnailPath != null;
         mThumbnail = ImageLoader.loadPictureFromCache(
-                ImageLoader.convertUrlToCacheFileName(thumbnailPath, mCacheDir, ImageLoader.THUMB_SIZE), false);
+                CacheFile.convertUrlToCacheFileName(thumbnailPath, mCacheDir, true,
+                        String.valueOf(ImageLoader.THUMB_SIZE)), false);
         mImageView.setImageBitmap(mThumbnail);
 
 
@@ -259,7 +260,7 @@ public class ActivityView extends AppCompatActivity {
             fullsizeImageRequest.execute();
         } else {
             String fullsizeFileName =
-                    ImageLoader.convertUrlToCacheFileName(fullSizeUrl, mCacheDir, ImageLoader.NORESIZE);
+                    CacheFile.convertUrlToCacheFileName(fullSizeUrl, mCacheDir, false, "");
             mImageView.setImageBitmap(ImageLoader.loadPictureFromCache(fullsizeFileName, false));
         }
     }

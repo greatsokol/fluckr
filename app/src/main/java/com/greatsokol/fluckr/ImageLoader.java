@@ -3,7 +3,7 @@ package com.greatsokol.fluckr;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
-import android.util.Log;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,13 +11,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.Date;
 
 
 class ImageLoader {
     private static final String TAG = "ImageLoader";
-    private static final String OLD = "old";
-    private static final long CACHE_TIME = 24 *  60 * 60; // 1 days * 24 hours * 60 minutes * 60 sec
+
     static final int NORESIZE = -1;
     static final int THUMB_SIZE = 320;
 
@@ -26,73 +24,44 @@ class ImageLoader {
     }
 
 
-    static void cleanCache(final String cacheDir){
-        File directory = new File(cacheDir);
-        File[] files = directory.listFiles();
-        assert files != null;
-        for(File file : files){
-            final String filePath = file.getPath();
-            if (!__isFileNotOverdue(filePath))
-                if (__deleteCacheFile(filePath))
-                    Log.d(TAG, String.format("Cleaned cache file %s",filePath));
-        }
-    }
-
     static Bitmap loadPicture(final String url, final String cacheDir, final int resize) throws Exception {
-        String cacheFileName = convertUrlToCacheFileName(url, cacheDir, resize);
-        Bitmap bitmap = __loadPictureLocal(true, cacheFileName);
+        String cacheFileName
+                = CacheFile.convertUrlToCacheFileName(url, cacheDir,
+                                resize!=NORESIZE, String.valueOf(resize));
+        Bitmap bitmap = loadPictureFromCache(cacheFileName, true);
         if (bitmap == null)
            bitmap = loadImageFromUrlAndCacheIt(url, cacheFileName, resize);
         return bitmap;
     }
 
-    static String convertUrlToCacheFileName(final String url, final String cacheDir, int resize){
-        String fileName = cacheDir + "/" +
-                url.replace(':', '_').
-                        replace('?','_').
-                        replace('&','_').
-                        replace('/','_').
-                        replace('.','_');
-        if (resize!=NORESIZE)
-            fileName = fileName+"_"+resize;
-        return fileName;
-    }
-
-    private static Bitmap __loadPictureLocal(boolean checkIsFileOverdue, String cacheFileName) {
-        return loadPictureFromCache(cacheFileName, checkIsFileOverdue);
-    }
 
     static Bitmap loadPictureFromCache(final String path, boolean checkIsFileOverdue) {
-        if (!checkIsFileOverdue || __isFileNotOverdue(path)) {
+        if (!checkIsFileOverdue || CacheFile.isFileNotOverdue(path)) {
             Bitmap bitmap = loadPictureFromFile(path);
-            if (!checkIsFileOverdue && bitmap == null) {
-                bitmap = loadPictureFromFile(path + OLD);
-            }
+            if (!checkIsFileOverdue && bitmap == null)
+                bitmap = loadPictureFromFile(path + CacheFile.OLD);
             return bitmap;
         } else {
             //Log.i(TAG, "OVERDUTED FILE " + path);
-            __makeFileOverdue(path);
+            CacheFile.makeFileOverdue(path);
         }
         return null;
     }
 
-    private static Bitmap loadPictureFromFile(String path) {
-        if (path != null && !path.trim().isEmpty()) {
-            //Log.i(TAG, "LOADING FILE BEGIN = " + path);
-            File file = new File(path);
-            if (file.isFile() && file.exists()) {
-                return BitmapFactory.decodeFile(path);
-                //Log.i(TAG, "LOADING FILE FINISHED = " + path);
-            }
-        }
-        return null;
+    private static Bitmap loadPictureFromFile(final String path) {
+        return (Bitmap) CacheFile.loadFileFromCache(path, new CacheFile.Callable<String, Object>() {
+                                                        @Override
+                                                        public Object call(String input) {
+                                                            return BitmapFactory.decodeFile(path);
+                                                        }
+                                                    });
     }
 
 
     private static Bitmap loadImageFromUrlAndCacheIt(String urlPath, String cacheFileName, int resize) throws Exception {
         try {
             //Log.i(TAG, "LOADING URL BEGIN = " + urlPath);
-            File cacheFile = __prepareCacheFile(cacheFileName);
+            File cacheFile = CacheFile.prepareCacheFile(cacheFileName);
             if (cacheFile != null) {
                 OutputStream os = new FileOutputStream(cacheFile);
                 InputStream is = (new URL(urlPath)).openStream();
@@ -100,9 +69,10 @@ class ImageLoader {
                 try {
                     CopyStream(is, bos);
                     Bitmap bitmap = BitmapFactory.decodeByteArray(bos.toByteArray(), 0, bos.size());
-                    if (resize>0) bitmap = ThumbnailUtils.extractThumbnail(bitmap, resize, resize);
+                    if (resize!=NORESIZE)
+                        bitmap = ThumbnailUtils.extractThumbnail(bitmap, resize, resize);
                     bitmap.compress(Bitmap.CompressFormat.PNG, 0, os);
-                    __deleteCacheFile(cacheFileName + OLD);
+                    CacheFile.deleteCacheFile(cacheFileName + CacheFile.OLD);
                     //Log.i(TAG, "LOADING URL FINISHED = " + urlPath);
                     return bitmap;
                 } finally {
@@ -116,7 +86,7 @@ class ImageLoader {
                 }
             }
         } catch (Exception e) {
-            __deleteCacheFile(cacheFileName);
+            CacheFile.deleteCacheFile(cacheFileName);
             throw new Exception(e);
             //Log.i(TAG, "LOADING URL ERROR (" + e.getClass().getSimpleName() + ") = " + urlPath);
         }
@@ -124,42 +94,9 @@ class ImageLoader {
     }
 
 
-    private static boolean __deleteCacheFile(String cacheFileName) {
-        File cacheFile = new File(cacheFileName);
-        return !cacheFile.exists() || cacheFile.delete();
-    }
 
 
-     private static File __prepareCacheFile(String cacheFileName) {
-        if (!__deleteCacheFile(cacheFileName)) return null;
-        return new File(cacheFileName);
-    }
 
-    private static boolean __isFileNotOverdue(String path) {
-        if (path != null) {
-            File file = new File(path);
-            if (file.exists()) {
-                final long currentTime = new Date().getTime() / 1000;
-                final long lastModifed = file.lastModified() / 1000;
-                return lastModifed + CACHE_TIME > currentTime;
-            }
-        }
-        return false;
-    }
-
-    private static void __makeFileOverdue(String path) {
-        if (path != null) {
-            File file = new File(path);
-            if (file.exists()) {
-                boolean proceed = true;
-                File file_old = new File(path + OLD);
-                if (file_old.exists())
-                    proceed = file_old.delete();
-                if (proceed)
-                    file.renameTo(new File(path + OLD));
-            }
-        }
-    }
 
     private static void CopyStream(InputStream is, OutputStream os) throws IOException {
         final int buffer_size=512;

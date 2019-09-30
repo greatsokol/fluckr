@@ -64,7 +64,7 @@ public class ActivityMain extends AppCompatActivity
         }
 
         // clean older than 1 day cached files
-        ImageLoader.cleanCache(getCacheDir().getAbsolutePath());
+        CacheFile.cleanCache(getCacheDir().getAbsolutePath());
 
         setInsets();
         setLayout();
