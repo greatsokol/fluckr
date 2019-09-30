@@ -62,7 +62,8 @@ public class ActivityMain extends AppCompatActivity
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
 
-        loadSettings(savedInstanceState);
+        loadNavigationSettings();
+        loadInstanceSettings(savedInstanceState);
 
         // clean older than 1 day cached files
         CacheFile.cleanCache(getCacheDir().getAbsolutePath());
@@ -102,27 +103,39 @@ public class ActivityMain extends AppCompatActivity
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        saveSettings(outState);
+        saveInstanceSettings(outState);
         super.onSaveInstanceState(outState);
     }
 
 
-    private void loadSettings(Bundle settings){
+    private void loadInstanceSettings(Bundle settings){
         if (settings != null) {
             mTransitionPosition = settings.getInt(ConstsAndUtils.TAG_TR_POSITION);
             mSearchFor = settings.getString(ConstsAndUtils.TAG_SEARCH_FOR);
-            mDateOfCurrentList = new Date(settings.getLong(ConstsAndUtils.TAG_DATE_TO_VIEW));
         } else{
             mTransitionPosition = NO_POSITION;
             mSearchFor = "";
-            mDateOfCurrentList = ConstsAndUtils.DecDate(new Date());
         }
     }
 
-    private void saveSettings(Bundle settings){
+    private void saveInstanceSettings(Bundle settings){
         settings.putInt(ConstsAndUtils.TAG_TR_POSITION, mTransitionPosition);
         settings.putString(ConstsAndUtils.TAG_SEARCH_FOR, mSearchFor);
-        settings.putLong(ConstsAndUtils.TAG_DATE_TO_VIEW, mDateOfCurrentList.getTime());
+    }
+
+
+    private void loadNavigationSettings(){
+        mDateOfCurrentList
+                = new Date(getPreferences(MODE_PRIVATE).getLong(ConstsAndUtils.TAG_DATE_TO_VIEW,
+                                                            ConstsAndUtils.DecDate(new Date()).getTime()));
+    }
+
+    private void saveNavigationSettings(){
+        SharedPreferences activityPreferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = activityPreferences.edit();
+        editor.putLong(ConstsAndUtils.TAG_DATE_TO_VIEW, mDateOfCurrentList.getTime());
+
+        editor.apply();
     }
 
     private void setInsets(){
@@ -176,7 +189,7 @@ public class ActivityMain extends AppCompatActivity
         RecyclerView.LayoutManager lm = mRecyclerView.getLayoutManager();
         Parcelable recycleViewSavedState = lm!=null ? lm.onSaveInstanceState() : null;
 
-        final boolean viewAsGrid = getViewAsGrid();
+        final boolean viewAsGrid = settings_getViewAsGrid();
         final int spanCount = getSpanCount(viewAsGrid);
         final ImageListAdapter adapter = getActiveAdapter();
         adapter.setViewAsGrid(viewAsGrid);
@@ -298,7 +311,7 @@ public class ActivityMain extends AppCompatActivity
     public boolean onOptionsItemSelected(final MenuItem item) {
         final int id = item.getItemId();
         if (id == R.id.viewSwitch) {
-            setViewAsGrid(!getViewAsGrid());
+            settings_setViewAsGrid(!settings_getViewAsGrid());
             setLayout();
             return true;
         }
@@ -317,6 +330,7 @@ public class ActivityMain extends AppCompatActivity
         super.onStop();
         getTodayListAdapter().setOnItemClickListener(null);
         getSearchAdapter().setOnItemClickListener(null);
+        saveNavigationSettings();
     }
 
         @Override
@@ -362,16 +376,14 @@ public class ActivityMain extends AppCompatActivity
         }
     }
 
-    private boolean getViewAsGrid(){
+    private boolean settings_getViewAsGrid(){
         return getPreferences(MODE_PRIVATE).getBoolean(ConstsAndUtils.TAG_VIEWASGRID, true);
     }
 
-    private void setViewAsGrid(boolean bAsGrid){
+    private void settings_setViewAsGrid(boolean bAsGrid){
         SharedPreferences activityPreferences = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor editor = activityPreferences.edit();
         editor.putBoolean(ConstsAndUtils.TAG_VIEWASGRID, bAsGrid);
         editor.apply();
     }
-
-
 }
