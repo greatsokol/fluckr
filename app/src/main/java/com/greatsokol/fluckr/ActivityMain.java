@@ -25,13 +25,17 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import java.util.Date;
+
+
+
 
 public class ActivityMain extends AppCompatActivity
         implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
     private final static int NO_POSITION = -1;
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefresh;
-    private int mTransitionPosition = NO_POSITION;
+    private int mTransitionPosition;
     private boolean mActivityViewStarted = false;
     private ListRequest mListRequest;
     private Toolbar mToolbar;
@@ -44,6 +48,7 @@ public class ActivityMain extends AppCompatActivity
             mSearchFor.equals("") ? ((FluckrApplication)getApplication()).getAdapter() :
                                     ((FluckrApplication)getApplication()).getSearchAdapter();}
     private String mSearchFor = "";
+    private Date mDateOfCurrentList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,13 +60,9 @@ public class ActivityMain extends AppCompatActivity
         mSwipeRefresh = findViewById(R.id.swipeRefresh);
         mSwipeRefresh.setOnRefreshListener(this);
         mRecyclerView = findViewById(R.id.recyclerView);
-        //mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setHasFixedSize(true);
 
-        // Workaround for orientation change issue
-        if (savedInstanceState != null) {
-            mTransitionPosition = savedInstanceState.getInt(ConstsAndUtils.TAG_TR_POSITION);
-            mSearchFor = savedInstanceState.getString(ConstsAndUtils.TAG_SEARCH_FOR);
-        }
+        loadSettings(savedInstanceState);
 
         // clean older than 1 day cached files
         CacheFile.cleanCache(getCacheDir().getAbsolutePath());
@@ -99,6 +100,30 @@ public class ActivityMain extends AppCompatActivity
     }
 
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        saveSettings(outState);
+        super.onSaveInstanceState(outState);
+    }
+
+
+    private void loadSettings(Bundle settings){
+        if (settings != null) {
+            mTransitionPosition = settings.getInt(ConstsAndUtils.TAG_TR_POSITION);
+            mSearchFor = settings.getString(ConstsAndUtils.TAG_SEARCH_FOR);
+            mDateOfCurrentList = new Date(settings.getLong(ConstsAndUtils.TAG_DATE_TO_VIEW));
+        } else{
+            mTransitionPosition = NO_POSITION;
+            mSearchFor = "";
+            mDateOfCurrentList = ConstsAndUtils.DecDate(new Date());
+        }
+    }
+
+    private void saveSettings(Bundle settings){
+        settings.putInt(ConstsAndUtils.TAG_TR_POSITION, mTransitionPosition);
+        settings.putString(ConstsAndUtils.TAG_SEARCH_FOR, mSearchFor);
+        settings.putLong(ConstsAndUtils.TAG_DATE_TO_VIEW, mDateOfCurrentList.getTime());
+    }
 
     private void setInsets(){
         findViewById(R.id.constraint).setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -213,6 +238,7 @@ public class ActivityMain extends AppCompatActivity
         mListRequest.prepareLoadNextPicturesListRequest(
                 mSwipeRefresh,
                 getActiveAdapter(),
+                mDateOfCurrentList,
                 mSearchFor);
         mListRequest.Execute();
     }
@@ -279,18 +305,6 @@ public class ActivityMain extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private boolean getViewAsGrid(){
-        return getPreferences(MODE_PRIVATE).getBoolean(ConstsAndUtils.TAG_VIEWASGRID, true);
-    }
-
-    private void setViewAsGrid(boolean bAsGrid){
-        SharedPreferences activityPreferences = getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor editor = activityPreferences.edit();
-        editor.putBoolean(ConstsAndUtils.TAG_VIEWASGRID, bAsGrid);
-        editor.apply();
-    }
-
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -339,13 +353,6 @@ public class ActivityMain extends AppCompatActivity
         mTransitionPosition = NO_POSITION;
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putInt(ConstsAndUtils.TAG_TR_POSITION, mTransitionPosition);
-        outState.putString(ConstsAndUtils.TAG_SEARCH_FOR, mSearchFor);
-        super.onSaveInstanceState(outState);
-    }
-
     void restoreSearchViewState(MenuItem searchItem, String query){
         SearchView searchView = (SearchView) searchItem.getActionView();
         if (!TextUtils.isEmpty(query)) {
@@ -354,4 +361,17 @@ public class ActivityMain extends AppCompatActivity
             searchView.clearFocus();
         }
     }
+
+    private boolean getViewAsGrid(){
+        return getPreferences(MODE_PRIVATE).getBoolean(ConstsAndUtils.TAG_VIEWASGRID, true);
+    }
+
+    private void setViewAsGrid(boolean bAsGrid){
+        SharedPreferences activityPreferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = activityPreferences.edit();
+        editor.putBoolean(ConstsAndUtils.TAG_VIEWASGRID, bAsGrid);
+        editor.apply();
+    }
+
+
 }

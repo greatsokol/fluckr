@@ -4,6 +4,7 @@ import android.view.View;
 import com.google.android.material.snackbar.Snackbar;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Date;
 
 class ListRequest {
     private static final String API_KEY = "dcfa7bcdfe436387cefa172c2d3dc2ae";
@@ -11,7 +12,7 @@ class ListRequest {
     private AsyncListRequest mFlickrRequest;
     private ImageListAdapter mAdapter;
 
-    void prepareLoadNextPicturesListRequest(final View viewToShowSnackbar, final ImageListAdapter adapter, String searchFor){
+    void prepareLoadNextPicturesListRequest(final View viewToShowSnackbar, final ImageListAdapter adapter, Date dateToView, String searchFor){
         if (adapter.isLoadingNow() || (adapter.isLastPage() && adapter.getItemCount()>0))
             return;
 
@@ -41,6 +42,7 @@ class ListRequest {
                         _showSnack(refViewToShowSnackbar, "Network error");
                     }
                 },
+                dateToView,
                 searchFor,
                 API_KEY,
                 FLICKR_PER_PAGE,

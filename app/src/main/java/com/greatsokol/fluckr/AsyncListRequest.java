@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 class AsyncListRequest extends AsyncTask<Void, Void, ArrayList<ImageListItem>> {
@@ -20,6 +21,7 @@ class AsyncListRequest extends AsyncTask<Void, Void, ArrayList<ImageListItem>> {
     private String mApiKey;
     private int mPerPage;
     private int mCurrentPage;
+    private Date mDate;
 
     public abstract static class OnAnswerListener{
         public abstract void OnAnswerReady(ArrayList<ImageListItem> items);
@@ -27,7 +29,7 @@ class AsyncListRequest extends AsyncTask<Void, Void, ArrayList<ImageListItem>> {
         public abstract void OnError();
     }
 
-    AsyncListRequest(@NonNull final AsyncListRequest.OnAnswerListener listener, String searchFor,
+    AsyncListRequest(@NonNull final AsyncListRequest.OnAnswerListener listener, Date date, String searchFor,
                      String ApiKey, int NumberPerPage, int CurrentPage, String cacheDir) {
         mListener = listener;
         mSearchForString = searchFor;
@@ -35,6 +37,7 @@ class AsyncListRequest extends AsyncTask<Void, Void, ArrayList<ImageListItem>> {
         mApiKey = ApiKey;
         mPerPage = NumberPerPage;
         mCurrentPage = CurrentPage;
+        mDate = date;
     }
 
 
@@ -47,12 +50,15 @@ class AsyncListRequest extends AsyncTask<Void, Void, ArrayList<ImageListItem>> {
                     "https://www.flickr.com/services/rest/?method=" +
                             "flickr.interestingness.getList" +
                             "&api_key=%s" +
+                            "&date=%s"+
                             "&per_page=%d" +
                             "&page=%d" +
                             "&extras=%s"+
                             "&format=json" +
                             "&nojsoncallback=1",
-                    mApiKey, mPerPage, mCurrentPage, extras);
+                    mApiKey,
+                    ConstsAndUtils.DateToStr_yyyy_mm_dd(mDate),
+                    mPerPage, mCurrentPage, extras);
         else
             list_request = String.format( Locale.getDefault(),
                     "https://www.flickr.com/services/rest/?method=" +

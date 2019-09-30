@@ -1,6 +1,12 @@
 package com.greatsokol.fluckr;
 
 import android.content.res.Resources;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 
 abstract class ConstsAndUtils {
@@ -14,6 +20,7 @@ abstract class ConstsAndUtils {
     final static String TAG_VIEWASGRID = "VIEWASGRID";
     final static String TAG_READY = "READY";
     final static String TAG_SEARCH_FOR = "SEARCH_FOR";
+    final static String TAG_DATE_TO_VIEW = "DATE_VIEW";
 
 
     static boolean isLandscape(Resources res){
@@ -23,5 +30,23 @@ abstract class ConstsAndUtils {
 
     static int pxFromDp(Resources res, float dp) {
         return (int)(dp * res.getDisplayMetrics().density);
+    }
+
+    static String DateToStr_yyyy_mm_dd(Date date){
+        return new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date);
+    }
+
+    private static Date __dec_inc_date(Date date, int amount){
+        final Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, amount);
+        return cal.getTime();
+    }
+
+    static Date DecDate(Date date){
+        return __dec_inc_date(date, -1);
+    }
+
+    static Date IncDate(Date date){
+        return __dec_inc_date(date, 1);
     }
 }
