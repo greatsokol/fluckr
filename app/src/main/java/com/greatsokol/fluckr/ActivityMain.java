@@ -195,16 +195,6 @@ public class ActivityMain extends AppCompatActivity
             protected void loadPrevPage() {
                 getActiveAdapter().loadPrevPage(mToolbar, mSearchFor);
             }
-
-            @Override
-            public boolean isLastPage() {
-                return getActiveAdapter().isLastPage();
-            }
-
-            @Override
-            public boolean isLoading() {
-                return getActiveAdapter().isLoadingNow();
-            }
         });
 
         if (recycleViewSavedState!=null)

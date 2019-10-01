@@ -11,9 +11,10 @@ class ImageGridLayoutManager extends GridLayoutManager {
             @Override
             public int getSpanSize(int position) {
                 switch (adapter.getItemViewType(position)) {
+                    case ImageListItem.VIEW_TYPE_DATE:
                     case ImageListItem.VIEW_TYPE_LOADING:
                         return spanCount;
-                    case ImageListItem.VIEW_TYPE_NORMAL:
+                    case ImageListItem.VIEW_TYPE_IMAGE:
                         return 1;
                 }
                 return 1;

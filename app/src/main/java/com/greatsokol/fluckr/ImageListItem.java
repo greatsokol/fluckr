@@ -8,8 +8,10 @@ class ImageListItem {
 
     static final int VIEW_TYPE_UNKNOWN = -1;
     static final int VIEW_TYPE_LOADING = 0;
-    static final int VIEW_TYPE_NORMAL = 1;
+    static final int VIEW_TYPE_IMAGE = 1;
+    static final int VIEW_TYPE_DATE = 2;
 
+    private int mPage;
     private Date mDate;
     private String mTitle;
     private String mDetails;
@@ -18,19 +20,26 @@ class ImageListItem {
     private String mFullsizeUrl;
 
 
-    private int mViewType = VIEW_TYPE_NORMAL;
+    private int mViewType = VIEW_TYPE_IMAGE;
     ImageListItem(int viewtype){mViewType = viewtype;}
-    ImageListItem(Date date, String title, String details, Bitmap thumbnail,
+    ImageListItem(Date date, int page, String title, String details, Bitmap thumbnail,
                   String thumbnailUrl, String fullsizeUrl) {
         mTitle = title;
+        mPage = page;
         mDetails = details;
         mBitmapThumbnail = thumbnail;
         mThumbnailUrl = thumbnailUrl;
         mFullsizeUrl = fullsizeUrl;
         mDate = date;
     }
+    ImageListItem(Date date, int page){
+        mViewType = VIEW_TYPE_DATE;
+        mPage = page;
+        mDate = date;
+    }
 
     Date getDate(){return mDate;}
+    int getPage(){return mPage;}
     int getViewType(){return mViewType;}
     String getTitle() {
         return mTitle;

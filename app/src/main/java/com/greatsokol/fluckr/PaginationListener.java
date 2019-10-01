@@ -20,10 +20,10 @@ public abstract class PaginationListener extends RecyclerView.OnScrollListener {
         int visibleItemCount = layoutManager.getChildCount();
         int totalItemCount = layoutManager.getItemCount();
         int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-        boolean isloading = isLoading();
-        boolean islast = isLastPage();
+        //boolean isloading = isLoading();
+        //boolean islast = isLastPage();
 
-        if (!isloading && !islast) {
+        //if (!isloading && !islast) {
             if (dy > 0 && (visibleItemCount + firstVisibleItemPosition) >= totalItemCount
                     /*&& firstVisibleItemPosition >= 0
                     && totalItemCount >= FLICKR_PER_PAGE*/) {
@@ -31,14 +31,14 @@ public abstract class PaginationListener extends RecyclerView.OnScrollListener {
             } else if (dy < 0 && firstVisibleItemPosition == 0) {
                 loadPrevPage();
             }
-        }
+        //}
     }
 
     protected abstract void loadNextPage();
 
     protected abstract void loadPrevPage();
 
-    public abstract boolean isLastPage();
+    //public abstract boolean isLastPage();
 
-    public abstract boolean isLoading();
+    //public abstract boolean isLoading();
 }

@@ -103,6 +103,7 @@ class AsyncListRequest extends AsyncTask<Void, Void, ArrayList<ImageListItem>> {
                     if (bmp!=null) {
                         items.add(new ImageListItem(
                                 mDate,
+                                mPage,
                                 title, details,
                                 bmp, thumbnailUrl, fullsizeUrl));
                     } else Log.d(TAG, "Can't load picture");
