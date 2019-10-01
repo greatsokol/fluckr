@@ -25,7 +25,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-
+import java.util.ArrayList;
 
 
 public class ActivityMain extends AppCompatActivity
@@ -36,14 +36,15 @@ public class ActivityMain extends AppCompatActivity
     private int mTransitionPosition;
     private boolean mActivityViewStarted = false;
     private Toolbar mToolbar;
+    private ImageListAdapter mAdapter;
+    private ImageListAdapter mSearchAdapter;
     //private View mAppBar;
 
-    private ImageListAdapter getTodayListAdapter(){ return ((FluckrApplication)getApplication()).getAdapter();}
-    private ImageListAdapter getSearchAdapter(){ return ((FluckrApplication)getApplication()).getSearchAdapter();}
+    private ImageListAdapter getTodayListAdapter(){ return mAdapter;}
+    private ImageListAdapter getSearchAdapter(){ return mSearchAdapter;}
     private ImageListAdapter getActiveAdapter(){ return
             mSearchFor == null ||
-            mSearchFor.equals("") ? ((FluckrApplication)getApplication()).getAdapter() :
-                                    ((FluckrApplication)getApplication()).getSearchAdapter();}
+            mSearchFor.equals("") ? getTodayListAdapter() : getSearchAdapter();}
     private String mSearchFor = "";
 
     @Override
@@ -57,6 +58,8 @@ public class ActivityMain extends AppCompatActivity
         //mSwipeRefresh.setOnRefreshListener(this);
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
+        mAdapter = new ImageListAdapter(new ArrayList<ImageListItem>());
+        mSearchAdapter = new ImageListAdapter(new ArrayList<ImageListItem>());
 
         loadInstanceSettings(savedInstanceState);
 
@@ -184,8 +187,22 @@ public class ActivityMain extends AppCompatActivity
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
+
+        mRecyclerView.setPreserveFocusAfterLayout(true);
+        mRecyclerView.setOnFlingListener(new PaginationListenerOnFling(layoutManager) {
+            @Override
+            protected void loadNextPage() {
+                getActiveAdapter().loadNextPage(mToolbar, mSearchFor);
+            }
+
+            @Override
+            protected void loadPrevPage() {
+                getActiveAdapter().loadPrevPage(mToolbar, mSearchFor);
+            }
+        });
+
         mRecyclerView.clearOnScrollListeners();
-        mRecyclerView.addOnScrollListener(new PaginationListener(layoutManager) {
+        mRecyclerView.addOnScrollListener(new PaginationListenerOnScroll(layoutManager) {
             @Override
             protected void loadNextPage() {
                 getActiveAdapter().loadNextPage(mToolbar, mSearchFor);
