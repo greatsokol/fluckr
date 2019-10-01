@@ -201,7 +201,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         TextView textViewDetails;
         ImageView imageView;
         int mItemPosition;
-
+        ImageListItem listItem;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -219,8 +219,8 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         public void onBind(int position) {
             super.onBind(position);
             mItemPosition = position;
-            ImageListItem listItem = getItem(position);
-            assert listItem != null;
+            listItem = getItem(position);
+            assert listItem!=null;
             if(textViewTitle!=null)
                 textViewTitle.setText(listItem.getTitle());
             if(textViewDetails!=null) {
@@ -241,10 +241,6 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
 
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
-
-            ImageListItem listItem = getItem(mItemPosition);
-            assert listItem != null;
-
             if(motionEvent.getAction() == MotionEvent.ACTION_CANCEL ||
                     listItem.getViewType()!=ImageListItem.VIEW_TYPE_IMAGE)
             {
