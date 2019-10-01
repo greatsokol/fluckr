@@ -15,34 +15,37 @@ import java.util.Locale;
 
 class AsyncListRequest extends AsyncTask<Void, Void, ArrayList<ImageListItem>> {
     private static final String TAG = "AsyncFlickrListRequest";
+    private static final String API_KEY = "dcfa7bcdfe436387cefa172c2d3dc2ae";
+    private static final int FLICKR_PER_PAGE = 24;
     private String mCacheDir;
     private AsyncListRequest.OnAnswerListener mListener;
     private String mSearchForString;
-    private String mApiKey;
-    private int mPerPage;
-    private int mCurrentPage;
+    private int mPage;
     private Date mDate;
 
     public abstract static class OnAnswerListener{
+        public abstract void OnStart();
         public abstract void OnAnswerReady(ArrayList<ImageListItem> items);
         public abstract void OnGetPagesNumber(int number);
         public abstract void OnError();
     }
 
-    AsyncListRequest(@NonNull final AsyncListRequest.OnAnswerListener listener, Date date, String searchFor,
-                     String ApiKey, int NumberPerPage, int CurrentPage, String cacheDir) {
+    AsyncListRequest(@NonNull final AsyncListRequest.OnAnswerListener listener,
+                     Date date,
+                     int page,
+                     String cacheDir,
+                     String searchFor) {
         mListener = listener;
         mSearchForString = searchFor;
         mCacheDir = cacheDir;
-        mApiKey = ApiKey;
-        mPerPage = NumberPerPage;
-        mCurrentPage = CurrentPage;
+        mPage = page;
         mDate = date;
     }
 
 
     @Override
     protected ArrayList<ImageListItem> doInBackground(Void... voids) {
+        mListener.OnStart();
         String list_request;
         final String extras = "description,url_t,url_m,url_n,url_b,url_k,url_h";
         if(mSearchForString.equals(""))
@@ -56,9 +59,9 @@ class AsyncListRequest extends AsyncTask<Void, Void, ArrayList<ImageListItem>> {
                             "&extras=%s"+
                             "&format=json" +
                             "&nojsoncallback=1",
-                    mApiKey,
+                    API_KEY,
                     ConstsAndUtils.DateToStr_yyyy_mm_dd(mDate),
-                    mPerPage, mCurrentPage, extras);
+                    FLICKR_PER_PAGE, mPage, extras);
         else
             list_request = String.format( Locale.getDefault(),
                     "https://www.flickr.com/services/rest/?method=" +
@@ -70,7 +73,7 @@ class AsyncListRequest extends AsyncTask<Void, Void, ArrayList<ImageListItem>> {
                             "&format=json" +
                             "&nojsoncallback=1"+
                             "&text=%s",
-                    mApiKey, mPerPage, mCurrentPage, extras, mSearchForString);
+                    API_KEY, FLICKR_PER_PAGE, mPage, extras, mSearchForString);
 
         try {
             JSONObject jsonObject;
@@ -99,7 +102,7 @@ class AsyncListRequest extends AsyncTask<Void, Void, ArrayList<ImageListItem>> {
                     Bitmap bmp = ImageLoader.loadPicture(thumbnailUrl, mCacheDir, ImageLoader.THUMB_SIZE);
                     if (bmp!=null) {
                         items.add(new ImageListItem(
-                                mCurrentPage,
+                                mDate,
                                 title, details,
                                 bmp, thumbnailUrl, fullsizeUrl));
                     } else Log.d(TAG, "Can't load picture");

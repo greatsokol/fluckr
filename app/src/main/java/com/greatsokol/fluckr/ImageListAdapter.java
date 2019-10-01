@@ -1,5 +1,6 @@
 package com.greatsokol.fluckr;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -9,27 +10,32 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.snackbar.Snackbar;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     private List<ImageListItem> mItems;
+    private AsyncListRequest mFlickrRequest;
     private boolean mIsLoadingNow = false;
-    private int mCurrentPage = 0;
+    private int mCurrentPage;
+    private Date mCurrentDate;
     private boolean mViewAsGrid = true;
 
     boolean isLoadingNow(){return mIsLoadingNow; }
-    int getCurrentPage(){return mCurrentPage;}
-    void setCurrentPage(int number){mCurrentPage = number;}
     void setViewAsGrid(boolean viewAsGrid){mViewAsGrid = viewAsGrid;}
 
     private int mTotalPage = 0; // обновится после LoadNextPicturesList
     private int mSpanCount = 3;
-    boolean isLastPage(){return mCurrentPage>(mTotalPage-1);}
-    void setTotalPage(int totalPage){mTotalPage = totalPage;}
+    boolean isLastPage(){return false;}//mCurrentPage>(mTotalPage-1);}
+    private boolean __isLastPage(){ return mCurrentPage>(mTotalPage-1);}
     void setSpanCount(int spanCount){mSpanCount = spanCount;}
 
 
@@ -98,18 +104,30 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         return mItems==null? 0 : mItems.size();
     }
 
-    synchronized void addItems(List<ImageListItem> items) {
+    private synchronized void addItemsAtBottom(List<ImageListItem> items) {
         mItems.addAll(items);
         int itemsSize = items.size();
         int positionStart = mItems.size() - itemsSize;
         notifyItemRangeInserted(positionStart, itemsSize);
-        //removeObsoletePages();
+        removeObsoleteDates();
     }
 
-    synchronized void startLoading() {
+    private synchronized void addItemsAtStart(List<ImageListItem> items) {
+        mItems.addAll(0, items);
+        int itemsSize = items.size();
+        notifyItemRangeInserted(0, itemsSize);
+        removeObsoleteDates();
+    }
+
+    private synchronized void startLoading(int page) {
         mIsLoadingNow = true;
-        mItems.add(new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
-        notifyItemInserted(mItems.size() - 1);
+        if(page >= mCurrentPage){
+            mItems.add(new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
+            notifyItemInserted(mItems.size() - 1);
+        } else {
+            mItems.add(0, new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
+            notifyItemInserted(0);
+        }
     }
 
     private void __removeArrayOfNumbers(ArrayList<Integer> list_to_remove){
@@ -122,7 +140,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         }
     }
 
-    synchronized void stopLoading() {
+    private synchronized void stopLoading() {
         ArrayList<Integer> list_to_remove = new ArrayList<>();
         for (int i = 0; i < mItems.size(); i++) {
             if (getItemViewType(i) == ImageListItem.VIEW_TYPE_LOADING) {
@@ -133,22 +151,22 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         mIsLoadingNow = false;
     }
 
-    private synchronized void removeObsoletePages() {
-        int pageNext = getCurrentPage()+1;
-        int pagePrev = getCurrentPage()-1;
+    private synchronized void removeObsoleteDates() {
+        //Date dateNext = ConstsAndUtils.DecDate(mCurrentDate);
+        Date datePrev = mCurrentDate; //ConstsAndUtils.IncDate(mCurrentDate);
         ArrayList<Integer> list_to_remove = new ArrayList<>();
 
         for(int i=0; i<mItems.size(); i++){
             ImageListItem item = mItems.get(i);
             if(item.getViewType()!=ImageListItem.VIEW_TYPE_LOADING) {
-                int itempage = item.getPageNumber();
-                if (itempage < pagePrev)
+                Date itemDate = item.getDate();
+                if (!ConstsAndUtils.IsEqualDay(itemDate, datePrev))
                     list_to_remove.add(i);
             }
         }
 
         //удаление неполного ряда в конце списка
-        int c = list_to_remove.size() % mSpanCount;
+        /*int c = list_to_remove.size() % mSpanCount;
         if(c > 0){
             int size = list_to_remove.size();
             list_to_remove.subList(size - c, size).clear();
@@ -161,14 +179,14 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 if (itempage > pageNext)
                     list_to_remove.add(i);
             }
-        }
+        }*/
         __removeArrayOfNumbers(list_to_remove);
     }
 
     void clear() {
         if (isLoadingNow()) return;
         mItems.clear();
-        setCurrentPage(0);
+        mCurrentPage=0;
         notifyDataSetChanged();
     }
 
@@ -249,5 +267,105 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         protected void clear() {
 
         }
+    }
+
+
+    void loadNavigationSettings(SharedPreferences prefs){
+        mCurrentDate
+         = new Date(prefs.getLong(ConstsAndUtils.TAG_DATE_TO_VIEW, ConstsAndUtils.DecDate(new Date()).getTime()));
+        mCurrentPage = prefs.getInt(ConstsAndUtils.TAG_PAGE_TO_VIEW,0);
+        mViewAsGrid = prefs.getBoolean(ConstsAndUtils.TAG_VIEWASGRID, true);
+    }
+
+    void saveNavigationSettings(SharedPreferences prefs){
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putLong(ConstsAndUtils.TAG_DATE_TO_VIEW, mCurrentDate.getTime());
+        editor.putInt(ConstsAndUtils.TAG_PAGE_TO_VIEW, mCurrentPage);
+        editor.putBoolean(ConstsAndUtils.TAG_VIEWASGRID, mViewAsGrid);
+        editor.apply();
+    }
+
+    void stopLoadingRequest(boolean clear){
+        if(mFlickrRequest != null)
+            mFlickrRequest.cancel(true);
+        stopLoading();
+        if(clear)clear();
+    }
+
+    private void __loadPage(final View viewToShowSnackbar,
+                            final String searchFor,
+                            final Date date,
+                            final int page){
+        if (isLoadingNow() || (isLastPage() && getItemCount()>0)) return;
+
+        mFlickrRequest = new AsyncListRequest(new AsyncListRequest.OnAnswerListener() {
+                            @Override
+                            public void OnStart() {
+                                startLoading(page);
+                            }
+
+                            @Override
+                            public void OnAnswerReady(ArrayList<ImageListItem> items) {
+                                if(page >= mCurrentPage) addItemsAtBottom(items);
+                                else addItemsAtStart(items);
+
+                                stopLoading();
+                                if (getItemCount()==0)
+                                    _showSnack(viewToShowSnackbar, "No results");
+                                else {
+                                    mCurrentPage = page;
+                                    mCurrentDate = date;
+                                }
+                            }
+
+                            @Override
+                            public void OnGetPagesNumber(int number) {
+                                mTotalPage = number;
+                            }
+
+                            @Override
+                            public void OnError() {
+                                stopLoading();
+                                _showSnack(viewToShowSnackbar, "Network error");
+                            }
+                        },
+                date,
+                page,
+                viewToShowSnackbar.getContext().getCacheDir().getAbsolutePath(),
+                searchFor);
+        mFlickrRequest.execute();
+    }
+
+
+    void loadCurrentPage(View viewToShowSnackbar, String searchFor){
+        __loadPage(viewToShowSnackbar, searchFor, mCurrentDate, mCurrentPage);
+    }
+
+    void loadNextPage(View viewToShowSnackbar, String searchFor){
+        Date dt = mCurrentDate;
+        int page = mCurrentPage+1;
+        if(__isLastPage()){
+            dt = ConstsAndUtils.DecDate(mCurrentDate);
+            page = 1;
+        }
+        __loadPage(viewToShowSnackbar, searchFor, dt, page);
+    }
+
+    void loadPrevPage(View viewToShowSnackbar, String searchFor){
+        Date dt = mCurrentDate;
+        int page = mCurrentPage-1;
+        if(page==0){
+            dt = ConstsAndUtils.IncDate(dt);
+            if(ConstsAndUtils.IsToday(dt)) return;
+            page=16; // TODO - detect number of pages;
+        }
+        __loadPage(viewToShowSnackbar, searchFor, dt, page);
+    }
+
+
+    private void _showSnack(View view, String message){
+        if (mFlickrRequest != null)
+            if (!mFlickrRequest.isCancelled())
+                    Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
     }
 }

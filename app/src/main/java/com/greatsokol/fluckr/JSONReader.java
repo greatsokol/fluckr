@@ -29,8 +29,8 @@ class JSONReader {
         try{
             HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
             try {
-                conn.setConnectTimeout(5000);
-                conn.setReadTimeout(5000);
+                conn.setConnectTimeout(15000);
+                conn.setReadTimeout(15000);
                 conn.connect();
                 InputStream is = conn.getInputStream();
                 BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));

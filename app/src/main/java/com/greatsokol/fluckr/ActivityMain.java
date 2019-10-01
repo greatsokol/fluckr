@@ -25,8 +25,6 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import java.util.Date;
-
 
 
 
@@ -34,10 +32,9 @@ public class ActivityMain extends AppCompatActivity
         implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
     private final static int NO_POSITION = -1;
     private RecyclerView mRecyclerView;
-    private SwipeRefreshLayout mSwipeRefresh;
+    //private SwipeRefreshLayout mSwipeRefresh;
     private int mTransitionPosition;
     private boolean mActivityViewStarted = false;
-    private ListRequest mListRequest;
     private Toolbar mToolbar;
     //private View mAppBar;
 
@@ -48,7 +45,6 @@ public class ActivityMain extends AppCompatActivity
             mSearchFor.equals("") ? ((FluckrApplication)getApplication()).getAdapter() :
                                     ((FluckrApplication)getApplication()).getSearchAdapter();}
     private String mSearchFor = "";
-    private Date mDateOfCurrentList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,12 +53,11 @@ public class ActivityMain extends AppCompatActivity
         //mAppBar = findViewById(R.id.appbar);
         mToolbar = findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(mToolbar);
-        mSwipeRefresh = findViewById(R.id.swipeRefresh);
-        mSwipeRefresh.setOnRefreshListener(this);
+        //mSwipeRefresh = findViewById(R.id.swipeRefresh);
+        //mSwipeRefresh.setOnRefreshListener(this);
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
 
-        loadNavigationSettings();
         loadInstanceSettings(savedInstanceState);
 
         // clean older than 1 day cached files
@@ -70,7 +65,7 @@ public class ActivityMain extends AppCompatActivity
 
         setInsets();
         setLayout();
-        doApiCall();
+        getActiveAdapter().loadCurrentPage(mToolbar, mSearchFor);
 
 
 
@@ -124,19 +119,7 @@ public class ActivityMain extends AppCompatActivity
     }
 
 
-    private void loadNavigationSettings(){
-        mDateOfCurrentList
-                = new Date(getPreferences(MODE_PRIVATE).getLong(ConstsAndUtils.TAG_DATE_TO_VIEW,
-                                                            ConstsAndUtils.DecDate(new Date()).getTime()));
-    }
 
-    private void saveNavigationSettings(){
-        SharedPreferences activityPreferences = getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor editor = activityPreferences.edit();
-        editor.putLong(ConstsAndUtils.TAG_DATE_TO_VIEW, mDateOfCurrentList.getTime());
-
-        editor.apply();
-    }
 
     private void setInsets(){
         findViewById(R.id.constraint).setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -171,7 +154,7 @@ public class ActivityMain extends AppCompatActivity
             }
         });
 
-        ViewCompat.setOnApplyWindowInsetsListener(mSwipeRefresh, new OnApplyWindowInsetsListener() {
+        /*ViewCompat.setOnApplyWindowInsetsListener(mSwipeRefresh, new OnApplyWindowInsetsListener() {
             @Override
             public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
                 int offsetStart = toolbarHeight + insets.getSystemWindowInsetTop();
@@ -181,7 +164,7 @@ public class ActivityMain extends AppCompatActivity
                 ViewCompat.setOnApplyWindowInsetsListener(mSwipeRefresh, null);
                 return insets;
             }
-        });
+        });*/
 
     }
 
@@ -192,6 +175,7 @@ public class ActivityMain extends AppCompatActivity
         final boolean viewAsGrid = settings_getViewAsGrid();
         final int spanCount = getSpanCount(viewAsGrid);
         final ImageListAdapter adapter = getActiveAdapter();
+        adapter.loadNavigationSettings(getPreferences(MODE_PRIVATE));
         adapter.setViewAsGrid(viewAsGrid);
         adapter.setSpanCount(spanCount);
         ImageGridLayoutManager layoutManager
@@ -204,11 +188,13 @@ public class ActivityMain extends AppCompatActivity
         mRecyclerView.addOnScrollListener(new PaginationListener(layoutManager) {
             @Override
             protected void loadNextPage() {
-                doApiCall();
+                getActiveAdapter().loadNextPage(mToolbar, mSearchFor);
             }
 
             @Override
-            protected void loadPrevPage() {  }
+            protected void loadPrevPage() {
+                getActiveAdapter().loadPrevPage(mToolbar, mSearchFor);
+            }
 
             @Override
             public boolean isLastPage() {
@@ -231,10 +217,7 @@ public class ActivityMain extends AppCompatActivity
     }
 
     private void stopRequestLoading(boolean clear){
-        if(mListRequest !=null)
-            mListRequest.Stop();
-        getActiveAdapter().stopLoading();
-        if(clear)getActiveAdapter().clear();
+        getActiveAdapter().stopLoadingRequest(clear);
     }
 
     @Override
@@ -244,16 +227,7 @@ public class ActivityMain extends AppCompatActivity
     }
 
     private void doApiCall() {
-        mSwipeRefresh.setRefreshing(false);
-        if(mListRequest != null)
-            mListRequest.Stop();
-        mListRequest = new ListRequest();
-        mListRequest.prepareLoadNextPicturesListRequest(
-                mSwipeRefresh,
-                getActiveAdapter(),
-                mDateOfCurrentList,
-                mSearchFor);
-        mListRequest.Execute();
+        getActiveAdapter().loadNextPage(mToolbar, mSearchFor);
     }
 
     @Override
@@ -330,7 +304,7 @@ public class ActivityMain extends AppCompatActivity
         super.onStop();
         getTodayListAdapter().setOnItemClickListener(null);
         getSearchAdapter().setOnItemClickListener(null);
-        saveNavigationSettings();
+        getTodayListAdapter().saveNavigationSettings(getPreferences(MODE_PRIVATE));
     }
 
         @Override

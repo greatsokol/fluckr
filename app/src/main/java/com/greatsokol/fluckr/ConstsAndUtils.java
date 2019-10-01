@@ -3,6 +3,7 @@ package com.greatsokol.fluckr;
 import android.content.res.Resources;
 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -21,6 +22,7 @@ abstract class ConstsAndUtils {
     final static String TAG_READY = "READY";
     final static String TAG_SEARCH_FOR = "SEARCH_FOR";
     final static String TAG_DATE_TO_VIEW = "DATE_VIEW";
+    final static String TAG_PAGE_TO_VIEW = "PAGE_VIEW";
 
 
     static boolean isLandscape(Resources res){
@@ -38,6 +40,7 @@ abstract class ConstsAndUtils {
 
     private static Date __dec_inc_date(Date date, int amount){
         final Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
         cal.add(Calendar.DATE, amount);
         return cal.getTime();
     }
@@ -48,5 +51,19 @@ abstract class ConstsAndUtils {
 
     static Date IncDate(Date date){
         return __dec_inc_date(date, 1);
+    }
+
+    static boolean IsEqualDay(Date date1, Date date2){
+        final Calendar cal1 = Calendar.getInstance();
+        final Calendar cal2 = Calendar.getInstance();
+        cal1.setTime(date1);
+        cal2.setTime(date2);
+        return  cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH) &&
+                cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH);
+    }
+
+    static boolean IsToday(Date date){
+        return IsEqualDay(date, new Date());
     }
 }

@@ -23,11 +23,11 @@
     </com.google.android.material.appbar.AppBarLayout>
 
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    <!--androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintTop_toBottomOf="@+id/appbar">
+        app:layout_constraintTop_toBottomOf="@+id/appbar" -->
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
@@ -37,5 +37,5 @@
             android:overScrollMode="never"
             />
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    <!--/androidx.swiperefreshlayout.widget.SwipeRefreshLayout-->
 </androidx.constraintlayout.widget.ConstraintLayout>

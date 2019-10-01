@@ -2,13 +2,15 @@ package com.greatsokol.fluckr;
 
 import android.graphics.Bitmap;
 
+import java.util.Date;
+
 class ImageListItem {
 
     static final int VIEW_TYPE_UNKNOWN = -1;
     static final int VIEW_TYPE_LOADING = 0;
     static final int VIEW_TYPE_NORMAL = 1;
 
-    private int mPageNumber;
+    private Date mDate;
     private String mTitle;
     private String mDetails;
     private Bitmap mBitmapThumbnail;
@@ -18,17 +20,17 @@ class ImageListItem {
 
     private int mViewType = VIEW_TYPE_NORMAL;
     ImageListItem(int viewtype){mViewType = viewtype;}
-    ImageListItem(int pageNumber, String title, String details, Bitmap thumbnail,
+    ImageListItem(Date date, String title, String details, Bitmap thumbnail,
                   String thumbnailUrl, String fullsizeUrl) {
         mTitle = title;
         mDetails = details;
         mBitmapThumbnail = thumbnail;
         mThumbnailUrl = thumbnailUrl;
         mFullsizeUrl = fullsizeUrl;
-        mPageNumber = pageNumber;
+        mDate = date;
     }
 
-    int getPageNumber(){return mPageNumber;}
+    Date getDate(){return mDate;}
     int getViewType(){return mViewType;}
     String getTitle() {
         return mTitle;
