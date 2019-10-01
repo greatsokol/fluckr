@@ -120,9 +120,9 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         notifyItemRangeInserted(0, itemsSize);
     }
 
-    private synchronized void startLoading(int page) {
+    private synchronized void startLoading(boolean bAddProgressbarAtBottom) {
         mIsLoadingNow = true;
-        if(page >= mCurrentPage){
+        if(bAddProgressbarAtBottom){
             mItems.add(new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
             notifyItemInserted(mItems.size() - 1);
         } else {
@@ -304,12 +304,13 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                             final int page,
                             final boolean bAddDateHeader,
                             final boolean bAddItemsAtBottom){
-        if (mIsLoadingNow || (isLastPage() && getItemCount()>0)) return;
-        mIsLoadingNow = true;
+        if (mIsLoadingNow) return; // || (isLastPage() && getItemCount()>0)) return;
+        //mIsLoadingNow = true;
+        startLoading(bAddItemsAtBottom);
         mFlickrRequest = new AsyncListRequest(new AsyncListRequest.OnAnswerListener() {
                             @Override
                             public void OnStart() {
-                                startLoading(page);
+                                //startLoading(bAddItemsAtBottom);
                             }
 
                             @Override
@@ -320,14 +321,13 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                                 if(bAddItemsAtBottom) addItemsAtBottom(items);
                                 else addItemsAtStart(items);
 
-                                stopLoading();
                                 if (getItemCount()==0)
                                     _showSnack(viewToShowSnackbar, "No results");
                                 else {
                                     mCurrentPage = page;
                                     mCurrentDate = date;
                                 }
-
+                                stopLoading();
                                 //removeObsoleteDates();
                             }
 
