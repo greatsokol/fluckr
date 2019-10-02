@@ -36,12 +36,11 @@ public class ActivityMain extends AppCompatActivity
     private int mTransitionPosition;
     private boolean mActivityViewStarted = false;
     private Toolbar mToolbar;
-    private ImageListAdapter mAdapter;
-    private ImageListAdapter mSearchAdapter;
+
     //private View mAppBar;
 
-    private ImageListAdapter getTodayListAdapter(){ return mAdapter;}
-    private ImageListAdapter getSearchAdapter(){ return mSearchAdapter;}
+    private ImageListAdapter getTodayListAdapter(){ return ((FluckrApp)getApplication()).getTodayListAdapter();}
+    private ImageListAdapter getSearchAdapter(){ return ((FluckrApp)getApplication()).getSearchAdapter();}
     private ImageListAdapter getActiveAdapter(){ return
             mSearchFor == null ||
             mSearchFor.equals("") ? getTodayListAdapter() : getSearchAdapter();}
@@ -58,8 +57,6 @@ public class ActivityMain extends AppCompatActivity
         //mSwipeRefresh.setOnRefreshListener(this);
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
-        mAdapter = new ImageListAdapter(new ArrayList<ImageListItem>());
-        mSearchAdapter = new ImageListAdapter(new ArrayList<ImageListItem>());
 
         loadInstanceSettings(savedInstanceState);
 
@@ -68,7 +65,8 @@ public class ActivityMain extends AppCompatActivity
 
         setInsets();
         setLayout();
-        getActiveAdapter().loadCurrentPage(mToolbar, mSearchFor);
+        if(savedInstanceState==null)
+            getActiveAdapter().loadCurrentPage(mToolbar, mSearchFor);
 
 
 
@@ -200,6 +198,8 @@ public class ActivityMain extends AppCompatActivity
                 getActiveAdapter().loadPrevPage(mToolbar, mSearchFor);
             }
         });
+
+
 
         mRecyclerView.clearOnScrollListeners();
         mRecyclerView.addOnScrollListener(new PaginationListenerOnScroll(layoutManager) {

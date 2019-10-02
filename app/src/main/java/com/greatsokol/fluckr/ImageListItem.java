@@ -6,7 +6,8 @@ import java.util.Date;
 
 class ImageListItem {
 
-    static final int VIEW_TYPE_UNKNOWN = -1;
+    static final int VIEW_TYPE_UNKNOWN = -2;
+    static final int VIEW_TYPE_PLACEHOLDER = -1;
     static final int VIEW_TYPE_LOADING = 0;
     static final int VIEW_TYPE_IMAGE = 1;
     static final int VIEW_TYPE_DATE = 2;
@@ -30,6 +31,11 @@ class ImageListItem {
         mBitmapThumbnail = thumbnail;
         mThumbnailUrl = thumbnailUrl;
         mFullsizeUrl = fullsizeUrl;
+        mDate = date;
+    }
+    ImageListItem(int viewtype, Date date, int page){
+        mViewType = viewtype;
+        mPage = page;
         mDate = date;
     }
     ImageListItem(Date date, int page){

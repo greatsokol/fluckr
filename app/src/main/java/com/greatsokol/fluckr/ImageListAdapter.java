@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
+class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     private List<ImageListItem> mItems;
     private AsyncListRequest mFlickrRequest;
     private boolean mIsLoadingNow = false;
@@ -33,7 +33,6 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
 
     private int mTotalPage = 0; // обновится после LoadNextPicturesList
     private int mSpanCount = 3;
-    private boolean isLastPage(){return false;}//mCurrentPage>(mTotalPage-1);}
     private boolean __isLastPage(){ return mCurrentPage>(mTotalPage-1);}
     void setSpanCount(int spanCount){mSpanCount = spanCount;}
 
@@ -64,35 +63,16 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                                     R.layout.listitem_grid :
                                     R.layout.listitem_linear,
                                     parent, false));
-        } else {
+        }
+        else if(viewType == ImageListItem.VIEW_TYPE_DATE){
             return new ViewHolder(
                     LayoutInflater.from(parent.getContext()).
                             inflate(R.layout.listitem_grouptitle, parent, false));
         }
+        return new ViewHolder(
+                LayoutInflater.from(parent.getContext()).
+                        inflate(R.layout.listitem_placeholder, parent, false));
     }
-
-    @Override
-    public void onBindViewHolder(@NonNull BaseViewHolder holder, int position) {
-        holder.onBind(position);
-        setFadeAnimation(holder.itemView);
-    }
-
-    private static int FADE_DURATION = 500;
-    private void setFadeAnimation(View view) {
-        AlphaAnimation anim = new AlphaAnimation(0.0f, 1.0f);
-        anim.setDuration(FADE_DURATION);
-        view.startAnimation(anim);
-    }
-
-    /*
-    private void setScaleAnimation(View view) {
-        ScaleAnimation anim = new ScaleAnimation(
-                0.0f, 1.0f, 0.0f, 1.0f,
-                Animation.RELATIVE_TO_SELF, 0.5f,
-                Animation.RELATIVE_TO_SELF, 0.5f);
-        anim.setDuration(FADE_DURATION);
-        view.startAnimation(anim);
-    }*/
 
     @Override
     synchronized public int getItemViewType(int position) {
@@ -107,6 +87,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         return mItems==null? 0 : mItems.size();
     }
 
+
     private synchronized void addItemsAtBottom(List<ImageListItem> items) {
         mItems.addAll(items);
         int itemsSize = items.size();
@@ -115,9 +96,24 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     }
 
     private synchronized void addItemsAtStart(List<ImageListItem> items) {
+        __removeItemsOfType(ImageListItem.VIEW_TYPE_PLACEHOLDER);
+
+        ImageListItem firstItem = items.get(0);
+        int index = firstItem.getViewType()==ImageListItem.VIEW_TYPE_DATE ? 1 : 0;
+
+        int c = items.size() - index /*- removed*/;
+        if(c>0) {
+            c = c % mSpanCount;
+            if (c != 0) {
+                c = mSpanCount - c;
+                for (int i = 0; i < c; i++) {
+                    items.add(new ImageListItem(ImageListItem.VIEW_TYPE_PLACEHOLDER, firstItem.getDate(), firstItem.getPage()));
+                }
+            }
+        }
+
         mItems.addAll(0, items);
-        int itemsSize = items.size();
-        notifyItemRangeInserted(0, itemsSize);
+        notifyItemRangeInserted(0, items.size());
     }
 
     private synchronized void startLoading(boolean bAddProgressbarAtBottom) {
@@ -131,24 +127,43 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         }
     }
 
-    private void __removeArrayOfNumbers(ArrayList<Integer> list_to_remove){
+
+    @Override
+    public void onBindViewHolder(@NonNull BaseViewHolder holder, int position) {
+        holder.onBind(position);
+        setFadeAnimation(holder.itemView);
+    }
+
+    private void setFadeAnimation(View view) {
+        AlphaAnimation anim = new AlphaAnimation(0.0f, 1.0f);
+        anim.setDuration(500);
+        view.startAnimation(anim);
+    }
+
+    private void __removeArrayOfNumbers(ArrayList<Integer> list_to_remove, boolean bNotify){
         for(int i=0; i<list_to_remove.size(); i++){
             int num_to_remove = list_to_remove.get(i);
-            if(mItems.size() > num_to_remove) {
+            if(num_to_remove < mItems.size()) {
                 mItems.remove(num_to_remove);
-                notifyItemRemoved(num_to_remove);
+                if(bNotify)
+                    notifyItemRemoved(num_to_remove);
+            }
+        }
+    }
+
+    private synchronized void __removeItemsOfType(int itemType){
+        ArrayList<Integer> list_to_remove = new ArrayList<>();
+        for (int i = 0; i < mItems.size(); i++) {
+            if (getItemViewType(i) == itemType) {
+                mItems.remove(i);
+                notifyItemRemoved(i);
+                i--;
             }
         }
     }
 
     private synchronized void stopLoading() {
-        ArrayList<Integer> list_to_remove = new ArrayList<>();
-        for (int i = 0; i < mItems.size(); i++) {
-            if (getItemViewType(i) == ImageListItem.VIEW_TYPE_LOADING) {
-                list_to_remove.add(i);
-            }
-        }
-        __removeArrayOfNumbers(list_to_remove);
+        __removeItemsOfType(ImageListItem.VIEW_TYPE_LOADING);
         mIsLoadingNow = false;
     }
 
@@ -181,7 +196,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                     list_to_remove.add(i);
             }
         }*/
-        __removeArrayOfNumbers(list_to_remove);
+        //__removeArrayOfNumbers(list_to_remove, true);
     }
 
     void clear() {
@@ -196,7 +211,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     }
 
     public class ViewHolder extends BaseViewHolder implements View.OnTouchListener {
-        TextView textviewDate;
+        TextView textViewDate;
         TextView textViewTitle;
         TextView textViewDetails;
         ImageView imageView;
@@ -208,7 +223,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
             textViewTitle = itemView.findViewById(R.id.textviewTitle);
             textViewDetails = itemView.findViewById(R.id.textviewDetails);
             imageView = itemView.findViewById(R.id.imageview);
-            textviewDate = itemView.findViewById(R.id.textviewDate);
+            textViewDate = itemView.findViewById(R.id.textviewDate);
             itemView.setOnTouchListener(this);
         }
 
@@ -235,8 +250,8 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 final String transitionName = "itemImage" + "_" + getClass().getName() + "_" + position;
                 ViewCompat.setTransitionName(imageView, transitionName);
             }
-            if(textviewDate!=null)
-                textviewDate.setText(String.valueOf(listItem.getDate()));
+            if(textViewDate!=null)
+                textViewDate.setText(String.valueOf(listItem.getDate()));
         }
 
         @Override
@@ -303,7 +318,8 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                             final Date date,
                             final int page,
                             final boolean bAddDateHeader,
-                            final boolean bAddItemsAtBottom){
+                            final boolean bAddItemsAtBottom,
+                            final boolean bLoadPrevPageAfterFinish){
         if (mIsLoadingNow) return; // || (isLastPage() && getItemCount()>0)) return;
         //mIsLoadingNow = true;
         startLoading(bAddItemsAtBottom);
@@ -328,7 +344,11 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                                     mCurrentDate = date;
                                 }
                                 stopLoading();
-                                //removeObsoleteDates();
+
+                                // load previous page when run app with empty
+                                // list at some previous date and page:
+                                if(bLoadPrevPageAfterFinish)
+                                    loadPrevPage(viewToShowSnackbar, searchFor);
                             }
 
                             @Override
@@ -352,7 +372,10 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
 
     void loadCurrentPage(View viewToShowSnackbar, String searchFor){
         if(mIsLoadingNow)return;
-        __loadPage(viewToShowSnackbar, searchFor, mCurrentDate, mCurrentPage, mCurrentPage==1, true);
+        __loadPage(viewToShowSnackbar, searchFor, mCurrentDate, mCurrentPage,
+                mCurrentPage==1,
+                true,
+                true);
     }
 
     void loadNextPage(View viewToShowSnackbar, String searchFor){
@@ -364,7 +387,10 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
             dt = ConstsAndUtils.DecDate(mCurrentDate);
             page = 1;
         }
-        __loadPage(viewToShowSnackbar, searchFor, dt, page, page==1, true);
+        __loadPage(viewToShowSnackbar, searchFor, dt, page,
+                page==1,
+                true,
+                false);
     }
 
     void loadPrevPage(View viewToShowSnackbar, String searchFor){
@@ -377,7 +403,10 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
             if(ConstsAndUtils.IsToday(dt)) return;
             page=16; // TODO - detect number of pages;
         }
-        __loadPage(viewToShowSnackbar, searchFor, dt, page,page==1, false);
+        __loadPage(viewToShowSnackbar, searchFor, dt, page,
+                page==1,
+                false,
+                false);
     }
 
 

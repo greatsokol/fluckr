@@ -13,9 +13,7 @@ class ImageGridLayoutManager extends GridLayoutManager {
                 switch (adapter.getItemViewType(position)) {
                     case ImageListItem.VIEW_TYPE_DATE:
                     case ImageListItem.VIEW_TYPE_LOADING:
-                        return spanCount;
-                    case ImageListItem.VIEW_TYPE_IMAGE:
-                        return 1;
+                        return spanCount; //all width of line
                 }
                 return 1;
             }
