@@ -65,7 +65,8 @@ public class ActivityMain extends AppCompatActivity
 
         setInsets();
         setLayout();
-        if(savedInstanceState==null)
+
+        if(getActiveAdapter().getItemCount()==0)
             getActiveAdapter().loadCurrentPage(mToolbar, mSearchFor);
 
 
