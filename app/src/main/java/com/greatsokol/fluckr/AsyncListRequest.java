@@ -81,6 +81,7 @@ class AsyncListRequest extends AsyncTask<Void, Void, ArrayList<ImageListItem>> {
             final ArrayList<ImageListItem> items = new ArrayList<>();
             JSONObject jsonRoot = jsonObject.getJSONObject("photos");
             final int pagesTotal = jsonRoot.getInt("pages");
+            final int currPage = jsonRoot.getInt("page");
             JSONArray jsonArray = jsonRoot.getJSONArray("photo");
 
             int pictures_count = jsonArray.length();
@@ -102,7 +103,7 @@ class AsyncListRequest extends AsyncTask<Void, Void, ArrayList<ImageListItem>> {
                         items.add(new ImageListItem(
                                 mDate,
                                 pagesTotal,
-                                mPage,
+                                currPage,
                                 i,
                                 title, details,
                                 bmp, thumbnailUrl, fullsizeUrl));

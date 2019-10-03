@@ -25,8 +25,6 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import java.util.ArrayList;
-
 
 public class ActivityMain extends AppCompatActivity
         implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
@@ -191,12 +189,12 @@ public class ActivityMain extends AppCompatActivity
         mRecyclerView.setOnFlingListener(new PaginationListenerOnFling(layoutManager) {
             @Override
             protected void loadNextPage() {
-                getActiveAdapter().loadNextPage(mToolbar, mSearchFor);
+                getActiveAdapter().loadLowerPage(mToolbar, mSearchFor);
             }
 
             @Override
             protected void loadPrevPage() {
-                getActiveAdapter().loadPrevPage(mToolbar, mSearchFor);
+                getActiveAdapter().loadUpperPage(mToolbar, mSearchFor);
             }
         });
 
@@ -211,12 +209,12 @@ public class ActivityMain extends AppCompatActivity
 
             @Override
             protected void loadNextPage() {
-                getActiveAdapter().loadNextPage(mToolbar, mSearchFor);
+                getActiveAdapter().loadLowerPage(mToolbar, mSearchFor);
             }
 
             @Override
             protected void loadPrevPage() {
-                getActiveAdapter().loadPrevPage(mToolbar, mSearchFor);
+                getActiveAdapter().loadUpperPage(mToolbar, mSearchFor);
             }
         });
 
@@ -240,7 +238,7 @@ public class ActivityMain extends AppCompatActivity
     }
 
     private void doApiCall() {
-        getActiveAdapter().loadNextPage(mToolbar, mSearchFor);
+        getActiveAdapter().loadLowerPage(mToolbar, mSearchFor);
     }
 
     @Override

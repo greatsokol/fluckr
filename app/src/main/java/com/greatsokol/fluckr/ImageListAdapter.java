@@ -2,6 +2,7 @@ package com.greatsokol.fluckr;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -22,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
+
     private List<ImageListItem> mItems;
     private AsyncListRequest mFlickrRequest;
     //private RecyclerView mRecyclerView;
@@ -105,18 +107,19 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     }
 
     private synchronized void addItemsAtStart(List<ImageListItem> items) {
-        __removeItemsOfType(ImageListItem.VIEW_TYPE_PLACEHOLDER);
+        if(items.size()==0) return;
 
+        int removed = __removeItemsOfType(ImageListItem.VIEW_TYPE_PLACEHOLDER, false);
         ImageListItem firstItem = items.get(0);
         int index = firstItem.getViewType()==ImageListItem.VIEW_TYPE_DATE ? 1 : 0;
 
-        int c = items.size() - index /*- removed*/;
+        int c = items.size() - index - removed;
         if(c>0) {
             c = c % mSpanCount;
             if (c != 0) {
                 c = mSpanCount - c;
                 for (int i = 0; i < c; i++) {
-                    items.add(
+                    items.add(index,
                             new ImageListItem( // empty placeholder
                                     ImageListItem.VIEW_TYPE_PLACEHOLDER,
                                     firstItem.getDate(),
@@ -127,17 +130,27 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         }
 
         mItems.addAll(0, items);
-        notifyItemRangeInserted(0, items.size());
+        if(removed>0)notifyItemRangeChanged(items.size()-removed, removed);
+        notifyItemRangeInserted(0, items.size()-removed);
+    }
+
+    private void __notifyItemInserted(final int index){
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                notifyItemInserted(index);
+            }
+        });
     }
 
     private synchronized void startLoading(boolean bAddProgressbarAtBottom) {
         mIsLoadingNow = true;
         if(bAddProgressbarAtBottom){
             mItems.add(new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
-            notifyItemInserted(mItems.size() - 1);
+            __notifyItemInserted(mItems.size() - 1);
         } else {
             mItems.add(0, new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
-            notifyItemInserted(0);
+            __notifyItemInserted(0);
         }
     }
 
@@ -154,30 +167,21 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         view.startAnimation(anim);
     }
 
-    private void __removeArrayOfNumbers(ArrayList<Integer> list_to_remove, boolean bNotify){
-        for(int i=0; i<list_to_remove.size(); i++){
-            int num_to_remove = list_to_remove.get(i);
-            if(num_to_remove < mItems.size()) {
-                mItems.remove(num_to_remove);
-                if(bNotify)
-                    notifyItemRemoved(num_to_remove);
-            }
-        }
-    }
-
-    private synchronized void __removeItemsOfType(int itemType){
-        ArrayList<Integer> list_to_remove = new ArrayList<>();
+    private synchronized int __removeItemsOfType(int itemType, boolean notify){
+        int removed = 0;
         for (int i = 0; i < mItems.size(); i++) {
             if (getItemViewType(i) == itemType) {
                 mItems.remove(i);
-                notifyItemRemoved(i);
+                if(notify)notifyItemRemoved(i);
                 i--;
+                removed++;
             }
         }
+        return removed;
     }
 
     private synchronized void stopLoading() {
-        __removeItemsOfType(ImageListItem.VIEW_TYPE_LOADING);
+        __removeItemsOfType(ImageListItem.VIEW_TYPE_LOADING, true);
         mIsLoadingNow = false;
     }
 
@@ -313,8 +317,9 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
 
                             @Override
                             public void OnAnswerReady(ArrayList<ImageListItem> items) {
-                                if(bAddDateHeader){
-                                    items.add(0,new ImageListItem(date, page));
+                                if(bAddDateHeader && items.size()>0) {
+                                    ImageListItem item = items.get(0);
+                                    items.add(0, new ImageListItem(item.getDate(), item.getPage()));
                                 }
                                 if(bAddItemsAtBottom) addItemsAtBottom(items);
                                 else addItemsAtStart(items);
@@ -326,7 +331,7 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                                 // load previous page when run app with empty
                                 // list at some previous date and page:
                                 if(bLoadPrevPageAfterFinish)
-                                    loadPrevPage(viewToShowSnackbar, searchFor);
+                                    loadUpperPage(viewToShowSnackbar, searchFor);
                             }
 
                             @Override
@@ -358,7 +363,7 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 true);
     }
 
-    void loadNextPage(View viewToShowSnackbar, String searchFor){
+    void loadLowerPage(View viewToShowSnackbar, String searchFor){
         if(mIsLoadingNow)return;
         ImageListItem item = mItems.get(mItems.size()-1); // last item of list
         Date dt = item.getDate();
@@ -374,7 +379,7 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 false);
     }
 
-    void loadPrevPage(View viewToShowSnackbar, String searchFor){
+    void loadUpperPage(View viewToShowSnackbar, String searchFor){
         if(mIsLoadingNow)return;
         ImageListItem item = mItems.get(0); // first item of list
         Date dt = item.getDate();
@@ -382,7 +387,7 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         if(page<=0){
             dt = ConstsAndUtils.IncDate(dt);
             if(ConstsAndUtils.IsToday(dt)) return;
-            page=16; // TODO - detect number of pages;
+            page=99999; // Max page will be returned;
         }
         __loadPage(viewToShowSnackbar, searchFor, dt, page, -1,
                 page==1,
