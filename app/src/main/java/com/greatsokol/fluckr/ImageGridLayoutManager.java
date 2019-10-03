@@ -2,6 +2,7 @@ package com.greatsokol.fluckr;
 
 import android.content.Context;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 class ImageGridLayoutManager extends GridLayoutManager {
 

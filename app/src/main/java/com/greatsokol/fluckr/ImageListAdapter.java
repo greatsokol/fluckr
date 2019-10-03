@@ -24,16 +24,13 @@ import java.util.List;
 class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     private List<ImageListItem> mItems;
     private AsyncListRequest mFlickrRequest;
+    //private RecyclerView mRecyclerView;
     private boolean mIsLoadingNow = false;
-    private int mCurrentPage;
-    private Date mCurrentDate;
     private boolean mViewAsGrid = true;
 
     void setViewAsGrid(boolean viewAsGrid){mViewAsGrid = viewAsGrid;}
 
-    private int mTotalPage = 0; // обновится после LoadNextPicturesList
     private int mSpanCount = 3;
-    private boolean __isLastPage(){ return mCurrentPage>(mTotalPage-1);}
     void setSpanCount(int spanCount){mSpanCount = spanCount;}
 
 
@@ -47,6 +44,18 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     void setOnItemClickListener(View.OnClickListener listener){
         mItemClickListener = listener;
     }
+
+    /*@Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        mRecyclerView = recyclerView;
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        mRecyclerView = null;
+    } */
 
     @NonNull
     @Override
@@ -107,7 +116,12 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
             if (c != 0) {
                 c = mSpanCount - c;
                 for (int i = 0; i < c; i++) {
-                    items.add(new ImageListItem(ImageListItem.VIEW_TYPE_PLACEHOLDER, firstItem.getDate(), firstItem.getPage()));
+                    items.add(
+                            new ImageListItem( // empty placeholder
+                                    ImageListItem.VIEW_TYPE_PLACEHOLDER,
+                                    firstItem.getDate(),
+                                    firstItem.getPagesTotal(),
+                                    firstItem.getPage()));
                 }
             }
         }
@@ -167,42 +181,9 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         mIsLoadingNow = false;
     }
 
-    private synchronized void removeObsoleteDates() {
-        //Date dateNext = ConstsAndUtils.DecDate(mCurrentDate);
-        //Date datePrev = ConstsAndUtils.IncDate(mCurrentDate);
-        ArrayList<Integer> list_to_remove = new ArrayList<>();
-
-        for(int i=0; i<mItems.size(); i++){
-            ImageListItem item = mItems.get(i);
-            if(item.getViewType()!=ImageListItem.VIEW_TYPE_LOADING) {
-                Date itemDate = item.getDate();
-                if (!ConstsAndUtils.IsEqualDay(itemDate, mCurrentDate))
-                    list_to_remove.add(i);
-            }
-        }
-
-        //удаление неполного ряда в конце списка
-        /*int c = list_to_remove.size() % mSpanCount;
-        if(c > 0){
-            int size = list_to_remove.size();
-            list_to_remove.subList(size - c, size).clear();
-        }
-
-        for(int i=0; i<mItems.size(); i++){
-            ImageListItem item = mItems.get(i);
-            if(item.getViewType()!=ImageListItem.VIEW_TYPE_LOADING) {
-                int itempage = item.getPageNumber();
-                if (itempage > pageNext)
-                    list_to_remove.add(i);
-            }
-        }*/
-        //__removeArrayOfNumbers(list_to_remove, true);
-    }
-
     void clear() {
         if(mIsLoadingNow)return;
         mItems.clear();
-        mCurrentPage=0;
         notifyDataSetChanged();
     }
 
@@ -250,8 +231,9 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 final String transitionName = "itemImage" + "_" + getClass().getName() + "_" + position;
                 ViewCompat.setTransitionName(imageView, transitionName);
             }
-            if(textViewDate!=null)
-                textViewDate.setText(String.valueOf(listItem.getDate()));
+            if(textViewDate!=null) {
+                textViewDate.setText(ConstsAndUtils.DateToStr_dd_mmmm_yyyy(listItem.getDate()));
+            }
         }
 
         @Override
@@ -291,19 +273,18 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     }
 
 
-    void loadNavigationSettings(SharedPreferences prefs){
-        mCurrentDate
-         = new Date(prefs.getLong(ConstsAndUtils.TAG_DATE_TO_VIEW, ConstsAndUtils.DecDate(new Date()).getTime()));
-        mCurrentPage = prefs.getInt(ConstsAndUtils.TAG_PAGE_TO_VIEW,1);
-        mViewAsGrid = prefs.getBoolean(ConstsAndUtils.TAG_VIEWASGRID, true);
-    }
-
-    void saveNavigationSettings(SharedPreferences prefs){
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putLong(ConstsAndUtils.TAG_DATE_TO_VIEW, mCurrentDate.getTime());
-        editor.putInt(ConstsAndUtils.TAG_PAGE_TO_VIEW, mCurrentPage);
-        editor.putBoolean(ConstsAndUtils.TAG_VIEWASGRID, mViewAsGrid);
-        editor.apply();
+    void saveNavigationSettings(SharedPreferences prefs, int firstVisibleItemPosition){
+        ImageListItem item = mItems.get(firstVisibleItemPosition);
+        if(item!=null) {
+            Date dt = item.getDate();
+            if(dt != null) {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putLong(ConstsAndUtils.TAG_DATE_TO_VIEW, dt.getTime());
+                editor.putInt(ConstsAndUtils.TAG_PAGE_TO_VIEW, item.getPage());
+                editor.putInt(ConstsAndUtils.TAG_NUMBER_ON_PAGE, item.getNumberOnPage());
+                editor.apply();
+            }
+        }
     }
 
     void stopLoadingRequest(boolean clear){
@@ -317,6 +298,7 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                             final String searchFor,
                             final Date date,
                             final int page,
+                            final int numberOnPage,
                             final boolean bAddDateHeader,
                             final boolean bAddItemsAtBottom,
                             final boolean bLoadPrevPageAfterFinish){
@@ -339,21 +321,12 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
 
                                 if (getItemCount()==0)
                                     _showSnack(viewToShowSnackbar, "No results");
-                                else {
-                                    mCurrentPage = page;
-                                    mCurrentDate = date;
-                                }
                                 stopLoading();
 
                                 // load previous page when run app with empty
                                 // list at some previous date and page:
                                 if(bLoadPrevPageAfterFinish)
                                     loadPrevPage(viewToShowSnackbar, searchFor);
-                            }
-
-                            @Override
-                            public void OnGetPagesNumber(int number) {
-                                mTotalPage = number;
                             }
 
                             @Override
@@ -369,11 +342,18 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         mFlickrRequest.execute();
     }
 
-
-    void loadCurrentPage(View viewToShowSnackbar, String searchFor){
+    void loadInitialPage(SharedPreferences prefs, View viewToShowSnackbar, String searchFor){
         if(mIsLoadingNow)return;
-        __loadPage(viewToShowSnackbar, searchFor, mCurrentDate, mCurrentPage,
-                mCurrentPage==1,
+        Date savedCurrentPageDate
+                = new Date(prefs.getLong(ConstsAndUtils.TAG_DATE_TO_VIEW, ConstsAndUtils.DecDate(new Date()).getTime()));
+        int savedCurrentPageNumber = prefs.getInt(ConstsAndUtils.TAG_PAGE_TO_VIEW,1);
+        int savedCurentItemNumberOnPage = prefs.getInt(ConstsAndUtils.TAG_NUMBER_ON_PAGE,1);
+
+        __loadPage(viewToShowSnackbar, searchFor,
+                    savedCurrentPageDate,
+                    savedCurrentPageNumber,
+                    savedCurentItemNumberOnPage,
+                savedCurrentPageNumber ==1,
                 true,
                 true);
     }
@@ -382,12 +362,13 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         if(mIsLoadingNow)return;
         ImageListItem item = mItems.get(mItems.size()-1); // last item of list
         Date dt = item.getDate();
-        int page = item.getPage()+1;
-        if(__isLastPage()){
-            dt = ConstsAndUtils.DecDate(mCurrentDate);
+        int page = item.getPage() + 1;
+        int pagesTotal = item.getPagesTotal();
+        if(page > pagesTotal){
+            dt = ConstsAndUtils.DecDate(dt);
             page = 1;
         }
-        __loadPage(viewToShowSnackbar, searchFor, dt, page,
+        __loadPage(viewToShowSnackbar, searchFor, dt, page, -1,
                 page==1,
                 true,
                 false);
@@ -403,7 +384,7 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
             if(ConstsAndUtils.IsToday(dt)) return;
             page=16; // TODO - detect number of pages;
         }
-        __loadPage(viewToShowSnackbar, searchFor, dt, page,
+        __loadPage(viewToShowSnackbar, searchFor, dt, page, -1,
                 page==1,
                 false,
                 false);

@@ -26,7 +26,6 @@ class AsyncListRequest extends AsyncTask<Void, Void, ArrayList<ImageListItem>> {
     public abstract static class OnAnswerListener{
         public abstract void OnStart();
         public abstract void OnAnswerReady(ArrayList<ImageListItem> items);
-        public abstract void OnGetPagesNumber(int number);
         public abstract void OnError();
     }
 
@@ -76,13 +75,12 @@ class AsyncListRequest extends AsyncTask<Void, Void, ArrayList<ImageListItem>> {
                     API_KEY, FLICKR_PER_PAGE, mPage, extras, mSearchForString);
 
         try {
-            JSONObject jsonObject;
-            jsonObject = JSONReader.readJsonFromUrl(list_request);
+            JSONObject jsonObject = JSONReader.readJsonFromUrl(list_request);
             if (jsonObject==null)
                 return null;
             final ArrayList<ImageListItem> items = new ArrayList<>();
             JSONObject jsonRoot = jsonObject.getJSONObject("photos");
-            mListener.OnGetPagesNumber(jsonRoot.getInt("pages"));
+            final int pagesTotal = jsonRoot.getInt("pages");
             JSONArray jsonArray = jsonRoot.getJSONArray("photo");
 
             int pictures_count = jsonArray.length();
@@ -103,7 +101,9 @@ class AsyncListRequest extends AsyncTask<Void, Void, ArrayList<ImageListItem>> {
                     if (bmp!=null) {
                         items.add(new ImageListItem(
                                 mDate,
+                                pagesTotal,
                                 mPage,
+                                i,
                                 title, details,
                                 bmp, thumbnailUrl, fullsizeUrl));
                     } else Log.d(TAG, "Can't load picture");

@@ -23,6 +23,7 @@ abstract class ConstsAndUtils {
     final static String TAG_SEARCH_FOR = "SEARCH_FOR";
     final static String TAG_DATE_TO_VIEW = "DATE_VIEW";
     final static String TAG_PAGE_TO_VIEW = "PAGE_VIEW";
+    final static String TAG_NUMBER_ON_PAGE = "NUMBER_ON_PAGE";
 
 
     static boolean isLandscape(Resources res){
@@ -36,6 +37,10 @@ abstract class ConstsAndUtils {
 
     static String DateToStr_yyyy_mm_dd(Date date){
         return new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date);
+    }
+
+    static String DateToStr_dd_mmmm_yyyy(Date date){
+        return new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(date);
     }
 
     private static Date __dec_inc_date(Date date, int amount){

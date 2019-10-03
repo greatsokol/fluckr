@@ -67,7 +67,8 @@ public class ActivityMain extends AppCompatActivity
         setLayout();
 
         if(getActiveAdapter().getItemCount()==0)
-            getActiveAdapter().loadCurrentPage(mToolbar, mSearchFor);
+            getActiveAdapter().loadInitialPage(getPreferences(MODE_PRIVATE), mToolbar, mSearchFor);
+
 
 
 
@@ -177,12 +178,11 @@ public class ActivityMain extends AppCompatActivity
         final boolean viewAsGrid = settings_getViewAsGrid();
         final int spanCount = getSpanCount(viewAsGrid);
         final ImageListAdapter adapter = getActiveAdapter();
-        adapter.loadNavigationSettings(getPreferences(MODE_PRIVATE));
+
         adapter.setViewAsGrid(viewAsGrid);
         adapter.setSpanCount(spanCount);
         ImageGridLayoutManager layoutManager
                 = new ImageGridLayoutManager(this, adapter, spanCount);
-
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
@@ -204,6 +204,11 @@ public class ActivityMain extends AppCompatActivity
 
         mRecyclerView.clearOnScrollListeners();
         mRecyclerView.addOnScrollListener(new PaginationListenerOnScroll(layoutManager) {
+            @Override
+            protected void onScrolled(int firstVisibleItemPosition) {
+                getActiveAdapter().saveNavigationSettings(getPreferences(MODE_PRIVATE), firstVisibleItemPosition);
+            }
+
             @Override
             protected void loadNextPage() {
                 getActiveAdapter().loadNextPage(mToolbar, mSearchFor);
@@ -312,7 +317,6 @@ public class ActivityMain extends AppCompatActivity
         super.onStop();
         getTodayListAdapter().setOnItemClickListener(null);
         getSearchAdapter().setOnItemClickListener(null);
-        getTodayListAdapter().saveNavigationSettings(getPreferences(MODE_PRIVATE));
     }
 
         @Override
