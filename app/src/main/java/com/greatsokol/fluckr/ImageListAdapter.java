@@ -109,7 +109,7 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     private synchronized void addItemsAtStart(List<ImageListItem> items) {
         if(items.size()==0) return;
 
-        int removed = __removeItemsOfType(ImageListItem.VIEW_TYPE_PLACEHOLDER, false);
+        int removed = __removeItemsOfType(ImageListItem.VIEW_TYPE_PLACEHOLDER, false, false);
         ImageListItem firstItem = items.get(0);
         int index = firstItem.getViewType()==ImageListItem.VIEW_TYPE_DATE ? 1 : 0;
 
@@ -168,21 +168,22 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         view.startAnimation(anim);
     }
 
-    private synchronized int __removeItemsOfType(int itemType, boolean notify){
+    private synchronized int __removeItemsOfType(int itemType, boolean notify, boolean all){
         int removed = 0;
         for (int i = 0; i < mItems.size(); i++) {
-            if (getItemViewType(i) == itemType) {
+            int type = getItemViewType(i);
+            if (type == itemType) {
                 mItems.remove(i);
                 if(notify)notifyItemRemoved(i);
                 i--;
                 removed++;
-            }
+            } else if(!all && type != ImageListItem.VIEW_TYPE_LOADING) break;
         }
         return removed;
     }
 
     private synchronized void stopLoading() {
-        __removeItemsOfType(ImageListItem.VIEW_TYPE_LOADING, true);
+        __removeItemsOfType(ImageListItem.VIEW_TYPE_LOADING, true, true);
         mIsLoadingNow = false;
     }
 
