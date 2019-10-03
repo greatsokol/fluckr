@@ -134,23 +134,24 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         notifyItemRangeInserted(0, items.size()-removed);
     }
 
-    private void __notifyItemInserted(final int index){
+    /*private void __notifyItemInserted(final int index){
         new Handler().post(new Runnable() {
             @Override
             public void run() {
-                notifyItemInserted(index);
+                if(mItems.size()>index)
+                    notifyItemInserted(index);
             }
         });
-    }
+    }*/
 
     private synchronized void startLoading(boolean bAddProgressbarAtBottom) {
         mIsLoadingNow = true;
         if(bAddProgressbarAtBottom){
             mItems.add(new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
-            __notifyItemInserted(mItems.size() - 1);
+            notifyItemInserted(mItems.size() - 1);
         } else {
             mItems.add(0, new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
-            __notifyItemInserted(0);
+            notifyItemInserted(0);
         }
     }
 
@@ -277,18 +278,23 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     }
 
 
-    void saveNavigationSettings(SharedPreferences prefs, int firstVisibleItemPosition){
-        ImageListItem item = mItems.get(firstVisibleItemPosition);
-        if(item!=null) {
+    String saveNavigationSettings(SharedPreferences prefs, int firstVisibleItemPosition){
+        if(firstVisibleItemPosition>=0 && firstVisibleItemPosition<mItems.size()) {
+            ImageListItem item = mItems.get(firstVisibleItemPosition);
             Date dt = item.getDate();
             if(dt != null) {
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putLong(ConstsAndUtils.TAG_DATE_TO_VIEW, dt.getTime());
-                editor.putInt(ConstsAndUtils.TAG_PAGE_TO_VIEW, item.getPage());
-                editor.putInt(ConstsAndUtils.TAG_NUMBER_ON_PAGE, item.getNumberOnPage());
-                editor.apply();
+                int savedCurrentPageNumber = prefs.getInt(ConstsAndUtils.TAG_PAGE_TO_VIEW,1);
+                if(savedCurrentPageNumber!=item.getPage()){
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putLong(ConstsAndUtils.TAG_DATE_TO_VIEW, dt.getTime());
+                    editor.putInt(ConstsAndUtils.TAG_PAGE_TO_VIEW, item.getPage());
+                    editor.putInt(ConstsAndUtils.TAG_NUMBER_ON_PAGE, item.getNumberOnPage());
+                    editor.apply();
+                    return ConstsAndUtils.DateToStr_dd_mmmm_yyyy(dt);
+                }
             }
         }
+        return "";
     }
 
     void stopLoadingRequest(boolean clear){
@@ -347,24 +353,24 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         mFlickrRequest.execute();
     }
 
-    void loadInitialPage(SharedPreferences prefs, View viewToShowSnackbar, String searchFor){
+    void loadInitialPage(SharedPreferences prefs, View viewToShowSnackbar, String searchFor, Boolean tryLoadUpperPage){
         if(mIsLoadingNow)return;
-        Date savedCurrentPageDate
-                = new Date(prefs.getLong(ConstsAndUtils.TAG_DATE_TO_VIEW, ConstsAndUtils.DecDate(new Date()).getTime()));
+        Date savedCurrentPageDate = new Date(prefs.getLong(ConstsAndUtils.TAG_DATE_TO_VIEW, ConstsAndUtils.DecDate(new Date()).getTime()));
         int savedCurrentPageNumber = prefs.getInt(ConstsAndUtils.TAG_PAGE_TO_VIEW,1);
-        int savedCurentItemNumberOnPage = prefs.getInt(ConstsAndUtils.TAG_NUMBER_ON_PAGE,1);
+        int savedCurrentItemNumberOnPage = prefs.getInt(ConstsAndUtils.TAG_NUMBER_ON_PAGE,1);
 
         __loadPage(viewToShowSnackbar, searchFor,
                     savedCurrentPageDate,
                     savedCurrentPageNumber,
-                    savedCurentItemNumberOnPage,
+                    savedCurrentItemNumberOnPage,
                 savedCurrentPageNumber ==1,
                 true,
-                true);
+                tryLoadUpperPage);
     }
 
     void loadLowerPage(View viewToShowSnackbar, String searchFor){
         if(mIsLoadingNow)return;
+        if(mItems.size()==0)return;
         ImageListItem item = mItems.get(mItems.size()-1); // last item of list
         Date dt = item.getDate();
         int page = item.getPage() + 1;

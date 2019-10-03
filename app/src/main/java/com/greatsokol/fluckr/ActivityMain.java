@@ -27,7 +27,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 
 public class ActivityMain extends AppCompatActivity
-        implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
+        implements /*SwipeRefreshLayout.OnRefreshListener,*/ View.OnClickListener {
     private final static int NO_POSITION = -1;
     private RecyclerView mRecyclerView;
     //private SwipeRefreshLayout mSwipeRefresh;
@@ -65,7 +65,7 @@ public class ActivityMain extends AppCompatActivity
         setLayout();
 
         if(getActiveAdapter().getItemCount()==0)
-            getActiveAdapter().loadInitialPage(getPreferences(MODE_PRIVATE), mToolbar, mSearchFor);
+            getActiveAdapter().loadInitialPage(getPreferences(MODE_PRIVATE), mToolbar, mSearchFor, true);
 
 
 
@@ -130,7 +130,6 @@ public class ActivityMain extends AppCompatActivity
         ViewCompat.setOnApplyWindowInsetsListener(mToolbar, new OnApplyWindowInsetsListener(){
             @Override
             public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
-
                 ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
                 lp.setMargins(  insets.getSystemWindowInsetLeft(),
                                 insets.getSystemWindowInsetTop(),
@@ -204,7 +203,10 @@ public class ActivityMain extends AppCompatActivity
         mRecyclerView.addOnScrollListener(new PaginationListenerOnScroll(layoutManager) {
             @Override
             protected void onScrolled(int firstVisibleItemPosition) {
-                getActiveAdapter().saveNavigationSettings(getPreferences(MODE_PRIVATE), firstVisibleItemPosition);
+                String title = getActiveAdapter().
+                        saveNavigationSettings(getPreferences(MODE_PRIVATE), firstVisibleItemPosition);
+                if(!title.equals(""))
+                    mToolbar.setTitle(title);
             }
 
             @Override
@@ -231,7 +233,7 @@ public class ActivityMain extends AppCompatActivity
         getActiveAdapter().stopLoadingRequest(clear);
     }
 
-    @Override
+    /*@Override
     public void onRefresh() {
         stopRequestLoading(true);
         doApiCall();
@@ -239,7 +241,7 @@ public class ActivityMain extends AppCompatActivity
 
     private void doApiCall() {
         getActiveAdapter().loadLowerPage(mToolbar, mSearchFor);
-    }
+    } */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -277,7 +279,7 @@ public class ActivityMain extends AppCompatActivity
                 mSearchFor = queryText;
                 getSearchAdapter().clear();
                 setLayout();
-                doApiCall();
+                getActiveAdapter().loadInitialPage(getPreferences(MODE_PRIVATE), mToolbar, mSearchFor, false);
                 return true;
             }
 
