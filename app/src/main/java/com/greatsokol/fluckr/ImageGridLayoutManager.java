@@ -1,6 +1,8 @@
 package com.greatsokol.fluckr;
 
 import android.content.Context;
+import android.util.Log;
+
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,5 +21,14 @@ class ImageGridLayoutManager extends GridLayoutManager {
                 return 1;
             }
         });
+    }
+
+    @Override
+    public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+        try {
+            super.onLayoutChildren(recycler, state);
+        } catch (IndexOutOfBoundsException e) {
+            Log.e("TAG", "meet a IOOBE in RecyclerView");
+        }
     }
 }

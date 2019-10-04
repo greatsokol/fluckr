@@ -24,7 +24,6 @@ class AsyncListRequest extends AsyncTask<Void, Void, ArrayList<ImageListItem>> {
     private Date mDate;
 
     public abstract static class OnAnswerListener{
-        public abstract void OnStart();
         public abstract void OnAnswerReady(ArrayList<ImageListItem> items);
         public abstract void OnError();
     }
@@ -44,7 +43,6 @@ class AsyncListRequest extends AsyncTask<Void, Void, ArrayList<ImageListItem>> {
 
     @Override
     protected ArrayList<ImageListItem> doInBackground(Void... voids) {
-        mListener.OnStart();
         String list_request;
         final String extras = "description,url_t,url_m,url_n,url_b,url_k,url_h";
         if(mSearchForString.equals(""))

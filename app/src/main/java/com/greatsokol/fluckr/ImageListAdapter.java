@@ -134,24 +134,23 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         notifyItemRangeInserted(0, items.size()-removed);
     }
 
-    /*private void __notifyItemInserted(final int index){
+    private void __notifyItemInserted(final int position){
         new Handler().post(new Runnable() {
             @Override
             public void run() {
-                if(mItems.size()>index)
-                    notifyItemInserted(index);
+                notifyItemInserted(position);
             }
         });
-    }*/
+    }
 
     private synchronized void startLoading(boolean bAddProgressbarAtBottom) {
         mIsLoadingNow = true;
         if(bAddProgressbarAtBottom){
             mItems.add(new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
-            notifyItemInserted(mItems.size() - 1);
+            __notifyItemInserted(mItems.size() - 1);
         } else {
             mItems.add(0, new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
-            notifyItemInserted(0);
+            __notifyItemInserted(0);
         }
     }
 
@@ -314,14 +313,8 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                             final boolean bAddItemsAtBottom,
                             final boolean bLoadPrevPageAfterFinish){
         if (mIsLoadingNow) return; // || (isLastPage() && getItemCount()>0)) return;
-        //mIsLoadingNow = true;
         startLoading(bAddItemsAtBottom);
         mFlickrRequest = new AsyncListRequest(new AsyncListRequest.OnAnswerListener() {
-                            @Override
-                            public void OnStart() {
-                                //startLoading(bAddItemsAtBottom);
-                            }
-
                             @Override
                             public void OnAnswerReady(ArrayList<ImageListItem> items) {
                                 if(bAddDateHeader && items.size()>0) {
