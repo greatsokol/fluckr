@@ -106,7 +106,7 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         notifyItemRangeInserted(positionStart, itemsSize);
     }
 
-    private synchronized void addItemsAtStart(List<ImageListItem> items) {
+    private synchronized void AddItemsUpper(List<ImageListItem> items) {
         if(items.size()==0) return;
 
         int removed = __removeItemsOfType(ImageListItem.VIEW_TYPE_PLACEHOLDER, false, false);
@@ -133,6 +133,47 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         if(removed>0)notifyItemRangeChanged(items.size()-removed, removed);
         notifyItemRangeInserted(0, items.size()-removed);
     }
+
+    private synchronized void RemoveObsoletePagesUpper(Date JustLoadedDate, int JustLoadedPage){
+        if(mItems.size() == 0) return;
+        int HeadersToRemove = 0;
+        int ImagesToRemove = 0;
+        for (int i = 0; i < mItems.size(); i++) {
+            int ItemType = getItemViewType(i);
+            if(ItemType != ImageListItem.VIEW_TYPE_LOADING) {
+                ImageListItem item = mItems.get(i);
+                int ItemPage = item.getPage();
+                Date ItemDate = item.getDate();
+                int Days = JustLoadedDate.compareTo(ItemDate);
+
+                if (ItemPage < JustLoadedPage - 2 && Days >= 0){
+                    if(ItemType == ImageListItem.VIEW_TYPE_PLACEHOLDER || ItemType == ImageListItem.VIEW_TYPE_IMAGE)ImagesToRemove++;
+                    if(ItemType == ImageListItem.VIEW_TYPE_DATE)HeadersToRemove++;
+                }
+                else break;
+            }
+        }
+
+        ImagesToRemove = ImagesToRemove - ImagesToRemove % mSpanCount;
+        int TotalToRemove = ImagesToRemove + HeadersToRemove;
+        for (int i = 0; i < TotalToRemove; i++) {
+            mItems.remove(0);
+            notifyItemRemoved(0);
+        }
+    }
+
+    private synchronized void RemoveObsoletePagesAtBottom(Date JustLoadedDate, int JustLoadedPage){
+        /*for (int i = 0; i < mItems.size(); i++) {
+            ImageListItem item = mItems.get(i);
+            int itemPage = item.getPage();
+            if (itemPage > JustLoadedPage+2) {
+                mItems.remove(i);
+                notifyItemRemoved(i);
+                i--;
+            }
+        } */
+    }
+
 
     private void __notifyItemInserted(final int position){
         new Handler().post(new Runnable() {
@@ -321,8 +362,14 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                                     ImageListItem item = items.get(0);
                                     items.add(0, new ImageListItem(item.getDate(), item.getPage()));
                                 }
-                                if(bAddItemsAtBottom) addItemsAtBottom(items);
-                                else addItemsAtStart(items);
+                                if(bAddItemsAtBottom) {
+                                    addItemsAtBottom(items);
+                                    RemoveObsoletePagesUpper(date, page);
+                                }
+                                else {
+                                    AddItemsUpper(items);
+                                    RemoveObsoletePagesAtBottom(date, page);
+                                }
 
                                 if (getItemCount()==0)
                                     _showSnack(viewToShowSnackbar, "No results");
