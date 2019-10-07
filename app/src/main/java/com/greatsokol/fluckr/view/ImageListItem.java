@@ -1,16 +1,20 @@
-package com.greatsokol.fluckr;
+package com.greatsokol.fluckr.view;
 
 import android.graphics.Bitmap;
 
+import com.greatsokol.fluckr.etc.ImageLoader;
+import com.greatsokol.fluckr.model.Photo;
+import com.greatsokol.fluckr.view.FluckrApp;
+
 import java.util.Date;
 
-class ImageListItem {
+public class ImageListItem {
 
     static final int VIEW_TYPE_UNKNOWN = -2;
     static final int VIEW_TYPE_PLACEHOLDER = -1;
-    static final int VIEW_TYPE_LOADING = 0;
+    public static final int VIEW_TYPE_LOADING = 0;
     static final int VIEW_TYPE_IMAGE = 1;
-    static final int VIEW_TYPE_DATE = 2;
+    public static final int VIEW_TYPE_DATE = 2;
 
     private int mNumberOnPage;
     private int mPage;
@@ -30,8 +34,8 @@ class ImageListItem {
         mPagesTotal = -1;
         mPage = -1;
     }
-    ImageListItem(Date date, int pagesTotal, int page, int numberOnPage, String title, String details, Bitmap thumbnail,
-                  String thumbnailUrl, String fullsizeUrl) {
+    public ImageListItem(Date date, int pagesTotal, int page, int numberOnPage, String title, String details, Bitmap thumbnail,
+                         String thumbnailUrl, String fullsizeUrl) {
         mTitle = title;
         mPage = page;
         mPagesTotal = pagesTotal;
@@ -41,6 +45,21 @@ class ImageListItem {
         mThumbnailUrl = thumbnailUrl;
         mFullsizeUrl = fullsizeUrl;
         mDate = date;
+    }
+    public ImageListItem(Date DateOfList, int TotalPages, int PageNumber, int NumberOnPage, Photo photo) throws Exception {
+        mTitle = photo.getTitle();
+        mPage = PageNumber;
+        mPagesTotal = TotalPages;
+        mNumberOnPage = NumberOnPage;
+        mDetails = photo.getDescription().getContent();
+        String thumbnailUrl = photo.getThumbnailUrl();
+        String fullsizeUrl = photo.getFullsizeUrl();
+
+        assert thumbnailUrl != null;
+        mBitmapThumbnail = ImageLoader.loadPicture(thumbnailUrl, FluckrApp.getCacheDirectory(), ImageLoader.THUMB_SIZE);;
+        mThumbnailUrl = thumbnailUrl;
+        mFullsizeUrl = fullsizeUrl;
+        mDate = DateOfList;
     }
     ImageListItem(int viewtype, Date date, int pagesTotal, int page){
         mNumberOnPage = -1;

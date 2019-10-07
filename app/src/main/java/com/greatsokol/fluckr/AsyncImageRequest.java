@@ -3,6 +3,8 @@ package com.greatsokol.fluckr;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 
+import com.greatsokol.fluckr.etc.ImageLoader;
+
 public class AsyncImageRequest extends AsyncTask<Void, Void, Bitmap> {
 
 
@@ -24,8 +26,8 @@ public class AsyncImageRequest extends AsyncTask<Void, Void, Bitmap> {
         mResize = resize;
     }
 
-    AsyncImageRequest(final AsyncImageRequest.OnAnswerListener listener,
-                      final String url, final String cacheDir){
+    public AsyncImageRequest(final AsyncImageRequest.OnAnswerListener listener,
+                             final String url, final String cacheDir){
         mListener = listener;
         mUrl = url;
         mCacheDir = cacheDir;

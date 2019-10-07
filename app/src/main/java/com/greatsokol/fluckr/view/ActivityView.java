@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr;
+package com.greatsokol.fluckr.view;
 
 import android.content.ClipData;
 import android.content.Context;
@@ -28,6 +28,11 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.greatsokol.fluckr.AsyncImageRequest;
+import com.greatsokol.fluckr.etc.ImageLoader;
+import com.greatsokol.fluckr.R;
+import com.greatsokol.fluckr.etc.CacheFile;
+import com.greatsokol.fluckr.etc.ConstsAndUtils;
 
 import java.util.Objects;
 

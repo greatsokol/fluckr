@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr;
+package com.greatsokol.fluckr.view;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -17,33 +17,41 @@ import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.greatsokol.fluckr.etc.ConstsAndUtils;
+import com.greatsokol.fluckr.model.Photo;
+import com.greatsokol.fluckr.R;
+import com.greatsokol.fluckr.model.FlickrInterestingnessImageListModel;
+import com.greatsokol.fluckr.model.Photos;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
 
     private List<ImageListItem> mItems;
-    private AsyncListRequest mFlickrRequest;
     //private RecyclerView mRecyclerView;
     private boolean mIsLoadingNow = false;
     private boolean mViewAsGrid = true;
 
-    void setViewAsGrid(boolean viewAsGrid){mViewAsGrid = viewAsGrid;}
+    public void setViewAsGrid(boolean viewAsGrid){mViewAsGrid = viewAsGrid;}
 
     private int mSpanCount = 3;
-    void setSpanCount(int spanCount){mSpanCount = spanCount;}
+    public void setSpanCount(int spanCount){mSpanCount = spanCount;}
 
 
     private View.OnClickListener mItemClickListener;
 
 
-    ImageListAdapter(ArrayList<ImageListItem> items) {
+    public ImageListAdapter(ArrayList<ImageListItem> items) {
         mItems = items;
     }
 
-    void setOnItemClickListener(View.OnClickListener listener){
+    public void setOnItemClickListener(View.OnClickListener listener){
         mItemClickListener = listener;
     }
 
@@ -144,9 +152,9 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 ImageListItem item = mItems.get(i);
                 int ItemPage = item.getPage();
                 Date ItemDate = item.getDate();
+                if(ItemDate == null) continue;
                 int Days = JustLoadedDate.compareTo(ItemDate);
-
-                if (ItemPage < JustLoadedPage - 2 && Days >= 0){
+                if (ItemPage < JustLoadedPage - 1 || Days > 0){
                     if(ItemType == ImageListItem.VIEW_TYPE_PLACEHOLDER || ItemType == ImageListItem.VIEW_TYPE_IMAGE)ImagesToRemove++;
                     if(ItemType == ImageListItem.VIEW_TYPE_DATE)HeadersToRemove++;
                 }
@@ -163,15 +171,18 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     }
 
     private synchronized void RemoveObsoletePagesAtBottom(Date JustLoadedDate, int JustLoadedPage){
-        /*for (int i = 0; i < mItems.size(); i++) {
+        for (int i = 0; i < mItems.size(); i++) {
             ImageListItem item = mItems.get(i);
             int itemPage = item.getPage();
-            if (itemPage > JustLoadedPage+2) {
+            Date ItemDate = item.getDate();
+            if(ItemDate == null) continue;
+            int Days = JustLoadedDate.compareTo(ItemDate);
+            if (itemPage > JustLoadedPage + 1 || Days < 0) {
                 mItems.remove(i);
                 notifyItemRemoved(i);
                 i--;
             }
-        } */
+        }
     }
 
 
@@ -227,7 +238,7 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         mIsLoadingNow = false;
     }
 
-    void clear() {
+    public void clear() {
         if(mIsLoadingNow)return;
         mItems.clear();
         notifyDataSetChanged();
@@ -319,7 +330,7 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     }
 
 
-    String saveNavigationSettings(SharedPreferences prefs, int firstVisibleItemPosition){
+    public String saveNavigationSettings(SharedPreferences prefs, int firstVisibleItemPosition){
         if(firstVisibleItemPosition>=0 && firstVisibleItemPosition<mItems.size()) {
             ImageListItem item = mItems.get(firstVisibleItemPosition);
             Date dt = item.getDate();
@@ -338,9 +349,9 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         return "";
     }
 
-    void stopLoadingRequest(boolean clear){
-        if(mFlickrRequest != null)
-            mFlickrRequest.cancel(true);
+    public void stopLoadingRequest(boolean clear){
+        //if(mFlickrRequest != null)
+          //  mFlickrRequest.cancel(true);
         stopLoading();
         if(clear)clear();
     }
@@ -355,48 +366,72 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                             final boolean bLoadPrevPageAfterFinish){
         if (mIsLoadingNow) return; // || (isLastPage() && getItemCount()>0)) return;
         startLoading(bAddItemsAtBottom);
-        mFlickrRequest = new AsyncListRequest(new AsyncListRequest.OnAnswerListener() {
-                            @Override
-                            public void OnAnswerReady(ArrayList<ImageListItem> items) {
-                                if(bAddDateHeader && items.size()>0) {
-                                    ImageListItem item = items.get(0);
-                                    items.add(0, new ImageListItem(item.getDate(), item.getPage()));
-                                }
-                                if(bAddItemsAtBottom) {
-                                    addItemsAtBottom(items);
-                                    RemoveObsoletePagesUpper(date, page);
-                                }
-                                else {
-                                    AddItemsUpper(items);
-                                    RemoveObsoletePagesAtBottom(date, page);
-                                }
 
-                                if (getItemCount()==0)
-                                    _showSnack(viewToShowSnackbar, "No results");
-                                stopLoading();
-
-                                // load previous page when run app with empty
-                                // list at some previous date and page:
-                                if(bLoadPrevPageAfterFinish)
-                                    loadUpperPage(viewToShowSnackbar, searchFor);
-                            }
-
-                            @Override
-                            public void OnError() {
-                                stopLoading();
-                                _showSnack(viewToShowSnackbar, "Network error");
-                            }
-                        },
-                date,
+        FluckrApp.getApi().getList(
+                "dcfa7bcdfe436387cefa172c2d3dc2ae",
+                ConstsAndUtils.DateToStr_yyyy_mm_dd(date),
+                24,
                 page,
-                viewToShowSnackbar.getContext().getCacheDir().getAbsolutePath(),
-                searchFor);
-        mFlickrRequest.execute();
+                "description,url_t,url_m,url_n,url_b,url_k,url_h",
+                "json",
+                1).enqueue(new Callback<FlickrInterestingnessImageListModel>() {
+            @Override
+            public void onResponse(Call<FlickrInterestingnessImageListModel> call, Response<FlickrInterestingnessImageListModel> response) {
+                assert response.body() != null;
+                Photos photos = response.body().getPhotos();
+                List<Photo> PhotosArray = photos.getPhoto();
+                ArrayList<ImageListItem> ImageListItems = new ArrayList<>();
+                int photosNumber = PhotosArray.size();
+                for(int i=0; i<photosNumber; i++){
+                    Photo photo = PhotosArray.get(i);
+                    try {
+                        ImageListItems.add(new ImageListItem(
+                                date,
+                                photos.getPages(),
+                                photos.getPage(),
+                                i, photo));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                if(bAddDateHeader && ImageListItems.size()>0) {
+                    ImageListItem item = ImageListItems.get(0);
+                    ImageListItems.add(0, new ImageListItem(item.getDate(), item.getPage()));
+                }
+                if(bAddItemsAtBottom) {
+                    addItemsAtBottom(ImageListItems);
+                    //RemoveObsoletePagesUpper(date, page);
+                }
+                else {
+                    AddItemsUpper(ImageListItems);
+                    //RemoveObsoletePagesAtBottom(date, page);
+                }
+
+                if (getItemCount()==0)
+                    _showSnack(viewToShowSnackbar, "No results");
+                stopLoading();
+
+                // load previous page when run app with empty
+                // list at some previous date and page:
+                if(bLoadPrevPageAfterFinish)
+                    loadUpperPage(viewToShowSnackbar, searchFor);
+
+            }
+
+            @Override
+            public void onFailure(Call<FlickrInterestingnessImageListModel> call, Throwable t) {
+                t.printStackTrace();
+                stopLoading();
+                _showSnack(viewToShowSnackbar, "Network error");
+            }
+        });
     }
 
-    void loadInitialPage(SharedPreferences prefs, View viewToShowSnackbar, String searchFor, Boolean tryLoadUpperPage){
+    public void loadInitialPage(SharedPreferences prefs, View viewToShowSnackbar, String searchFor, Boolean tryLoadUpperPage){
         if(mIsLoadingNow)return;
-        Date savedCurrentPageDate = new Date(prefs.getLong(ConstsAndUtils.TAG_DATE_TO_VIEW, ConstsAndUtils.DecDate(new Date()).getTime()));
+        Date savedCurrentPageDate
+                = new Date(prefs.getLong(ConstsAndUtils.TAG_DATE_TO_VIEW,
+                ConstsAndUtils.DecDate(ConstsAndUtils.CurrentGMTDate()).getTime()));
         int savedCurrentPageNumber = prefs.getInt(ConstsAndUtils.TAG_PAGE_TO_VIEW,1);
         int savedCurrentItemNumberOnPage = prefs.getInt(ConstsAndUtils.TAG_NUMBER_ON_PAGE,1);
 
@@ -409,7 +444,7 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 tryLoadUpperPage);
     }
 
-    void loadLowerPage(View viewToShowSnackbar, String searchFor){
+    public void loadLowerPage(View viewToShowSnackbar, String searchFor){
         if(mIsLoadingNow)return;
         if(mItems.size()==0)return;
         ImageListItem item = mItems.get(mItems.size()-1); // last item of list
@@ -426,7 +461,7 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 false);
     }
 
-    void loadUpperPage(View viewToShowSnackbar, String searchFor){
+    public void loadUpperPage(View viewToShowSnackbar, String searchFor){
         if(mIsLoadingNow)return;
         ImageListItem item = mItems.get(0); // first item of list
         Date dt = item.getDate();
@@ -444,8 +479,8 @@ class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
 
 
     private void _showSnack(View view, String message){
-        if (mFlickrRequest != null)
-            if (!mFlickrRequest.isCancelled())
+        //if (mFlickrRequest != null)
+          //  if (!mFlickrRequest.isCancelled())
                     Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
     }
 }

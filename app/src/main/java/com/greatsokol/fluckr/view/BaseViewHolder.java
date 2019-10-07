@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr;
+package com.greatsokol.fluckr.view;
 
 import android.view.View;
 import androidx.recyclerview.widget.RecyclerView;

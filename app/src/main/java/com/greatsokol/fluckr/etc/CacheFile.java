@@ -1,11 +1,11 @@
-package com.greatsokol.fluckr;
+package com.greatsokol.fluckr.etc;
 
 import android.util.Log;
 
 import java.io.File;
 import java.util.Date;
 
-abstract class CacheFile {
+public abstract class CacheFile {
     static final String OLD = "old";
     private static final long CACHE_TIME = 24 *  60 * 60; // 1 days * 24 hours * 60 minutes * 60 sec
     private static final String TAG = "CacheFile";
@@ -14,7 +14,7 @@ abstract class CacheFile {
         O call(I input);
     }
 
-    static void cleanCache(final String cacheDir){
+    public static void cleanCache(final String cacheDir){
         File directory = new File(cacheDir);
         File[] files = directory.listFiles();
         assert files != null;
@@ -26,8 +26,8 @@ abstract class CacheFile {
         }
     }
 
-    static String convertUrlToCacheFileName(final String url, final String cacheDir,
-                                            boolean addpostfix, String postfix){
+    public static String convertUrlToCacheFileName(final String url, final String cacheDir,
+                                                   boolean addpostfix, String postfix){
         String fileName = cacheDir + "/" +
                 url.replace(':', '_').
                         replace('?','_').

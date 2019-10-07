@@ -1,8 +1,10 @@
-package com.greatsokol.fluckr;
+package com.greatsokol.fluckr.etc;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
+
+import com.greatsokol.fluckr.etc.CacheFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -13,18 +15,18 @@ import java.io.OutputStream;
 import java.net.URL;
 
 
-class ImageLoader {
+public class ImageLoader {
     private static final String TAG = "ImageLoader";
 
-    static final int NORESIZE = -1;
-    static final int THUMB_SIZE = 320;
+    public static final int NORESIZE = -1;
+    public static final int THUMB_SIZE = 320;
 
 
     ImageLoader(){
     }
 
 
-    static Bitmap loadPicture(final String url, final String cacheDir, final int resize) throws Exception {
+    public static Bitmap loadPicture(final String url, final String cacheDir, final int resize) throws Exception {
         String cacheFileName
                 = CacheFile.convertUrlToCacheFileName(url, cacheDir,
                                 resize!=NORESIZE, String.valueOf(resize));
@@ -35,7 +37,7 @@ class ImageLoader {
     }
 
 
-    static Bitmap loadPictureFromCache(final String path, boolean checkIsFileOverdue) {
+    public static Bitmap loadPictureFromCache(final String path, boolean checkIsFileOverdue) {
         if (!checkIsFileOverdue || CacheFile.isFileNotOverdue(path)) {
             Bitmap bitmap = loadPictureFromFile(path);
             if (!checkIsFileOverdue && bitmap == null)
@@ -86,6 +88,7 @@ class ImageLoader {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             CacheFile.deleteCacheFile(cacheFileName);
             throw new Exception(e);
             //Log.i(TAG, "LOADING URL ERROR (" + e.getClass().getSimpleName() + ") = " + urlPath);

@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr;
+package com.greatsokol.fluckr.view;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,7 +23,10 @@ import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.greatsokol.fluckr.R;
+import com.greatsokol.fluckr.etc.CacheFile;
+import com.greatsokol.fluckr.etc.ConstsAndUtils;
 
 
 public class ActivityMain extends AppCompatActivity

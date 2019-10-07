@@ -1,11 +1,11 @@
-package com.greatsokol.fluckr;
+package com.greatsokol.fluckr.view;
 
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.view.View;
 
 
-class MyDragShadowBuilder extends View.DragShadowBuilder {
+public class MyDragShadowBuilder extends View.DragShadowBuilder {
 
     private int mX, mY;
 

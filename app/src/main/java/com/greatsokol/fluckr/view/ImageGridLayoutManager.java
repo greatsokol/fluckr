@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr;
+package com.greatsokol.fluckr.view;
 
 import android.content.Context;
 import android.util.Log;
@@ -6,9 +6,9 @@ import android.util.Log;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-class ImageGridLayoutManager extends GridLayoutManager {
+public class ImageGridLayoutManager extends GridLayoutManager {
 
-    ImageGridLayoutManager(Context context, final ImageListAdapter adapter, final int spanCount) {
+    public ImageGridLayoutManager(Context context, final ImageListAdapter adapter, final int spanCount) {
         super(context, spanCount);
         setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
