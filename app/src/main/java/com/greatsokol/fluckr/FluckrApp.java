@@ -1,7 +1,9 @@
-package com.greatsokol.fluckr.view;
+package com.greatsokol.fluckr;
 
 import android.app.Application;
 
+import com.greatsokol.fluckr.ImageListAdapter;
+import com.greatsokol.fluckr.ImageListItem;
 import com.greatsokol.fluckr.service.FlickrInterestingnessImageListApi;
 
 import java.util.ArrayList;
@@ -14,8 +16,8 @@ public class FluckrApp extends Application {
     private ImageListAdapter mSearchAdapter;
     private static String mCacheDir;
 
-    ImageListAdapter getTodayListAdapter(){return mAdapter;}
-    ImageListAdapter getSearchAdapter(){return mSearchAdapter;}
+    public ImageListAdapter getTodayListAdapter(){return mAdapter;}
+    public ImageListAdapter getSearchAdapter(){return mSearchAdapter;}
 
     private static FlickrInterestingnessImageListApi mFlickrInterestingnessImageListApi;
     private Retrofit retrofit;

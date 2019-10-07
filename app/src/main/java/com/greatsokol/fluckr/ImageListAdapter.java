@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr.view;
+package com.greatsokol.fluckr;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.snackbar.Snackbar;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.model.Photo;
-import com.greatsokol.fluckr.R;
 import com.greatsokol.fluckr.model.FlickrInterestingnessImageListModel;
 import com.greatsokol.fluckr.model.Photos;
 

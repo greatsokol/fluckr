@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr.view;
+package com.greatsokol.fluckr;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public abstract class PaginationListenerOnScroll extends RecyclerView.OnScrollListener {
     @NonNull
     private GridLayoutManager layoutManager;
-    PaginationListenerOnScroll(@NonNull GridLayoutManager layoutManager) {
+    public PaginationListenerOnScroll(@NonNull GridLayoutManager layoutManager) {
         this.layoutManager = layoutManager;
     }
 

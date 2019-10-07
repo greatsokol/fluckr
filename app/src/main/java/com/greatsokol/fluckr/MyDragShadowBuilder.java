@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr.view;
+package com.greatsokol.fluckr;
 
 import android.graphics.Canvas;
 import android.graphics.Point;

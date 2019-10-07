@@ -1,10 +1,9 @@
-package com.greatsokol.fluckr.view;
+package com.greatsokol.fluckr;
 
 import android.graphics.Bitmap;
 
 import com.greatsokol.fluckr.etc.ImageLoader;
 import com.greatsokol.fluckr.model.Photo;
-import com.greatsokol.fluckr.view.FluckrApp;
 
 import java.util.Date;
 

@@ -1,10 +1,13 @@
-package com.greatsokol.fluckr.view;
+package com.greatsokol.fluckr;
 
 import android.content.Context;
 import android.util.Log;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.greatsokol.fluckr.ImageListAdapter;
+import com.greatsokol.fluckr.ImageListItem;
 
 public class ImageGridLayoutManager extends GridLayoutManager {
 
