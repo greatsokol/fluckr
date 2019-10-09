@@ -55,7 +55,7 @@ public class ImageListItem {
         String fullsizeUrl = photo.getFullsizeUrl();
 
         assert thumbnailUrl != null;
-        mBitmapThumbnail = ImageLoader.loadPicture(thumbnailUrl, FluckrApp.getCacheDirectory(), ImageLoader.THUMB_SIZE);;
+        mBitmapThumbnail = null; //ImageLoader.loadPicture(thumbnailUrl, FluckrApp.getCacheDirectory(), ImageLoader.THUMB_SIZE);;
         mThumbnailUrl = thumbnailUrl;
         mFullsizeUrl = fullsizeUrl;
         mDate = DateOfList;
@@ -67,16 +67,16 @@ public class ImageListItem {
         mPagesTotal = pagesTotal;
         mDate = date;
     }
-    ImageListItem(Date date, int page){
+    public ImageListItem(Date date, int page){
         mNumberOnPage = 1;
         mViewType = VIEW_TYPE_DATE;
         mPage = page;
         mDate = date;
     }
 
-    Date getDate(){return mDate;}
+    public Date getDate(){return mDate;}
     int getPagesTotal(){return mPagesTotal;}
-    int getPage(){return mPage;}
+    public int getPage(){return mPage;}
     int getNumberOnPage(){return mNumberOnPage;}
     int getViewType(){return mViewType;}
     String getTitle() {

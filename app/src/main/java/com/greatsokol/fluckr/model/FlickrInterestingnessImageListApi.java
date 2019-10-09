@@ -1,6 +1,4 @@
-package com.greatsokol.fluckr.service;
-
-import com.greatsokol.fluckr.model.FlickrInterestingnessImageListModel;
+package com.greatsokol.fluckr.model;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

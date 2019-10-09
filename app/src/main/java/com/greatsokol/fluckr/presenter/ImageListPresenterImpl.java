@@ -1,38 +1,57 @@
 package com.greatsokol.fluckr.presenter;
 
-import com.greatsokol.fluckr.view.ViewMain;
+import com.greatsokol.fluckr.ContractMain;
+import com.greatsokol.fluckr.ImageListItem;
+import com.greatsokol.fluckr.model.ModelMain;
 
-public class ImageListPresenterImpl implements ImageListPresenter {
-    private ViewMain viewMain;
+import java.util.ArrayList;
+import java.util.Date;
+
+public class ImageListPresenterImpl implements ContractMain.ImageListPresenter {
+    private ContractMain.ViewMain mView;
+    private ContractMain.Model mModel;
     private boolean isLoadingNow;
 
     @Override
-    public void attachView(ViewMain view) {
-        viewMain = view;
+    public void onViewCreate(ContractMain.ViewMain view, boolean loadInitial, Date savedDate, int savedPage, int savedItemNumber, String searchForThis) {
+        mView = view;
+        mModel = new ModelMain();
+        if(loadInitial) {
+            isLoadingNow = true;
+            view.onStartLoading(true);
+            mModel.loadInitialPage(savedDate, savedPage, savedItemNumber, searchForThis, new ContractMain.Model.OnResponseCallback() {
+                @Override
+                public void onResponse(ArrayList<ImageListItem> items) {
+                    mView.onImageListDownloaded(items);
+                    mView.onStopLoading();
+                    isLoadingNow = false;
+                }
+
+                @Override
+                public void onFailure(String message) {
+                    mView.onStopLoading();
+                    mView.onFailure(message);
+                    isLoadingNow = false;
+                }
+            });
+        }
     }
 
     @Override
-    public void detachView() {
-        viewMain = null;
+    public void onViewDestroy() {
+        mView = null;
+        mModel = null;
     }
 
     @Override
-    public void loadUpperPage(String searchFor) {
+    public void onScrolledDown() {
         if(isLoadingNow)return;
         isLoadingNow = true;
-
     }
 
     @Override
-    public void loadLowerPage(String searchFor) {
+    public void onScrolledUp() {
         if(isLoadingNow)return;
         isLoadingNow = true;
-    }
-
-    @Override
-    public void loadInitialPage(String searchFor) {
-        if(isLoadingNow)return;
-        isLoadingNow = true;
-
     }
 }

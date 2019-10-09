@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr;
+package com.greatsokol.fluckr.etc;
 
 import android.graphics.Canvas;
 import android.graphics.Point;
@@ -9,7 +9,7 @@ public class MyDragShadowBuilder extends View.DragShadowBuilder {
 
     private int mX, mY;
 
-    MyDragShadowBuilder(View view, float touchPointX, float touchPointY) {
+    public MyDragShadowBuilder(View view, float touchPointX, float touchPointY) {
         super(view);
         mX = (int)touchPointX;
         mY = (int)touchPointY;

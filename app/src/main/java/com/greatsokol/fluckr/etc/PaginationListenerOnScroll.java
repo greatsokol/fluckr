@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr;
+package com.greatsokol.fluckr.etc;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;

@@ -24,25 +24,35 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.greatsokol.fluckr.ActivityView;
+import com.greatsokol.fluckr.ContractMain;
 import com.greatsokol.fluckr.FluckrApp;
-import com.greatsokol.fluckr.ImageGridLayoutManager;
+import com.greatsokol.fluckr.ImageListItem;
+import com.greatsokol.fluckr.etc.ImageGridLayoutManager;
 import com.greatsokol.fluckr.ImageListAdapter;
-import com.greatsokol.fluckr.PaginationListenerOnFling;
-import com.greatsokol.fluckr.PaginationListenerOnScroll;
+import com.greatsokol.fluckr.etc.PaginationListenerOnFling;
+import com.greatsokol.fluckr.etc.PaginationListenerOnScroll;
 import com.greatsokol.fluckr.R;
 import com.greatsokol.fluckr.etc.CacheFile;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
+import com.greatsokol.fluckr.presenter.ImageListPresenterImpl;
+
+import java.util.ArrayList;
+import java.util.Date;
 
 
 public class ActivityMain extends AppCompatActivity
-        implements /*SwipeRefreshLayout.OnRefreshListener,*/ View.OnClickListener {
+        implements /*SwipeRefreshLayout.OnRefreshListener,*/
+        ContractMain.ViewMain,
+        View.OnClickListener {
     private final static int NO_POSITION = -1;
     private RecyclerView mRecyclerView;
     //private SwipeRefreshLayout mSwipeRefresh;
     private int mTransitionPosition;
     private boolean mActivityViewStarted = false;
     private Toolbar mToolbar;
+    private ContractMain.ImageListPresenter mPresenter;
 
     //private View mAppBar;
 
@@ -73,10 +83,15 @@ public class ActivityMain extends AppCompatActivity
         setInsets();
         setLayout();
 
-        if(getActiveAdapter().getItemCount()==0)
-            getActiveAdapter().loadInitialPage(getPreferences(MODE_PRIVATE), mToolbar, mSearchFor, true);
-
-
+        mPresenter = new ImageListPresenterImpl();
+        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+        Date savedDate
+                = new Date(prefs.getLong(ConstsAndUtils.TAG_DATE_TO_VIEW,
+                ConstsAndUtils.DecDate(ConstsAndUtils.CurrentGMTDate()).getTime()));
+        int savedPage = prefs.getInt(ConstsAndUtils.TAG_PAGE_TO_VIEW,1);
+        int savedItemNumber = prefs.getInt(ConstsAndUtils.TAG_NUMBER_ON_PAGE,1);
+        mPresenter.onViewCreate(this, getActiveAdapter().getItemCount()==0,
+                                    savedDate, savedPage, savedItemNumber, mSearchFor);
 
 
         // shared element transition tricks:
@@ -105,6 +120,11 @@ public class ActivityMain extends AppCompatActivity
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPresenter.onViewDestroy();
+    }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
@@ -197,12 +217,14 @@ public class ActivityMain extends AppCompatActivity
         mRecyclerView.setOnFlingListener(new PaginationListenerOnFling(layoutManager) {
             @Override
             protected void loadNextPage() {
-                getActiveAdapter().loadLowerPage(mToolbar, mSearchFor);
+                mPresenter.onScrolledDown();
+                //getActiveAdapter().loadLowerPage(mToolbar, mSearchFor);
             }
 
             @Override
             protected void loadPrevPage() {
-                getActiveAdapter().loadUpperPage(mToolbar, mSearchFor);
+                mPresenter.onScrolledUp();
+                //getActiveAdapter().loadUpperPage(mToolbar, mSearchFor);
             }
         });
 
@@ -220,12 +242,14 @@ public class ActivityMain extends AppCompatActivity
 
             @Override
             protected void loadNextPage() {
-                getActiveAdapter().loadLowerPage(mToolbar, mSearchFor);
+                mPresenter.onScrolledDown();
+                //getActiveAdapter().loadLowerPage(mToolbar, mSearchFor);
             }
 
             @Override
             protected void loadPrevPage() {
-                getActiveAdapter().loadUpperPage(mToolbar, mSearchFor);
+                mPresenter.onScrolledUp();
+                //getActiveAdapter().loadUpperPage(mToolbar, mSearchFor);
             }
         });
 
@@ -288,7 +312,7 @@ public class ActivityMain extends AppCompatActivity
                 mSearchFor = queryText;
                 getSearchAdapter().clear();
                 setLayout();
-                getActiveAdapter().loadInitialPage(getPreferences(MODE_PRIVATE), mToolbar, mSearchFor, false);
+                //getActiveAdapter().loadInitialPage(getPreferences(MODE_PRIVATE), mToolbar, mSearchFor, false);
                 return true;
             }
 
@@ -380,5 +404,27 @@ public class ActivityMain extends AppCompatActivity
         SharedPreferences.Editor editor = activityPreferences.edit();
         editor.putBoolean(ConstsAndUtils.TAG_VIEWASGRID, bAsGrid);
         editor.apply();
+    }
+
+
+
+    @Override
+    public void onImageListDownloaded(ArrayList<ImageListItem> items) {
+        getActiveAdapter().addItemsAtBottom(items);
+    }
+
+    @Override
+    public void onFailure(String message) {
+        Snackbar.make(mRecyclerView, message, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onStartLoading(boolean bAddProgressbarAtBottom) {
+        getActiveAdapter().startLoading(bAddProgressbarAtBottom);
+    }
+
+    @Override
+    public void onStopLoading() {
+        getActiveAdapter().stopLoading();
     }
 }

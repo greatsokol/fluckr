@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr;
+package com.greatsokol.fluckr.etc;
 
 import android.content.Context;
 import android.util.Log;

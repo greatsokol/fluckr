@@ -1,6 +1,7 @@
 package com.greatsokol.fluckr;
 
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
@@ -21,6 +22,7 @@ import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.model.Photo;
 import com.greatsokol.fluckr.model.FlickrInterestingnessImageListModel;
 import com.greatsokol.fluckr.model.Photos;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,10 +32,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
+public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.BaseViewHolder> {
 
     private List<ImageListItem> mItems;
-    //private RecyclerView mRecyclerView;
+    private RecyclerView mRecyclerView;
     private boolean mIsLoadingNow = false;
     private boolean mViewAsGrid = true;
 
@@ -54,7 +56,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         mItemClickListener = listener;
     }
 
-    /*@Override
+    @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         mRecyclerView = recyclerView;
@@ -64,7 +66,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
         mRecyclerView = null;
-    } */
+    }
 
     @NonNull
     @Override
@@ -106,7 +108,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     }
 
 
-    private synchronized void addItemsAtBottom(List<ImageListItem> items) {
+    public void addItemsAtBottom(List<ImageListItem> items) {
         mItems.addAll(items);
         int itemsSize = items.size();
         int positionStart = mItems.size() - itemsSize;
@@ -141,7 +143,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         notifyItemRangeInserted(0, items.size()-removed);
     }
 
-    private synchronized void RemoveObsoletePagesUpper(Date JustLoadedDate, int JustLoadedPage){
+    /*private synchronized void RemoveObsoletePagesUpper(Date JustLoadedDate, int JustLoadedPage){
         if(mItems.size() == 0) return;
         int HeadersToRemove = 0;
         int ImagesToRemove = 0;
@@ -182,7 +184,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 i--;
             }
         }
-    }
+    }*/
 
 
     private void __notifyItemInserted(final int position){
@@ -194,7 +196,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         });
     }
 
-    private synchronized void startLoading(boolean bAddProgressbarAtBottom) {
+    public void startLoading(boolean bAddProgressbarAtBottom) {
         mIsLoadingNow = true;
         if(bAddProgressbarAtBottom){
             mItems.add(new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
@@ -232,7 +234,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         return removed;
     }
 
-    private synchronized void stopLoading() {
+    public void stopLoading() {
         __removeItemsOfType(ImageListItem.VIEW_TYPE_LOADING, true, true);
         mIsLoadingNow = false;
     }
@@ -283,7 +285,24 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 }
             }
             if(imageView!=null){
-                imageView.setImageBitmap(listItem.getBitmapThumbnail());
+                Picasso picasso =
+                        new Picasso.Builder(mRecyclerView.getContext()).
+                                indicatorsEnabled(true).
+                                loggingEnabled(true).
+                                listener(new Picasso.Listener() {
+                                    @Override
+                                    public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                                        exception.printStackTrace();
+                                    }
+                                }).
+                                build();
+                Picasso.get().setLoggingEnabled(true);
+                Picasso.get().setIndicatorsEnabled(true);
+                Picasso.get().load(listItem.getThumbnailUrl()).fit().centerCrop()
+                        //.placeholder(R.drawable.user_placeholder)
+                        //.error(R.drawable.ic_launcher_background)
+                        .into(imageView);
+                //imageView.setImageBitmap(listItem.getBitmapThumbnail());
                 final String transitionName = "itemImage" + "_" + getClass().getName() + "_" + position;
                 ViewCompat.setTransitionName(imageView, transitionName);
             }
@@ -355,7 +374,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         if(clear)clear();
     }
 
-    private void __loadPage(final View viewToShowSnackbar,
+    /*private void __loadPage(final View viewToShowSnackbar,
                             final String searchFor,
                             final Date date,
                             final int page,
@@ -406,8 +425,8 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                     //RemoveObsoletePagesAtBottom(date, page);
                 }
 
-                if (getItemCount()==0)
-                    _showSnack(viewToShowSnackbar, "No results");
+                //if (getItemCount()==0)
+                    //_showSnack(viewToShowSnackbar, "No results");
                 stopLoading();
 
                 // load previous page when run app with empty
@@ -421,12 +440,12 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
             public void onFailure(Call<FlickrInterestingnessImageListModel> call, Throwable t) {
                 t.printStackTrace();
                 stopLoading();
-                _showSnack(viewToShowSnackbar, "Network error");
+                //_showSnack(viewToShowSnackbar, "Network error");
             }
         });
-    }
+    } */
 
-    public void loadInitialPage(SharedPreferences prefs, View viewToShowSnackbar, String searchFor, Boolean tryLoadUpperPage){
+    /*public void loadInitialPage(SharedPreferences prefs, View viewToShowSnackbar, String searchFor, Boolean tryLoadUpperPage){
         if(mIsLoadingNow)return;
         Date savedCurrentPageDate
                 = new Date(prefs.getLong(ConstsAndUtils.TAG_DATE_TO_VIEW,
@@ -441,8 +460,9 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 savedCurrentPageNumber ==1,
                 true,
                 tryLoadUpperPage);
-    }
+    }*/
 
+    /*
     public void loadLowerPage(View viewToShowSnackbar, String searchFor){
         if(mIsLoadingNow)return;
         if(mItems.size()==0)return;
@@ -474,12 +494,23 @@ public class ImageListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 page==1,
                 false,
                 false);
-    }
+    } */
 
 
-    private void _showSnack(View view, String message){
+    /*private void _showSnack(View view, String message){
         //if (mFlickrRequest != null)
           //  if (!mFlickrRequest.isCancelled())
                     Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
+    }*/
+
+
+    public abstract class BaseViewHolder extends RecyclerView.ViewHolder {
+        BaseViewHolder(View itemView) {
+            super(itemView);
+        }
+        protected abstract void clear();
+        public void onBind(int position) {
+            clear();
+        }
     }
 }
