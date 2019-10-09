@@ -1,6 +1,9 @@
 package com.greatsokol.fluckr;
 
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,6 +26,7 @@ import com.greatsokol.fluckr.model.Photo;
 import com.greatsokol.fluckr.model.FlickrInterestingnessImageListModel;
 import com.greatsokol.fluckr.model.Photos;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -298,11 +302,32 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
                                 build();
                 Picasso.get().setLoggingEnabled(true);*/
                 //Picasso.get().setIndicatorsEnabled(true);
-                Picasso.get().load(listItem.getThumbnailUrl()).fit().centerCrop()
+                //Picasso.get().load(listItem.getThumbnailUrl()).fit().centerCrop()
                         //.placeholder(R.drawable.user_placeholder)
-                        .error(R.drawable.ic_launcher_foreground)
-                        .into(imageView);
+                        //.error(R.drawable.ic_launcher_foreground)
+                        //.into(imageView);
+
                 //imageView.setImageBitmap(listItem.getBitmapThumbnail());
+
+                Target target = new Target() {
+                    @Override
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                        bitmap = ThumbnailUtils.extractThumbnail(bitmap, 300, 300);
+                        imageView.setImageBitmap(bitmap);
+                    }
+
+                    @Override
+                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+                    }
+
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                    }
+                };
+                Picasso.get().load(listItem.getThumbnailUrl()).into(target);
+
                 final String transitionName = "itemImage" + "_" + getClass().getName() + "_" + position;
                 ViewCompat.setTransitionName(imageView, transitionName);
             }

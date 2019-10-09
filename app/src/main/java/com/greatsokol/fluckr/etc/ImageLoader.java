@@ -4,8 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
 
-import com.greatsokol.fluckr.etc.CacheFile;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;

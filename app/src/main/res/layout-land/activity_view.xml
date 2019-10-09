@@ -46,6 +46,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/appbar"
         app:srcCompat="@drawable/ic_launcher_background"
+        android:scaleType="centerCrop"
         android:paddingTop="?android:actionBarSize"/>
 
     <ScrollView

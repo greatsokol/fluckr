@@ -4,6 +4,8 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.text.Html;
 import android.transition.Transition;
@@ -32,6 +34,8 @@ import com.greatsokol.fluckr.etc.ImageLoader;
 import com.greatsokol.fluckr.etc.CacheFile;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.etc.MyDragShadowBuilder;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.Objects;
 
@@ -49,6 +53,7 @@ public class ActivityView extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view);
+        postponeEnterTransition();
         mToolbar = findViewById(R.id.toolbar_actionbar);
         mRootView = findViewById(R.id.constraint);
         setSupportActionBar(mToolbar);
@@ -68,10 +73,31 @@ public class ActivityView extends AppCompatActivity {
 
         final String thumbnailPath = mArgs.getString(ConstsAndUtils.TAG_THUMBURL);
         assert thumbnailPath != null;
-        mThumbnail = ImageLoader.loadPictureFromCache(
+
+        Target target = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                mThumbnail = ThumbnailUtils.extractThumbnail(bitmap, 300, 300);
+                mImageView.setImageBitmap(mThumbnail);
+                startPostponedEnterTransition();
+            }
+
+            @Override
+            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        };
+        Picasso.get().load(thumbnailPath).into(target);
+
+        /*mThumbnail = ImageLoader.loadPictureFromCache(
                 CacheFile.convertUrlToCacheFileName(thumbnailPath, mCacheDir, true,
                         String.valueOf(ImageLoader.THUMB_SIZE)), false);
-        mImageView.setImageBitmap(mThumbnail);
+        mImageView.setImageBitmap(mThumbnail);*/
 
 
 
