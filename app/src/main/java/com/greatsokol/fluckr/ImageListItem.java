@@ -1,8 +1,5 @@
 package com.greatsokol.fluckr;
 
-import android.graphics.Bitmap;
-
-import com.greatsokol.fluckr.etc.ImageLoader;
 import com.greatsokol.fluckr.model.Photo;
 
 import java.util.Date;
@@ -21,7 +18,7 @@ public class ImageListItem {
     private Date mDate;
     private String mTitle;
     private String mDetails;
-    private Bitmap mBitmapThumbnail;
+    //private Bitmap mBitmapThumbnail;
     private String mThumbnailUrl;
     private String mFullsizeUrl;
 
@@ -33,14 +30,14 @@ public class ImageListItem {
         mPagesTotal = -1;
         mPage = -1;
     }
-    public ImageListItem(Date date, int pagesTotal, int page, int numberOnPage, String title, String details, Bitmap thumbnail,
+    public ImageListItem(Date date, int pagesTotal, int page, int numberOnPage, String title, String details, /*Bitmap thumbnail,*/
                          String thumbnailUrl, String fullsizeUrl) {
         mTitle = title;
         mPage = page;
         mPagesTotal = pagesTotal;
         mNumberOnPage = numberOnPage;
         mDetails = details;
-        mBitmapThumbnail = thumbnail;
+        //mBitmapThumbnail = thumbnail;
         mThumbnailUrl = thumbnailUrl;
         mFullsizeUrl = fullsizeUrl;
         mDate = date;
@@ -55,7 +52,8 @@ public class ImageListItem {
         String fullsizeUrl = photo.getFullsizeUrl();
 
         assert thumbnailUrl != null;
-        mBitmapThumbnail = null; //ImageLoader.loadPicture(thumbnailUrl, FluckrApp.getCacheDirectory(), ImageLoader.THUMB_SIZE);;
+        //mBitmapThumbnail = null; //ImageLoader.loadPicture(thumbnailUrl, FluckrApp.getCacheDirectory(), ImageLoader.THUMB_SIZE);
+
         mThumbnailUrl = thumbnailUrl;
         mFullsizeUrl = fullsizeUrl;
         mDate = DateOfList;
@@ -83,7 +81,7 @@ public class ImageListItem {
         return mTitle;
     }
     String getDetails() {return mDetails;}
-    Bitmap getBitmapThumbnail(){return mBitmapThumbnail;}
+    //Bitmap getBitmapThumbnail(){return mBitmapThumbnail;}
     String getThumbnailUrl(){return mThumbnailUrl;}
     String getFullsizeUrl(){return mFullsizeUrl;}
 }

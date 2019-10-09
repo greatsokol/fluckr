@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/grid_height"
+    android:layout_height="@dimen/image_height"
     android:layout_margin="@dimen/card_view_margin"
     android:id="@+id/listitem"
     android:clickable="true"
@@ -13,7 +13,7 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imageview"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/image_width"
             android:layout_height="match_parent"
             android:layout_gravity="start"
             android:adjustViewBounds="true" />

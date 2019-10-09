@@ -4,5 +4,6 @@
     <integer name="span_for_linear">1</integer>
     <dimen name="textviews_paddings">10dp</dimen>
     <dimen name="card_view_margin">0dp</dimen>
-    <dimen name="grid_height">200dp</dimen>
+    <dimen name="image_height">150dp</dimen>
+    <dimen name="image_width">150dp</dimen>
 </resources>

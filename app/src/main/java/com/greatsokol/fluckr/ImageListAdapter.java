@@ -216,7 +216,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
 
     private void setFadeAnimation(View view) {
         AlphaAnimation anim = new AlphaAnimation(0.0f, 1.0f);
-        anim.setDuration(500);
+        anim.setDuration(1000);
         view.startAnimation(anim);
     }
 
@@ -285,7 +285,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
                 }
             }
             if(imageView!=null){
-                Picasso picasso =
+                /*Picasso picasso =
                         new Picasso.Builder(mRecyclerView.getContext()).
                                 indicatorsEnabled(true).
                                 loggingEnabled(true).
@@ -296,11 +296,11 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
                                     }
                                 }).
                                 build();
-                Picasso.get().setLoggingEnabled(true);
-                Picasso.get().setIndicatorsEnabled(true);
+                Picasso.get().setLoggingEnabled(true);*/
+                //Picasso.get().setIndicatorsEnabled(true);
                 Picasso.get().load(listItem.getThumbnailUrl()).fit().centerCrop()
                         //.placeholder(R.drawable.user_placeholder)
-                        //.error(R.drawable.ic_launcher_background)
+                        .error(R.drawable.ic_launcher_foreground)
                         .into(imageView);
                 //imageView.setImageBitmap(listItem.getBitmapThumbnail());
                 final String transitionName = "itemImage" + "_" + getClass().getName() + "_" + position;
