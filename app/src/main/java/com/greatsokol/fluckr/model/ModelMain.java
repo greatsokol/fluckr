@@ -83,8 +83,6 @@ public class ModelMain implements ContractMain.Model {
             public void onFailure(Call<FlickrInterestingnessImageList> call, Throwable t) {
                 t.printStackTrace();
                 onResponseCallback.onFailure(t.getMessage());
-                //stopLoading();
-                //_showSnack(viewToShowSnackbar, "Network error");
             }
         });
     }
