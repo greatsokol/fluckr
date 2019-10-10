@@ -4,7 +4,7 @@ package com.greatsokol.fluckr.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class FlickrInterestingnessImageListModel {
+public class FlickrInterestingnessImageList {
 
     @SerializedName("photos")
     @Expose

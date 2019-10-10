@@ -1,13 +1,13 @@
 package com.greatsokol.fluckr.presenter;
 
-import com.greatsokol.fluckr.ContractMain;
-import com.greatsokol.fluckr.ImageListItem;
+import com.greatsokol.fluckr.contract.ContractMain;
+import com.greatsokol.fluckr.view.ImageListItem;
 import com.greatsokol.fluckr.model.ModelMain;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-public class ImageListPresenterImpl implements ContractMain.ImageListPresenter {
+public class ImageListPresenter implements ContractMain.ImageListPresenter {
     private ContractMain.ViewMain mView;
     private ContractMain.Model mModel;
     private boolean isLoadingNow;

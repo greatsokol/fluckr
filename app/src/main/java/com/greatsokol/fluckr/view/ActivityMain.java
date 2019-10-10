@@ -25,18 +25,15 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.greatsokol.fluckr.ActivityView;
-import com.greatsokol.fluckr.ContractMain;
+import com.greatsokol.fluckr.contract.ContractMain;
 import com.greatsokol.fluckr.FluckrApp;
-import com.greatsokol.fluckr.ImageListItem;
 import com.greatsokol.fluckr.etc.ImageGridLayoutManager;
-import com.greatsokol.fluckr.ImageListAdapter;
 import com.greatsokol.fluckr.etc.PaginationListenerOnFling;
 import com.greatsokol.fluckr.etc.PaginationListenerOnScroll;
 import com.greatsokol.fluckr.R;
-import com.greatsokol.fluckr.etc.CacheFile;
+import com.greatsokol.fluckr.etc.deprecated_saved_because_handmade_CacheFile;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
-import com.greatsokol.fluckr.presenter.ImageListPresenterImpl;
+import com.greatsokol.fluckr.presenter.ImageListPresenter;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -78,12 +75,12 @@ public class ActivityMain extends AppCompatActivity
         loadInstanceSettings(savedInstanceState);
 
         // clean older than 1 day cached files
-        CacheFile.cleanCache(getCacheDir().getAbsolutePath());
+        deprecated_saved_because_handmade_CacheFile.cleanCache(getCacheDir().getAbsolutePath());
 
         setInsets();
         setLayout();
 
-        mPresenter = new ImageListPresenterImpl();
+        mPresenter = new ImageListPresenter();
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         Date savedDate
                 = new Date(prefs.getLong(ConstsAndUtils.TAG_DATE_TO_VIEW,

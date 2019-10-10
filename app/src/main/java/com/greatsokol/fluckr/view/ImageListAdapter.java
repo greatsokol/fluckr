@@ -1,10 +1,8 @@
-package com.greatsokol.fluckr;
+package com.greatsokol.fluckr.view;
 
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
@@ -20,21 +18,14 @@ import androidx.annotation.NonNull;
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.snackbar.Snackbar;
+import com.greatsokol.fluckr.R;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
-import com.greatsokol.fluckr.model.Photo;
-import com.greatsokol.fluckr.model.FlickrInterestingnessImageListModel;
-import com.greatsokol.fluckr.model.Photos;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
+import com.squareup.picasso.Transformation;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.BaseViewHolder> {
 
@@ -289,44 +280,19 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
                 }
             }
             if(imageView!=null){
-                /*Picasso picasso =
-                        new Picasso.Builder(mRecyclerView.getContext()).
-                                indicatorsEnabled(true).
-                                loggingEnabled(true).
-                                listener(new Picasso.Listener() {
-                                    @Override
-                                    public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                                        exception.printStackTrace();
-                                    }
-                                }).
-                                build();
-                Picasso.get().setLoggingEnabled(true);*/
-                //Picasso.get().setIndicatorsEnabled(true);
-                //Picasso.get().load(listItem.getThumbnailUrl()).fit().centerCrop()
-                        //.placeholder(R.drawable.user_placeholder)
-                        //.error(R.drawable.ic_launcher_foreground)
-                        //.into(imageView);
-
-                //imageView.setImageBitmap(listItem.getBitmapThumbnail());
-
-                Target target = new Target() {
+                Picasso.get().load(listItem.getThumbnailUrl()).transform(new Transformation() {
                     @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        bitmap = ThumbnailUtils.extractThumbnail(bitmap, 300, 300);
-                        imageView.setImageBitmap(bitmap);
+                    public Bitmap transform(Bitmap source) {
+                        Bitmap result = ThumbnailUtils.extractThumbnail(source, 300, 300);
+                        source.recycle();
+                        return result;
                     }
 
                     @Override
-                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-
+                    public String key() {
+                        return "thumbnail()";
                     }
-
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                    }
-                };
-                Picasso.get().load(listItem.getThumbnailUrl()).into(target);
+                }).into(imageView);
 
                 final String transitionName = "itemImage" + "_" + getClass().getName() + "_" + position;
                 ViewCompat.setTransitionName(imageView, transitionName);
@@ -417,9 +383,9 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
                 page,
                 "description,url_t,url_m,url_n,url_b,url_k,url_h",
                 "json",
-                1).enqueue(new Callback<FlickrInterestingnessImageListModel>() {
+                1).enqueue(new Callback<FlickrInterestingnessImageList>() {
             @Override
-            public void onResponse(Call<FlickrInterestingnessImageListModel> call, Response<FlickrInterestingnessImageListModel> response) {
+            public void onResponse(Call<FlickrInterestingnessImageList> call, Response<FlickrInterestingnessImageList> response) {
                 assert response.body() != null;
                 Photos photos = response.body().getPhotos();
                 List<Photo> PhotosArray = photos.getPhoto();
@@ -462,7 +428,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
             }
 
             @Override
-            public void onFailure(Call<FlickrInterestingnessImageListModel> call, Throwable t) {
+            public void onFailure(Call<FlickrInterestingnessImageList> call, Throwable t) {
                 t.printStackTrace();
                 stopLoading();
                 //_showSnack(viewToShowSnackbar, "Network error");

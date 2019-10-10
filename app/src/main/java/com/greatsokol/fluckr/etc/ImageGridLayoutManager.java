@@ -6,8 +6,8 @@ import android.util.Log;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.greatsokol.fluckr.ImageListAdapter;
-import com.greatsokol.fluckr.ImageListItem;
+import com.greatsokol.fluckr.view.ImageListAdapter;
+import com.greatsokol.fluckr.view.ImageListItem;
 
 public class ImageGridLayoutManager extends GridLayoutManager {
 

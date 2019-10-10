@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr;
+package com.greatsokol.fluckr.view;
 
 import android.content.ClipData;
 import android.content.Context;
@@ -30,8 +30,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.greatsokol.fluckr.etc.ImageLoader;
-import com.greatsokol.fluckr.etc.CacheFile;
+import com.greatsokol.fluckr.R;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.etc.MyDragShadowBuilder;
 import com.squareup.picasso.Picasso;
@@ -45,7 +44,6 @@ public class ActivityView extends AppCompatActivity {
     private ProgressBar mProgress;
     private Toolbar mToolbar;
     private Bundle mArgs;
-    private String mCacheDir;
     private Bitmap mThumbnail;
     private final static int FLAG_ALREADY_LOADED_HIGH_RES = 1;
 
@@ -62,7 +60,6 @@ public class ActivityView extends AppCompatActivity {
 
         mImageView = findViewById(R.id.imageViewBig);
         mProgress = findViewById(R.id.progressBar);
-        mCacheDir = getCacheDir().getAbsolutePath();
 
         Intent intent = getIntent();
         ViewCompat.setTransitionName(mImageView, intent.getStringExtra(ConstsAndUtils.TAG_TR_NAME));
@@ -84,7 +81,7 @@ public class ActivityView extends AppCompatActivity {
 
             @Override
             public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-
+                startPostponedEnterTransition();
             }
 
             @Override
@@ -94,18 +91,10 @@ public class ActivityView extends AppCompatActivity {
         };
         Picasso.get().load(thumbnailPath).into(target);
 
-        /*mThumbnail = ImageLoader.loadPictureFromCache(
-                CacheFile.convertUrlToCacheFileName(thumbnailPath, mCacheDir, true,
-                        String.valueOf(ImageLoader.THUMB_SIZE)), false);
-        mImageView.setImageBitmap(mThumbnail);*/
-
-
-
-
         // run higher resolution picture
         if (savedInstanceState != null) {
             if (savedInstanceState.getInt(ConstsAndUtils.TAG_READY, 0) == FLAG_ALREADY_LOADED_HIGH_RES)
-                loadHigherResolution(true); // load without waiting for shared element transition ends
+                loadHigherResolution(false); // load without waiting for shared element transition ends
         } else {
             // load after shared element transition ends
             final Transition windowTransition = getWindow().getSharedElementEnterTransition();
@@ -120,7 +109,7 @@ public class ActivityView extends AppCompatActivity {
                 public void onTransitionResume(Transition transition) {}
                 @Override
                 public void onTransitionEnd(Transition transition) {
-                    loadHigherResolution(false);
+                    loadHigherResolution(true);
                     windowTransition.removeListener(this);
                 }
             });
@@ -267,32 +256,34 @@ public class ActivityView extends AppCompatActivity {
     }
 
 
-    void loadHigherResolution(boolean localFileReady){
+    void loadHigherResolution(final boolean animate){
         String fullSizeUrl = mArgs.getString(ConstsAndUtils.TAG_FULLSIZEURL);
-        assert fullSizeUrl != null;
-        if(fullSizeUrl.isEmpty()) fullSizeUrl = mArgs.getString(ConstsAndUtils.TAG_THUMBURL);
-        assert fullSizeUrl != null;
-        if (fullSizeUrl.equals(""))return;
+        if(fullSizeUrl==null || fullSizeUrl.isEmpty())return;
 
-        if(!localFileReady) {
-            mProgress.setVisibility(View.VISIBLE);
-            AsyncImageRequest fullsizeImageRequest =
-                    new AsyncImageRequest(new AsyncImageRequest.OnAnswerListener() {
-                        @Override
-                        public void OnAnswerReady(Bitmap bitmap) {
-                            if (bitmap != null)
-                                ImageViewAnimatedChange(getBaseContext(), mImageView, bitmap);
-                            else Snackbar.make(findViewById(R.id.constraint),
-                                    "Picture download error", Snackbar.LENGTH_LONG).show();
-                            mProgress.setVisibility(View.GONE);
-                        }
-                    }, fullSizeUrl, mCacheDir);
-            fullsizeImageRequest.execute();
-        } else {
-            String fullsizeFileName =
-                    CacheFile.convertUrlToCacheFileName(fullSizeUrl, mCacheDir, false, "");
-            mImageView.setImageBitmap(ImageLoader.loadPictureFromCache(fullsizeFileName, false));
-        }
+        Target target = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                if(animate)
+                    ImageViewAnimatedChange(mImageView, bitmap);
+                else
+                    mImageView.setImageBitmap(bitmap);
+                mProgress.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                String message = e.getMessage();
+                if(message != null && !message.isEmpty())
+                    Snackbar.make(mRootView, message, Snackbar.LENGTH_LONG);
+                mProgress.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+                mProgress.setVisibility(View.VISIBLE);
+            }
+        };
+        Picasso.get().load(fullSizeUrl).into(target);
     }
 
     @Override
@@ -317,9 +308,9 @@ public class ActivityView extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
-    private static void ImageViewAnimatedChange(Context c, final ImageView v, final Bitmap new_image) {
-        final Animation anim_out = AnimationUtils.loadAnimation(c, android.R.anim.fade_out);
-        final Animation anim_in  = AnimationUtils.loadAnimation(c, android.R.anim.fade_in);
+    private static void ImageViewAnimatedChange(final ImageView v, final Bitmap new_image) {
+        final Animation anim_out = AnimationUtils.loadAnimation(v.getContext(), android.R.anim.fade_out);
+        final Animation anim_in  = AnimationUtils.loadAnimation(v.getContext(), android.R.anim.fade_in);
         anim_out.setAnimationListener(new Animation.AnimationListener()
         {
             @Override public void onAnimationStart(Animation animation) {}

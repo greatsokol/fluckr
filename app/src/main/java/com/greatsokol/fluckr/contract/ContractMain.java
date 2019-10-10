@@ -1,4 +1,6 @@
-package com.greatsokol.fluckr;
+package com.greatsokol.fluckr.contract;
+
+import com.greatsokol.fluckr.view.ImageListItem;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,7 +14,7 @@ public interface ContractMain {
     }
 
     interface ImageListPresenter {
-        void onViewCreate(com.greatsokol.fluckr.ContractMain.ViewMain view, boolean loadInitial, Date savedDate, int savedPage, int savedItemNumber, String searchForThis);
+        void onViewCreate(ContractMain.ViewMain view, boolean loadInitial, Date savedDate, int savedPage, int savedItemNumber, String searchForThis);
         void onViewDestroy();
         void onScrolledDown();
         void onScrolledUp();

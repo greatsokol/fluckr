@@ -7,7 +7,7 @@ import retrofit2.http.Query;
 
 public interface FlickrInterestingnessImageListApi {
     @GET("/services/rest/?method=flickr.interestingness.getList")
-    Call<FlickrInterestingnessImageListModel> getList(
+    Call<FlickrInterestingnessImageList> getList(
             @Query("api_key") String ApiKey,
             @Query("date") String ListDate,
             @Query("per_page") int ImagesPerPage,

@@ -13,20 +13,20 @@ import java.io.OutputStream;
 import java.net.URL;
 
 
-public class ImageLoader {
-    private static final String TAG = "ImageLoader";
+public class deprecated_saved_because_handmade_ImageLoader {
+    private static final String TAG = "deprecated_saved_because_handmade_ImageLoader";
 
     public static final int NORESIZE = -1;
     public static final int THUMB_SIZE = 320;
 
 
-    ImageLoader(){
+    deprecated_saved_because_handmade_ImageLoader(){
     }
 
 
     public static Bitmap loadPicture(final String url, final String cacheDir, final int resize) throws Exception {
         String cacheFileName
-                = CacheFile.convertUrlToCacheFileName(url, cacheDir,
+                = deprecated_saved_because_handmade_CacheFile.convertUrlToCacheFileName(url, cacheDir,
                                 resize!=NORESIZE, String.valueOf(resize));
         Bitmap bitmap = loadPictureFromCache(cacheFileName, true);
         if (bitmap == null)
@@ -36,20 +36,20 @@ public class ImageLoader {
 
 
     public static Bitmap loadPictureFromCache(final String path, boolean checkIsFileOverdue) {
-        if (!checkIsFileOverdue || CacheFile.isFileNotOverdue(path)) {
+        if (!checkIsFileOverdue || deprecated_saved_because_handmade_CacheFile.isFileNotOverdue(path)) {
             Bitmap bitmap = loadPictureFromFile(path);
             if (!checkIsFileOverdue && bitmap == null)
-                bitmap = loadPictureFromFile(path + CacheFile.OLD);
+                bitmap = loadPictureFromFile(path + deprecated_saved_because_handmade_CacheFile.OLD);
             return bitmap;
         } else {
             //Log.i(TAG, "OVERDUTED FILE " + path);
-            CacheFile.makeFileOverdue(path);
+            deprecated_saved_because_handmade_CacheFile.makeFileOverdue(path);
         }
         return null;
     }
 
     private static Bitmap loadPictureFromFile(final String path) {
-        return (Bitmap) CacheFile.loadFileFromCache(path, new CacheFile.Callable<String, Object>() {
+        return (Bitmap) deprecated_saved_because_handmade_CacheFile.loadFileFromCache(path, new deprecated_saved_because_handmade_CacheFile.Callable<String, Object>() {
                                                         @Override
                                                         public Object call(String input) {
                                                             return BitmapFactory.decodeFile(path);
@@ -61,7 +61,7 @@ public class ImageLoader {
     private static Bitmap loadImageFromUrlAndCacheIt(String urlPath, String cacheFileName, int resize) throws Exception {
         try {
             //Log.i(TAG, "LOADING URL BEGIN = " + urlPath);
-            File cacheFile = CacheFile.prepareCacheFile(cacheFileName);
+            File cacheFile = deprecated_saved_because_handmade_CacheFile.prepareCacheFile(cacheFileName);
             if (cacheFile != null) {
                 OutputStream os = new FileOutputStream(cacheFile);
                 InputStream is = (new URL(urlPath)).openStream();
@@ -72,7 +72,7 @@ public class ImageLoader {
                     if (resize!=NORESIZE)
                         bitmap = ThumbnailUtils.extractThumbnail(bitmap, resize, resize);
                     bitmap.compress(Bitmap.CompressFormat.PNG, 0, os);
-                    CacheFile.deleteCacheFile(cacheFileName + CacheFile.OLD);
+                    deprecated_saved_because_handmade_CacheFile.deleteCacheFile(cacheFileName + deprecated_saved_because_handmade_CacheFile.OLD);
                     //Log.i(TAG, "LOADING URL FINISHED = " + urlPath);
                     return bitmap;
                 } finally {
@@ -87,7 +87,7 @@ public class ImageLoader {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            CacheFile.deleteCacheFile(cacheFileName);
+            deprecated_saved_because_handmade_CacheFile.deleteCacheFile(cacheFileName);
             throw new Exception(e);
             //Log.i(TAG, "LOADING URL ERROR (" + e.getClass().getSimpleName() + ") = " + urlPath);
         }

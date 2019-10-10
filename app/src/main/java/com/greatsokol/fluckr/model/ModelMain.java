@@ -1,10 +1,8 @@
 package com.greatsokol.fluckr.model;
 
-import android.view.View;
-
-import com.greatsokol.fluckr.ContractMain;
+import com.greatsokol.fluckr.contract.ContractMain;
 import com.greatsokol.fluckr.FluckrApp;
-import com.greatsokol.fluckr.ImageListItem;
+import com.greatsokol.fluckr.view.ImageListItem;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
 
 import java.util.ArrayList;
@@ -33,9 +31,9 @@ public class ModelMain implements ContractMain.Model {
                 page,
                 "description,url_t,url_m,url_n,url_b,url_k,url_h",
                 "json",
-                1).enqueue(new Callback<FlickrInterestingnessImageListModel>() {
+                1).enqueue(new Callback<FlickrInterestingnessImageList>() {
             @Override
-            public void onResponse(Call<FlickrInterestingnessImageListModel> call, Response<FlickrInterestingnessImageListModel> response) {
+            public void onResponse(Call<FlickrInterestingnessImageList> call, Response<FlickrInterestingnessImageList> response) {
                 assert response.body() != null;
                 Photos photos = response.body().getPhotos();
                 List<Photo> PhotosArray = photos.getPhoto();
@@ -82,7 +80,7 @@ public class ModelMain implements ContractMain.Model {
             }
 
             @Override
-            public void onFailure(Call<FlickrInterestingnessImageListModel> call, Throwable t) {
+            public void onFailure(Call<FlickrInterestingnessImageList> call, Throwable t) {
                 t.printStackTrace();
                 onResponseCallback.onFailure(t.getMessage());
                 //stopLoading();

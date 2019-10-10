@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr;
+package com.greatsokol.fluckr.view;
 
 import com.greatsokol.fluckr.model.Photo;
 
@@ -50,10 +50,7 @@ public class ImageListItem {
         mDetails = photo.getDescription().getContent();
         String thumbnailUrl = photo.getThumbnailUrl();
         String fullsizeUrl = photo.getFullsizeUrl();
-
         assert thumbnailUrl != null;
-        //mBitmapThumbnail = null; //ImageLoader.loadPicture(thumbnailUrl, FluckrApp.getCacheDirectory(), ImageLoader.THUMB_SIZE);
-
         mThumbnailUrl = thumbnailUrl;
         mFullsizeUrl = fullsizeUrl;
         mDate = DateOfList;

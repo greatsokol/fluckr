@@ -3,6 +3,8 @@ package com.greatsokol.fluckr;
 import android.app.Application;
 
 import com.greatsokol.fluckr.model.FlickrInterestingnessImageListApi;
+import com.greatsokol.fluckr.view.ImageListAdapter;
+import com.greatsokol.fluckr.view.ImageListItem;
 
 import java.util.ArrayList;
 

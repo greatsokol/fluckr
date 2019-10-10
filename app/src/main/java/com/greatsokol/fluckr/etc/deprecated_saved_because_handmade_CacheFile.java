@@ -5,10 +5,10 @@ import android.util.Log;
 import java.io.File;
 import java.util.Date;
 
-public abstract class CacheFile {
+public abstract class deprecated_saved_because_handmade_CacheFile {
     static final String OLD = "old";
     private static final long CACHE_TIME = 24 *  60 * 60; // 1 days * 24 hours * 60 minutes * 60 sec
-    private static final String TAG = "CacheFile";
+    private static final String TAG = "deprecated_saved_because_handmade_CacheFile";
 
     public interface Callable<I, O> {
         O call(I input);
@@ -77,7 +77,7 @@ public abstract class CacheFile {
         return new File(cacheFileName);
     }
 
-    static Object loadFileFromCache(String path, CacheFile.Callable<String, Object> func) {
+    static Object loadFileFromCache(String path, deprecated_saved_because_handmade_CacheFile.Callable<String, Object> func) {
         if (path != null && !path.trim().isEmpty()) {
             //Log.i(TAG, "LOADING FILE BEGIN = " + path);
             File file = new File(path);
