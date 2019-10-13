@@ -89,12 +89,13 @@ public class ActivityView extends AppCompatActivity {
 
             }
         };
+        mImageView.setTag(target);
         Picasso.get().load(thumbnailPath).into(target);
 
         // run higher resolution picture
         if (savedInstanceState != null) {
             if (savedInstanceState.getInt(ConstsAndUtils.TAG_READY, 0) == FLAG_ALREADY_LOADED_HIGH_RES)
-                loadHigherResolution(false); // load without waiting for shared element transition ends
+                loadHigherResolution(); // load without waiting for shared element transition ends
         } else {
             // load after shared element transition ends
             final Transition windowTransition = getWindow().getSharedElementEnterTransition();
@@ -103,7 +104,7 @@ public class ActivityView extends AppCompatActivity {
                 public void onTransitionStart(Transition transition) {}
                 @Override
                 public void onTransitionCancel(Transition transition) {
-                    loadHigherResolution(false); //TODO: searching why stucks
+                    loadHigherResolution();
                     windowTransition.removeListener(this);
                 }
                 @Override
@@ -112,7 +113,7 @@ public class ActivityView extends AppCompatActivity {
                 public void onTransitionResume(Transition transition) {}
                 @Override
                 public void onTransitionEnd(Transition transition) {
-                    loadHigherResolution(false); //TODO: searching why stucks
+                    loadHigherResolution();
                     windowTransition.removeListener(this);
                 }
             });
@@ -259,16 +260,16 @@ public class ActivityView extends AppCompatActivity {
     }
 
 
-    void loadHigherResolution(final boolean animate){
+    void loadHigherResolution(){//final boolean animate){
         String fullSizeUrl = mArgs.getString(ConstsAndUtils.TAG_FULLSIZEURL);
         if(fullSizeUrl==null || fullSizeUrl.isEmpty())return;
 
         Target target = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                if(animate)
-                    ImageViewAnimatedChange(mImageView, bitmap);
-                else
+                //if(animate)
+                  //  ImageViewAnimatedChange(mImageView, bitmap);
+                //else
                     mImageView.setImageBitmap(bitmap);
                 mProgress.setVisibility(View.GONE);
             }
@@ -286,6 +287,7 @@ public class ActivityView extends AppCompatActivity {
                 mProgress.setVisibility(View.VISIBLE);
             }
         };
+        mImageView.setTag(target);
         Picasso.get().load(fullSizeUrl).into(target);
     }
 
@@ -311,7 +313,7 @@ public class ActivityView extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
-    private static void ImageViewAnimatedChange(final ImageView v, final Bitmap newImage) {
+    /*private static void ImageViewAnimatedChange(final ImageView v, final Bitmap newImage) {
         final Animation animOut = AnimationUtils.loadAnimation(v.getContext(), android.R.anim.fade_out);
         final Animation animIn  = AnimationUtils.loadAnimation(v.getContext(), android.R.anim.fade_in);
         animOut.setAnimationListener(new Animation.AnimationListener()
@@ -325,6 +327,6 @@ public class ActivityView extends AppCompatActivity {
             }
         });
         v.startAnimation(animOut);
-    }
+    }*/
 
 }
