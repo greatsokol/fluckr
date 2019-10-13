@@ -27,21 +27,20 @@ public class ImageListPresenter implements ContractMain.ImageListPresenter {
 
     @Override
     public void onViewCreate(ContractMain.ViewMain view, boolean loadInitial,
-                             Date savedDate, int savedPage, final int savedItemNumber) {
+                             final Date date, final int page, final int itemNumber) {
         mView = view;
         mModel = new FlickrInterestingnessListModel();
         if(loadInitial) {
             isLoadingNow = true;
             view.onStartLoading(true);
-            final Date fdate = savedDate;
-            mModel.loadPage(fdate, savedPage, mView.getSearchPhrase(), new ContractMain.Model.OnResponseCallback() {
+            mModel.loadPage(date, page, mView.getSearchPhrase(), new ContractMain.Model.OnResponseCallback() {
                 @Override
                 public void onResponse(Photos photos) {
                     if(mView==null)return;
                     mView.onImageListDownloaded(
-                            Interactor.Translate(fdate, photos),
+                            Interactor.Translate(date, photos),
                             true,
-                            savedItemNumber);
+                            itemNumber);
                     stopLoading();
                     onScrolledUp(); //<---- load upper page if exists
                 }

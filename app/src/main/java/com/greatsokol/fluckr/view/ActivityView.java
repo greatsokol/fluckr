@@ -160,6 +160,7 @@ public class ActivityView extends AppCompatActivity {
                         return true;
 
                     case DragEvent.ACTION_DRAG_LOCATION:
+
                         float deltaY_coeff = coeff * deltaY;
                         deltaY_coeff = deltaY_coeff > height ? height : deltaY_coeff;
                         float alphaY = 1f - 1f * (deltaY_coeff / height);

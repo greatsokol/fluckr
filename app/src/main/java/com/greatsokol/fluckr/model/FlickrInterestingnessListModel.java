@@ -19,37 +19,61 @@ public class FlickrInterestingnessListModel implements ContractMain.Model {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-    private FlickrInterestingnessImageListApi flickrInterestingnessImageListApi
-            = retrofit.create(FlickrInterestingnessImageListApi.class);
+    private FlickrRequestsApi.Interestingness
+            interestingness = retrofit.create(FlickrRequestsApi.Interestingness.class);
 
+    private FlickrRequestsApi.Search
+            search = retrofit.create(FlickrRequestsApi.Search.class);
 
     private void __loadPage(final String searchFor,
                             final Date date,
                             final int page,
                             final OnResponseCallback onResponseCallback){
 
-        flickrInterestingnessImageListApi.getList(
+        if(searchFor.isEmpty())
+            interestingness.getList(
                 "dcfa7bcdfe436387cefa172c2d3dc2ae",
                 ConstsAndUtils.DateToStr_yyyy_mm_dd(date),
                 45,
                 page,
                 "description,url_t,url_m,url_n,url_b,url_k,url_h",
                 "json",
-                1).enqueue(new Callback<FlickrImageList>() {
+                1).enqueue(
+                        new Callback<FlickrImageList>() {
+                            @Override
+                            public void onResponse(Call<FlickrImageList> call, Response<FlickrImageList> response) {
+                                assert response.body() != null;
+                                onResponseCallback.onResponse(response.body().getPhotos());
+                            }
 
+                            @Override
+                            public void onFailure(Call<FlickrImageList> call, Throwable t) {
+                                t.printStackTrace();
+                                onResponseCallback.onFailure(t.getMessage());
+                            }
+                });
+        else
+            search.getList(
+                    "dcfa7bcdfe436387cefa172c2d3dc2ae",
+                    searchFor,
+                    45,
+                    page,
+                    "description,url_t,url_m,url_n,url_b,url_k,url_h",
+                    "json",
+                    1).enqueue(
+                        new Callback<FlickrImageList>() {
+                            @Override
+                            public void onResponse(Call<FlickrImageList> call, Response<FlickrImageList> response) {
+                                assert response.body() != null;
+                                onResponseCallback.onResponse(response.body().getPhotos());
+                            }
 
-            @Override
-            public void onResponse(Call<FlickrImageList> call, Response<FlickrImageList> response) {
-                assert response.body() != null;
-                onResponseCallback.onResponse(response.body().getPhotos());
-            }
-
-            @Override
-            public void onFailure(Call<FlickrImageList> call, Throwable t) {
-                t.printStackTrace();
-                onResponseCallback.onFailure(t.getMessage());
-            }
-        });
+                            @Override
+                            public void onFailure(Call<FlickrImageList> call, Throwable t) {
+                                t.printStackTrace();
+                                onResponseCallback.onFailure(t.getMessage());
+                            }
+                        });
     }
 
     @Override

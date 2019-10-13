@@ -286,7 +286,9 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
                 ViewCompat.setTransitionName(imageView, transitionName);
             }
             if(textViewDate!=null) {
-                textViewDate.setText(ConstsAndUtils.DateToStr_dd_mmmm_yyyy(listItem.getPageParams().getDate()));
+                Date date = listItem.getPageParams().getDate();
+                if(date!=null)
+                    textViewDate.setText(ConstsAndUtils.DateToStr_dd_mmmm_yyyy(date));
             }
         }
 

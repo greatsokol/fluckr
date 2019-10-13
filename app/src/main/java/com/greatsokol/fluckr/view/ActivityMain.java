@@ -304,7 +304,7 @@ public class ActivityMain extends AppCompatActivity
                 mSearchFor = queryText;
                 getSearchAdapter().clear();
                 setLayout();
-                //getActiveAdapter().loadPage(getPreferences(MODE_PRIVATE), mToolbar, mSearchFor, false);
+                mPresenter.onViewCreate(ActivityMain.this, true,null, 0, 0);
                 return true;
             }
 
