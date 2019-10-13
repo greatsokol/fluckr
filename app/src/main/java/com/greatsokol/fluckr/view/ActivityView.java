@@ -4,7 +4,6 @@ import android.content.ClipData;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.text.Html;
 import android.transition.Transition;
@@ -14,8 +13,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
@@ -32,6 +29,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.greatsokol.fluckr.R;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.etc.MyDragShadowBuilder;
+import com.greatsokol.fluckr.etc.ThumbnailTransformation;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -73,8 +71,7 @@ public class ActivityView extends AppCompatActivity {
         Target target = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                int size = ConstsAndUtils.pxFromDp(getResources(), 300);
-                mThumbnail = ThumbnailUtils.extractThumbnail(bitmap, size, size);
+                mThumbnail = bitmap;
                 mImageView.setImageBitmap(mThumbnail);
                 startPostponedEnterTransition();
             }
@@ -89,8 +86,9 @@ public class ActivityView extends AppCompatActivity {
 
             }
         };
-        mImageView.setTag(target);
-        Picasso.get().load(thumbnailPath).into(target);
+        mImageView.setTag(target); // making strong reference
+        int size = ConstsAndUtils.pxFromDp(getResources(), 300);
+        Picasso.get().load(thumbnailPath).transform(new ThumbnailTransformation(size, size)).into(target);
 
         // run higher resolution picture
         if (savedInstanceState != null) {
@@ -287,7 +285,7 @@ public class ActivityView extends AppCompatActivity {
                 mProgress.setVisibility(View.VISIBLE);
             }
         };
-        mImageView.setTag(target);
+        mImageView.setTag(target); // making strong reference
         Picasso.get().load(fullSizeUrl).into(target);
     }
 
