@@ -1,7 +1,6 @@
 package com.greatsokol.fluckr.view;
 
 import android.content.ClipData;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -74,7 +73,8 @@ public class ActivityView extends AppCompatActivity {
         Target target = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                mThumbnail = ThumbnailUtils.extractThumbnail(bitmap, 300, 300);
+                int size = ConstsAndUtils.pxFromDp(getResources(), 300);
+                mThumbnail = ThumbnailUtils.extractThumbnail(bitmap, size, size);
                 mImageView.setImageBitmap(mThumbnail);
                 startPostponedEnterTransition();
             }
@@ -102,14 +102,17 @@ public class ActivityView extends AppCompatActivity {
                 @Override
                 public void onTransitionStart(Transition transition) {}
                 @Override
-                public void onTransitionCancel(Transition transition) {}
+                public void onTransitionCancel(Transition transition) {
+                    loadHigherResolution(false); //TODO: searching why stucks
+                    windowTransition.removeListener(this);
+                }
                 @Override
                 public void onTransitionPause(Transition transition) {}
                 @Override
                 public void onTransitionResume(Transition transition) {}
                 @Override
                 public void onTransitionEnd(Transition transition) {
-                    loadHigherResolution(true);
+                    loadHigherResolution(false); //TODO: searching why stucks
                     windowTransition.removeListener(this);
                 }
             });
@@ -308,25 +311,20 @@ public class ActivityView extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
-    private static void ImageViewAnimatedChange(final ImageView v, final Bitmap new_image) {
-        final Animation anim_out = AnimationUtils.loadAnimation(v.getContext(), android.R.anim.fade_out);
-        final Animation anim_in  = AnimationUtils.loadAnimation(v.getContext(), android.R.anim.fade_in);
-        anim_out.setAnimationListener(new Animation.AnimationListener()
+    private static void ImageViewAnimatedChange(final ImageView v, final Bitmap newImage) {
+        final Animation animOut = AnimationUtils.loadAnimation(v.getContext(), android.R.anim.fade_out);
+        final Animation animIn  = AnimationUtils.loadAnimation(v.getContext(), android.R.anim.fade_in);
+        animOut.setAnimationListener(new Animation.AnimationListener()
         {
             @Override public void onAnimationStart(Animation animation) {}
             @Override public void onAnimationRepeat(Animation animation) {}
             @Override public void onAnimationEnd(Animation animation)
             {
-                v.setImageBitmap(new_image);
-                /*anim_in.setAnimationListener(new Animation.AnimationListener() {
-                    @Override public void onAnimationStart(Animation animation) {}
-                    @Override public void onAnimationRepeat(Animation animation) {}
-                    @Override public void onAnimationEnd(Animation animation) {}
-                }); */
-                v.startAnimation(anim_in);
+                v.setImageBitmap(newImage);
+                v.startAnimation(animIn);
             }
         });
-        v.startAnimation(anim_out);
+        v.startAnimation(animOut);
     }
 
 }

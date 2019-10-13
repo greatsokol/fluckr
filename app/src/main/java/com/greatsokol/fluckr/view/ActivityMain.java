@@ -88,7 +88,7 @@ public class ActivityMain extends AppCompatActivity
         int savedPage = prefs.getInt(ConstsAndUtils.TAG_PAGE_TO_VIEW,1);
         int savedItemNumber = prefs.getInt(ConstsAndUtils.TAG_NUMBER_ON_PAGE,1);
         mPresenter.onViewCreate(this, getActiveAdapter().getItemCount()==0,
-                                    savedDate, savedPage, savedItemNumber, mSearchFor);
+                                    savedDate, savedPage, savedItemNumber);
 
 
         // shared element transition tricks:
@@ -211,17 +211,16 @@ public class ActivityMain extends AppCompatActivity
         mRecyclerView.setAdapter(adapter);
 
         mRecyclerView.setPreserveFocusAfterLayout(true);
+
         mRecyclerView.setOnFlingListener(new PaginationListenerOnFling(layoutManager) {
             @Override
             protected void loadNextPage() {
                 mPresenter.onScrolledDown();
-                //getActiveAdapter().loadLowerPage(mToolbar, mSearchFor);
             }
 
             @Override
             protected void loadPrevPage() {
                 mPresenter.onScrolledUp();
-                //getActiveAdapter().loadUpperPage(mToolbar, mSearchFor);
             }
         });
 
@@ -240,13 +239,11 @@ public class ActivityMain extends AppCompatActivity
             @Override
             protected void loadNextPage() {
                 mPresenter.onScrolledDown();
-                //getActiveAdapter().loadLowerPage(mToolbar, mSearchFor);
             }
 
             @Override
             protected void loadPrevPage() {
                 mPresenter.onScrolledUp();
-                //getActiveAdapter().loadUpperPage(mToolbar, mSearchFor);
             }
         });
 
@@ -267,11 +264,7 @@ public class ActivityMain extends AppCompatActivity
     public void onRefresh() {
         stopRequestLoading(true);
         doApiCall();
-    }
-
-    private void doApiCall() {
-        getActiveAdapter().loadLowerPage(mToolbar, mSearchFor);
-    } */
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -309,7 +302,7 @@ public class ActivityMain extends AppCompatActivity
                 mSearchFor = queryText;
                 getSearchAdapter().clear();
                 setLayout();
-                //getActiveAdapter().loadInitialPage(getPreferences(MODE_PRIVATE), mToolbar, mSearchFor, false);
+                //getActiveAdapter().loadPage(getPreferences(MODE_PRIVATE), mToolbar, mSearchFor, false);
                 return true;
             }
 
@@ -406,8 +399,11 @@ public class ActivityMain extends AppCompatActivity
 
 
     @Override
-    public void onImageListDownloaded(ArrayList<ImageListItem> items) {
-        getActiveAdapter().addItemsAtBottom(items);
+    public void onImageListDownloaded(ArrayList<ImageListItem> items, boolean addAtBottom) {
+        if(addAtBottom)
+            getActiveAdapter().addItemsAtBottom(items);
+        else
+            getActiveAdapter().addItemsUpper(items);
     }
 
     @Override
@@ -416,12 +412,30 @@ public class ActivityMain extends AppCompatActivity
     }
 
     @Override
-    public void onStartLoading(boolean bAddProgressbarAtBottom) {
-        getActiveAdapter().startLoading(bAddProgressbarAtBottom);
+    public void onStartLoading(boolean addProgressbarAtBottom) {
+        getActiveAdapter().startLoading(addProgressbarAtBottom);
     }
 
     @Override
     public void onStopLoading() {
         getActiveAdapter().stopLoading();
     }
+
+
+    @Override
+    public String getSearchPhrase() {
+        return mSearchFor;
+    }
+
+    @Override
+    public ImageListItem.ListItemPageParams getLastItemPageParams() {
+        return getActiveAdapter().getLastItemPageParams();
+    }
+
+    @Override
+    public ImageListItem.ListItemPageParams getFirstItemPageParams() {
+        return getActiveAdapter().getFirstItemPageParams();
+    }
+
+
 }

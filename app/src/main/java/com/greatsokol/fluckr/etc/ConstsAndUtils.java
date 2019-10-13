@@ -31,7 +31,7 @@ public abstract class ConstsAndUtils {
         return orientation == ORIENTATION_LANDSCAPE;
     }
 
-    static int pxFromDp(Resources res, float dp) {
+    public static int pxFromDp(Resources res, float dp) {
         return (int)(dp * res.getDisplayMetrics().density);
     }
 
@@ -58,7 +58,7 @@ public abstract class ConstsAndUtils {
         return __dec_inc_date(date, 1);
     }
 
-    static boolean IsEqualDay(Date date1, Date date2){
+    private static boolean IsEqualDay(Date date1, Date date2){
         final Calendar cal1 = Calendar.getInstance();
         final Calendar cal2 = Calendar.getInstance();
         cal1.setTime(date1);

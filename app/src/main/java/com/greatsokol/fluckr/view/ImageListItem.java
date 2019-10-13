@@ -1,6 +1,6 @@
 package com.greatsokol.fluckr.view;
 
-import com.greatsokol.fluckr.model.Photo;
+import com.greatsokol.fluckr.model.api.Photo;
 
 import java.util.Date;
 
@@ -12,73 +12,60 @@ public class ImageListItem {
     static final int VIEW_TYPE_IMAGE = 1;
     public static final int VIEW_TYPE_DATE = 2;
 
-    private int mNumberOnPage;
-    private int mPage;
-    private int mPagesTotal;
-    private Date mDate;
+    private ListItemPageParams pageParams;
     private String mTitle;
     private String mDetails;
-    //private Bitmap mBitmapThumbnail;
     private String mThumbnailUrl;
     private String mFullsizeUrl;
 
+    public class ListItemPageParams {
+        private int mNumberOnPage;
+        private int mPage;
+        private int mPagesTotal;
+        private Date mDate;
+        ListItemPageParams(int numberOnPage, Date date, int page, int pagesTotal){
+            mNumberOnPage = numberOnPage;
+            mDate = date;
+            mPage = page;
+            mPagesTotal = pagesTotal;
+        }
+        public Date getDate(){return mDate;}
+        public int getPagesTotal(){return mPagesTotal;}
+        public int getPage(){return mPage;}
+        public int getNumberOnPage(){return mNumberOnPage;}
+    }
 
     private int mViewType = VIEW_TYPE_IMAGE;
     ImageListItem(int viewtype) {
         mViewType = viewtype;
-        mNumberOnPage = -1;
-        mPagesTotal = -1;
-        mPage = -1;
+        pageParams = new ListItemPageParams(-1, null, -1, -1);
     }
-    public ImageListItem(Date date, int pagesTotal, int page, int numberOnPage, String title, String details, /*Bitmap thumbnail,*/
-                         String thumbnailUrl, String fullsizeUrl) {
-        mTitle = title;
-        mPage = page;
-        mPagesTotal = pagesTotal;
-        mNumberOnPage = numberOnPage;
-        mDetails = details;
-        //mBitmapThumbnail = thumbnail;
-        mThumbnailUrl = thumbnailUrl;
-        mFullsizeUrl = fullsizeUrl;
-        mDate = date;
-    }
-    public ImageListItem(Date DateOfList, int TotalPages, int PageNumber, int NumberOnPage, Photo photo) throws Exception {
+    public ImageListItem(Date DateOfList, int totalPages, int PageNumber, int NumberOnPage, Photo photo) {
         mTitle = photo.getTitle();
-        mPage = PageNumber;
-        mPagesTotal = TotalPages;
-        mNumberOnPage = NumberOnPage;
         mDetails = photo.getDescription().getContent();
         String thumbnailUrl = photo.getThumbnailUrl();
         String fullsizeUrl = photo.getFullsizeUrl();
         assert thumbnailUrl != null;
         mThumbnailUrl = thumbnailUrl;
         mFullsizeUrl = fullsizeUrl;
-        mDate = DateOfList;
+        pageParams = new ListItemPageParams(NumberOnPage, DateOfList, PageNumber, totalPages);
     }
-    ImageListItem(int viewtype, Date date, int pagesTotal, int page){
-        mNumberOnPage = -1;
+    ImageListItem(int viewtype, Date date, int totalPages, int page){
         mViewType = viewtype;
-        mPage = page;
-        mPagesTotal = pagesTotal;
-        mDate = date;
+        pageParams = new ListItemPageParams(-1, date, page, totalPages);
     }
     public ImageListItem(Date date, int page){
-        mNumberOnPage = 1;
         mViewType = VIEW_TYPE_DATE;
-        mPage = page;
-        mDate = date;
+        pageParams = new ListItemPageParams(-1, date, page, -1);
     }
 
-    public Date getDate(){return mDate;}
-    int getPagesTotal(){return mPagesTotal;}
-    public int getPage(){return mPage;}
-    int getNumberOnPage(){return mNumberOnPage;}
+
     int getViewType(){return mViewType;}
     String getTitle() {
         return mTitle;
     }
     String getDetails() {return mDetails;}
-    //Bitmap getBitmapThumbnail(){return mBitmapThumbnail;}
     String getThumbnailUrl(){return mThumbnailUrl;}
     String getFullsizeUrl(){return mFullsizeUrl;}
+    public ListItemPageParams getPageParams(){return pageParams;}
 }
