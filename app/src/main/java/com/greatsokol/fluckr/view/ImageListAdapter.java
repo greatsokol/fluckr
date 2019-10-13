@@ -100,11 +100,14 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
     }
 
 
-    void addItemsAtBottom(List<ImageListItem> items) {
+    void addItemsAtBottom(List<ImageListItem> items, int restorePosition) {
         mItems.addAll(items);
         int itemsSize = items.size();
         int positionStart = mItems.size() - itemsSize;
         notifyItemRangeInserted(positionStart, itemsSize);
+        if(restorePosition != ConstsAndUtils.NO_POSITION){
+
+        }
     }
 
     void addItemsUpper(List<ImageListItem> items) {

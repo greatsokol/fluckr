@@ -43,7 +43,7 @@ public class ActivityMain extends AppCompatActivity
         implements /*SwipeRefreshLayout.OnRefreshListener,*/
         ContractMain.ViewMain,
         View.OnClickListener {
-    private final static int NO_POSITION = -1;
+
     private RecyclerView mRecyclerView;
     //private SwipeRefreshLayout mSwipeRefresh;
     private int mTransitionPosition;
@@ -94,7 +94,7 @@ public class ActivityMain extends AppCompatActivity
         // shared element transition tricks:
         final RecyclerView.LayoutManager lm = mRecyclerView.getLayoutManager();
         assert lm != null;
-        if(mTransitionPosition != NO_POSITION) {
+        if(mTransitionPosition != ConstsAndUtils.NO_POSITION) {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -135,7 +135,7 @@ public class ActivityMain extends AppCompatActivity
             mTransitionPosition = settings.getInt(ConstsAndUtils.TAG_TR_POSITION);
             mSearchFor = settings.getString(ConstsAndUtils.TAG_SEARCH_FOR);
         } else{
-            mTransitionPosition = NO_POSITION;
+            mTransitionPosition = ConstsAndUtils.NO_POSITION;
             mSearchFor = "";
         }
     }
@@ -230,8 +230,10 @@ public class ActivityMain extends AppCompatActivity
         mRecyclerView.addOnScrollListener(new PaginationListenerOnScroll(layoutManager) {
             @Override
             protected void onScrolled(int firstVisibleItemPosition) {
-                String title = getActiveAdapter().
-                        saveNavigationSettings(getPreferences(MODE_PRIVATE), firstVisibleItemPosition);
+                String title =
+                        getActiveAdapter().saveNavigationSettings(
+                                getPreferences(MODE_PRIVATE),
+                                firstVisibleItemPosition);
                 if(!title.equals(""))
                     mToolbar.setTitle(title);
             }
@@ -373,7 +375,7 @@ public class ActivityMain extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mActivityViewStarted = false;
-        mTransitionPosition = NO_POSITION;
+        mTransitionPosition = ConstsAndUtils.NO_POSITION;
     }
 
     void restoreSearchViewState(MenuItem searchItem, String query){
@@ -399,9 +401,9 @@ public class ActivityMain extends AppCompatActivity
 
 
     @Override
-    public void onImageListDownloaded(ArrayList<ImageListItem> items, boolean addAtBottom) {
+    public void onImageListDownloaded(ArrayList<ImageListItem> items, boolean addAtBottom, int restorePosition) {
         if(addAtBottom)
-            getActiveAdapter().addItemsAtBottom(items);
+            getActiveAdapter().addItemsAtBottom(items, restorePosition);
         else
             getActiveAdapter().addItemsUpper(items);
     }

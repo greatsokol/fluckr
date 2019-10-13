@@ -27,7 +27,7 @@ public class ImageListPresenter implements ContractMain.ImageListPresenter {
 
     @Override
     public void onViewCreate(ContractMain.ViewMain view, boolean loadInitial,
-                             Date savedDate, int savedPage, int savedItemNumber) {
+                             Date savedDate, int savedPage, final int savedItemNumber) {
         mView = view;
         mModel = new FlickrInterestingnessListModel();
         if(loadInitial) {
@@ -38,9 +38,12 @@ public class ImageListPresenter implements ContractMain.ImageListPresenter {
                 @Override
                 public void onResponse(Photos photos) {
                     if(mView==null)return;
-                    mView.onImageListDownloaded(Interactor.Translate(fdate, photos), true);
+                    mView.onImageListDownloaded(
+                            Interactor.Translate(fdate, photos),
+                            true,
+                            savedItemNumber);
                     stopLoading();
-                    onScrolledUp(); // load upper page if exists
+                    onScrolledUp(); //<---- load upper page if exists
                 }
 
                 @Override
@@ -74,7 +77,7 @@ public class ImageListPresenter implements ContractMain.ImageListPresenter {
         int page = pageParams.getPage();
         Date date = pageParams.getDate();
         int totalPages = pageParams.getPagesTotal();
-        if(page==-1 || date == null || totalPages==-1) {
+        if(page==ConstsAndUtils.NO_PAGE || date == null || totalPages==ConstsAndUtils.NO_PAGE) {
             stopLoading();
             return;
         }
@@ -90,7 +93,9 @@ public class ImageListPresenter implements ContractMain.ImageListPresenter {
             @Override
             public void onResponse(Photos photos) {
                 if(mView==null)return;
-                mView.onImageListDownloaded(Interactor.Translate(fdate, photos), true);
+                mView.onImageListDownloaded(
+                        Interactor.Translate(fdate, photos),
+                        true, ConstsAndUtils.NO_POSITION);
                 stopLoading();
             }
 
@@ -115,7 +120,7 @@ public class ImageListPresenter implements ContractMain.ImageListPresenter {
         }
         int page = pageParams.getPage();
         Date date = pageParams.getDate();
-        if(page==-1 || date == null) {
+        if(page==ConstsAndUtils.NO_PAGE || date == null) {
             stopLoading();
             return;
         }
@@ -135,7 +140,9 @@ public class ImageListPresenter implements ContractMain.ImageListPresenter {
             @Override
             public void onResponse(Photos photos) {
                 if(mView==null)return;
-                mView.onImageListDownloaded(Interactor.Translate(fdate, photos), false);
+                mView.onImageListDownloaded(
+                        Interactor.Translate(fdate, photos),
+                        false, ConstsAndUtils.NO_POSITION);
                 stopLoading();
             }
 

@@ -9,7 +9,7 @@ import java.util.Date;
 public interface ContractMain {
 
     interface ViewMain {
-        void onImageListDownloaded(ArrayList<ImageListItem> items, boolean addAtBottom);
+        void onImageListDownloaded(ArrayList<ImageListItem> items, boolean addAtBottom, int restorePosition);
         void onFailure(String message);
         void onStartLoading(boolean addProgressbarAtBottom);
         void onStopLoading();

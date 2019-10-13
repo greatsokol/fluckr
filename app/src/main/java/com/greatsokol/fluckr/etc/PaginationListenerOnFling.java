@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public abstract class PaginationListenerOnFling extends RecyclerView.OnFlingListener {
     @NonNull
     private GridLayoutManager layoutManager;
-    public PaginationListenerOnFling(@NonNull GridLayoutManager layoutManager) {
+    protected PaginationListenerOnFling(@NonNull GridLayoutManager layoutManager) {
         this.layoutManager = layoutManager;
     }
 

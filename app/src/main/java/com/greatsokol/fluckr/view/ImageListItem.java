@@ -1,5 +1,6 @@
 package com.greatsokol.fluckr.view;
 
+import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.model.api.Photo;
 
 import java.util.Date;
@@ -38,7 +39,11 @@ public class ImageListItem {
     private int mViewType = VIEW_TYPE_IMAGE;
     ImageListItem(int viewtype) {
         mViewType = viewtype;
-        pageParams = new ListItemPageParams(-1, null, -1, -1);
+        pageParams = new ListItemPageParams(
+                ConstsAndUtils.NO_POSITION,
+                null,
+                ConstsAndUtils.NO_PAGE,
+                ConstsAndUtils.NO_PAGE);
     }
     public ImageListItem(Date DateOfList, int totalPages, int PageNumber, int NumberOnPage, Photo photo) {
         mTitle = photo.getTitle();
@@ -52,11 +57,17 @@ public class ImageListItem {
     }
     ImageListItem(int viewtype, Date date, int totalPages, int page){
         mViewType = viewtype;
-        pageParams = new ListItemPageParams(-1, date, page, totalPages);
+        pageParams = new ListItemPageParams(
+                ConstsAndUtils.NO_POSITION,
+                date, page,
+                totalPages);
     }
     public ImageListItem(Date date, int page){
         mViewType = VIEW_TYPE_DATE;
-        pageParams = new ListItemPageParams(-1, date, page, -1);
+        pageParams = new ListItemPageParams(
+                ConstsAndUtils.NO_POSITION,
+                date, page,
+                ConstsAndUtils.NO_PAGE);
     }
 
 

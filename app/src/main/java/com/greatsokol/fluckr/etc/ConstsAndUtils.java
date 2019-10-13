@@ -24,6 +24,8 @@ public abstract class ConstsAndUtils {
     public final static String TAG_DATE_TO_VIEW = "DATE_VIEW";
     public final static String TAG_PAGE_TO_VIEW = "PAGE_VIEW";
     public final static String TAG_NUMBER_ON_PAGE = "NUMBER_ON_PAGE";
+    public final static int NO_POSITION = -1;
+    public final static int NO_PAGE = -1;
 
 
     public static boolean isLandscape(Resources res){
