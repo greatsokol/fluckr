@@ -252,9 +252,9 @@ public class ActivityView extends AppCompatActivity {
 
     @Override
     public void finishAfterTransition() {
-        setResult(0);
         mImageView.setImageBitmap(mThumbnail);
-        mImageView.reset();
+        mImageView.reset(false);
+        setResult(0);
         super.finishAfterTransition();
     }
 
