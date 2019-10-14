@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr.etc;
+package com.greatsokol.fluckr.deprecated;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

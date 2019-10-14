@@ -1,19 +1,15 @@
 package com.greatsokol.fluckr.view;
 
-import android.content.ClipData;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Html;
 import android.transition.Transition;
-import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -28,8 +24,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.snackbar.Snackbar;
 import com.greatsokol.fluckr.R;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
-import com.greatsokol.fluckr.etc.MyDragShadowBuilder;
 import com.greatsokol.fluckr.etc.ThumbnailTransformation;
+import com.jsibbold.zoomage.ZoomageView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -37,7 +33,7 @@ import java.util.Objects;
 
 public class ActivityView extends AppCompatActivity {
     private View mRootView;
-    private ImageView mImageView;
+    private ZoomageView mImageView;
     private ProgressBar mProgress;
     private Toolbar mToolbar;
     private Bundle mArgs;
@@ -117,6 +113,7 @@ public class ActivityView extends AppCompatActivity {
             });
         }
 
+        /*
         mImageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -191,6 +188,8 @@ public class ActivityView extends AppCompatActivity {
                 return true;
             }
         });
+
+        */
     }
 
 
@@ -255,6 +254,7 @@ public class ActivityView extends AppCompatActivity {
     public void finishAfterTransition() {
         setResult(0);
         mImageView.setImageBitmap(mThumbnail);
+        mImageView.reset();
         super.finishAfterTransition();
     }
 

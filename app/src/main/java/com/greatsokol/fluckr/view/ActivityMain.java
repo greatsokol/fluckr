@@ -31,7 +31,7 @@ import com.greatsokol.fluckr.etc.ImageGridLayoutManager;
 import com.greatsokol.fluckr.etc.PaginationListenerOnFling;
 import com.greatsokol.fluckr.etc.PaginationListenerOnScroll;
 import com.greatsokol.fluckr.R;
-import com.greatsokol.fluckr.etc.deprecated_saved_because_handmade_CacheFile;
+import com.greatsokol.fluckr.deprecated.deprecated_saved_because_handmade_CacheFile;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.presenter.ImageListPresenter;
 

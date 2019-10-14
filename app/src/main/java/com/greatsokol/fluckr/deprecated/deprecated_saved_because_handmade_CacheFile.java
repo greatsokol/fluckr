@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr.etc;
+package com.greatsokol.fluckr.deprecated;
 
 import android.util.Log;
 
@@ -26,7 +26,7 @@ public abstract class deprecated_saved_because_handmade_CacheFile {
         }
     }
 
-    public static String convertUrlToCacheFileName(final String url, final String cacheDir,
+    static String convertUrlToCacheFileName(final String url, final String cacheDir,
                                                    boolean addpostfix, String postfix){
         String fileName = cacheDir + "/" +
                 url.replace(':', '_').
