@@ -25,14 +25,13 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.greatsokol.fluckr.contract.ContractMain;
 import com.greatsokol.fluckr.FluckrApp;
+import com.greatsokol.fluckr.R;
+import com.greatsokol.fluckr.contract.ContractMain;
+import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.etc.ImageGridLayoutManager;
 import com.greatsokol.fluckr.etc.PaginationListenerOnFling;
 import com.greatsokol.fluckr.etc.PaginationListenerOnScroll;
-import com.greatsokol.fluckr.R;
-import com.greatsokol.fluckr.deprecated.deprecated_saved_because_handmade_CacheFile;
-import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.presenter.ImageListPresenter;
 
 import java.util.ArrayList;
@@ -40,18 +39,13 @@ import java.util.Date;
 
 
 public class ActivityMain extends AppCompatActivity
-        implements /*SwipeRefreshLayout.OnRefreshListener,*/
-        ContractMain.ViewMain,
-        View.OnClickListener {
+        implements ContractMain.ViewMain, View.OnClickListener {
 
     private RecyclerView mRecyclerView;
-    //private SwipeRefreshLayout mSwipeRefresh;
     private int mTransitionPosition;
     private boolean mActivityViewStarted = false;
     private Toolbar mToolbar;
     private ContractMain.ImageListPresenter mPresenter;
-
-    //private View mAppBar;
 
     private ImageListAdapter getTodayListAdapter(){ return ((FluckrApp)getApplication()).getTodayListAdapter();}
     private ImageListAdapter getSearchAdapter(){ return ((FluckrApp)getApplication()).getSearchAdapter();}
@@ -64,34 +58,27 @@ public class ActivityMain extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //mAppBar = findViewById(R.id.appbar);
         mToolbar = findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(mToolbar);
-        //mSwipeRefresh = findViewById(R.id.swipeRefresh);
-        //mSwipeRefresh.setOnRefreshListener(this);
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
 
         loadInstanceSettings(savedInstanceState);
-
-        // clean older than 1 day cached files
-        deprecated_saved_because_handmade_CacheFile.cleanCache(getCacheDir().getAbsolutePath());
 
         setInsets();
         setLayout();
 
         mPresenter = new ImageListPresenter();
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-        Date savedDate
-                = new Date(prefs.getLong(ConstsAndUtils.TAG_DATE_TO_VIEW,
-                ConstsAndUtils.DecDate(ConstsAndUtils.CurrentGMTDate()).getTime()));
-        int savedPage = prefs.getInt(ConstsAndUtils.TAG_PAGE_TO_VIEW,1);
-        int savedItemNumber = prefs.getInt(ConstsAndUtils.TAG_NUMBER_ON_PAGE,1);
-        mPresenter.onViewCreate(this, getActiveAdapter().getItemCount()==0,
-                                    savedDate, savedPage, savedItemNumber);
+        Date date = new Date(prefs.getLong(ConstsAndUtils.DATE_TO_VIEW,
+                        ConstsAndUtils.DecDate(ConstsAndUtils.CurrentGMTDate()).getTime()));
+        int page = prefs.getInt(ConstsAndUtils.PAGE_TO_VIEW,1);
+        int itemNumber = prefs.getInt(ConstsAndUtils.NUMBER_ON_PAGE,1);
+        boolean firstLoad = getActiveAdapter().getItemCount()==0;
+        mPresenter.onViewCreate(this, firstLoad, date, page, itemNumber);
 
 
-        // shared element transition tricks:
+        // shared element transition trick:
         final RecyclerView.LayoutManager lm = mRecyclerView.getLayoutManager();
         assert lm != null;
         if(mTransitionPosition != ConstsAndUtils.NO_POSITION) {
@@ -102,19 +89,6 @@ public class ActivityMain extends AppCompatActivity
                 }
             }, 500);
         }
-
-        /*setExitSharedElementCallback(new SharedElementCallback() {
-            @Override
-            public void onMapSharedElements(final List<String> names, final Map<String, View> sharedElements) {
-                super.onMapSharedElements(names, sharedElements);
-                if (sharedElements.isEmpty()) {
-                    ViewGroup view = (ViewGroup) lm.findViewByPosition(mTransitionPosition);
-                    if (view != null && names.size() > 0)
-                        sharedElements.put(names.get(0), view.findViewById(R.id.imageview));
-                }
-            }
-        });*/
-
     }
 
     @Override
@@ -132,8 +106,8 @@ public class ActivityMain extends AppCompatActivity
 
     private void loadInstanceSettings(Bundle settings){
         if (settings != null) {
-            mTransitionPosition = settings.getInt(ConstsAndUtils.TAG_TR_POSITION);
-            mSearchFor = settings.getString(ConstsAndUtils.TAG_SEARCH_FOR);
+            mTransitionPosition = settings.getInt(ConstsAndUtils.TRANS_POSITION);
+            mSearchFor = settings.getString(ConstsAndUtils.SEARCH_PHRASE);
         } else{
             mTransitionPosition = ConstsAndUtils.NO_POSITION;
             mSearchFor = "";
@@ -141,8 +115,8 @@ public class ActivityMain extends AppCompatActivity
     }
 
     private void saveInstanceSettings(Bundle settings){
-        settings.putInt(ConstsAndUtils.TAG_TR_POSITION, mTransitionPosition);
-        settings.putString(ConstsAndUtils.TAG_SEARCH_FOR, mSearchFor);
+        settings.putInt(ConstsAndUtils.TRANS_POSITION, mTransitionPosition);
+        settings.putString(ConstsAndUtils.SEARCH_PHRASE, mSearchFor);
     }
 
 
@@ -179,19 +153,6 @@ public class ActivityMain extends AppCompatActivity
                 return insets;
             }
         });
-
-        /*ViewCompat.setOnApplyWindowInsetsListener(mSwipeRefresh, new OnApplyWindowInsetsListener() {
-            @Override
-            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
-                int offsetStart = toolbarHeight + insets.getSystemWindowInsetTop();
-                ((SwipeRefreshLayout)v).setProgressViewOffset(true,
-                        offsetStart,
-                        offsetStart+ConstsAndUtils.pxFromDp(getResources(), 100));
-                ViewCompat.setOnApplyWindowInsetsListener(mSwipeRefresh, null);
-                return insets;
-            }
-        });*/
-
     }
 
     private void setLayout(){
@@ -209,8 +170,6 @@ public class ActivityMain extends AppCompatActivity
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
-
-        mRecyclerView.setPreserveFocusAfterLayout(true);
 
         mRecyclerView.setOnFlingListener(new PaginationListenerOnFling(layoutManager) {
             @Override
@@ -230,10 +189,9 @@ public class ActivityMain extends AppCompatActivity
         mRecyclerView.addOnScrollListener(new PaginationListenerOnScroll(layoutManager) {
             @Override
             protected void onScrolled(int firstVisibleItemPosition) {
-                String title =
-                        getActiveAdapter().saveNavigationSettings(
-                                getPreferences(MODE_PRIVATE),
-                                firstVisibleItemPosition);
+                String title = getActiveAdapter().saveNavigationSettings(
+                        getPreferences(MODE_PRIVATE),
+                        firstVisibleItemPosition);
                 if(!title.equals(""))
                     mToolbar.setTitle(title);
             }
@@ -261,12 +219,6 @@ public class ActivityMain extends AppCompatActivity
     private void stopRequestLoading(boolean clear){
         getActiveAdapter().stopLoadingRequest(clear);
     }
-
-    /*@Override
-    public void onRefresh() {
-        stopRequestLoading(true);
-        doApiCall();
-    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -347,25 +299,23 @@ public class ActivityMain extends AppCompatActivity
         @Override
     public void onClick(View view) {
         Bundle args = (Bundle) view.getTag();
-        if (args!=null && !mActivityViewStarted) synchronized (this) {
+        if (args!=null && !mActivityViewStarted) {
             View imageView = view.findViewById(R.id.imageview);
             if (imageView != null) {
-                mTransitionPosition = args.getInt(ConstsAndUtils.TAG_TR_POSITION);
+                mTransitionPosition = args.getInt(ConstsAndUtils.TRANS_POSITION);
                 mActivityViewStarted = true;
                 Intent intent = new Intent(ActivityMain.this, ActivityView.class);
                 String transitionName = ViewCompat.getTransitionName(imageView);
                 assert transitionName != null;
 
-                //Pair<View, String> pair1 = Pair.create(mAppBar, getResources().getString(R.string.AppBarTransitionName));
-                //Pair<View, String> pair2 = Pair.create(imageView, transitionName);
                 ActivityOptionsCompat options =
                         ActivityOptionsCompat.makeSceneTransitionAnimation(
                                 ActivityMain.this,
                                        imageView, transitionName);
 
 
-                intent.putExtra(ConstsAndUtils.TAG_TR_NAME, transitionName);
-                intent.putExtra(ConstsAndUtils.TAG_ARGS, args);
+                intent.putExtra(ConstsAndUtils.TRANS_NAME, transitionName);
+                intent.putExtra(ConstsAndUtils.ARGS, args);
                 startActivityForResult(intent, 0, options.toBundle());
             }
         }
@@ -388,13 +338,13 @@ public class ActivityMain extends AppCompatActivity
     }
 
     private boolean settings_getViewAsGrid(){
-        return getPreferences(MODE_PRIVATE).getBoolean(ConstsAndUtils.TAG_VIEWASGRID, true);
+        return getPreferences(MODE_PRIVATE).getBoolean(ConstsAndUtils.VIEWASGRID, true);
     }
 
     private void settings_setViewAsGrid(boolean bAsGrid){
         SharedPreferences activityPreferences = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor editor = activityPreferences.edit();
-        editor.putBoolean(ConstsAndUtils.TAG_VIEWASGRID, bAsGrid);
+        editor.putBoolean(ConstsAndUtils.VIEWASGRID, bAsGrid);
         editor.apply();
     }
 

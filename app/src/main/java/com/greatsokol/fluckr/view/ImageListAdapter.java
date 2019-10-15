@@ -24,11 +24,12 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.BaseViewHolder> {
 
     private List<ImageListItem> mItems;
-    //private RecyclerView mRecyclerView;
+    private RecyclerView mRecyclerView;
     private boolean mViewAsGrid = true;
 
     void setViewAsGrid(boolean viewAsGrid){mViewAsGrid = viewAsGrid;}
@@ -48,7 +49,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         mItemClickListener = listener;
     }
 
-    /*@Override
+    @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         mRecyclerView = recyclerView;
@@ -58,7 +59,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
     public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
         mRecyclerView = null;
-    }*/
+    }
 
     @NonNull
     @Override
@@ -110,6 +111,8 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         }
     }
 
+
+
     void addItemsUpper(List<ImageListItem> items) {
         if(items.size()==0) return;
 
@@ -137,50 +140,6 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         if(removed>0)notifyItemRangeChanged(items.size()-removed, removed);
         notifyItemRangeInserted(0, items.size()-removed);
     }
-
-    /*private synchronized void RemoveObsoletePagesUpper(Date JustLoadedDate, int JustLoadedPage){
-        if(mItems.size() == 0) return;
-        int HeadersToRemove = 0;
-        int ImagesToRemove = 0;
-        for (int i = 0; i < mItems.size(); i++) {
-            int ItemType = getItemViewType(i);
-            if(ItemType != ImageListItem.VIEW_TYPE_LOADING) {
-                ImageListItem item = mItems.get(i);
-                int ItemPage = item.getPage();
-                Date ItemDate = item.getDate();
-                if(ItemDate == null) continue;
-                int Days = JustLoadedDate.compareTo(ItemDate);
-                if (ItemPage < JustLoadedPage - 1 || Days > 0){
-                    if(ItemType == ImageListItem.VIEW_TYPE_PLACEHOLDER || ItemType == ImageListItem.VIEW_TYPE_IMAGE)ImagesToRemove++;
-                    if(ItemType == ImageListItem.VIEW_TYPE_DATE)HeadersToRemove++;
-                }
-                else break;
-            }
-        }
-
-        ImagesToRemove = ImagesToRemove - ImagesToRemove % mSpanCount;
-        int TotalToRemove = ImagesToRemove + HeadersToRemove;
-        for (int i = 0; i < TotalToRemove; i++) {
-            mItems.remove(0);
-            notifyItemRemoved(0);
-        }
-    }
-
-    private synchronized void RemoveObsoletePagesAtBottom(Date JustLoadedDate, int JustLoadedPage){
-        for (int i = 0; i < mItems.size(); i++) {
-            ImageListItem item = mItems.get(i);
-            int itemPage = item.getPage();
-            Date ItemDate = item.getDate();
-            if(ItemDate == null) continue;
-            int Days = JustLoadedDate.compareTo(ItemDate);
-            if (itemPage > JustLoadedPage + 1 || Days < 0) {
-                mItems.remove(i);
-                notifyItemRemoved(i);
-                i--;
-            }
-        }
-    }*/
-
 
     private void __notifyItemInserted(final int position){
         new Handler().post(new Runnable() {
@@ -303,11 +262,11 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
                 view.setPressed(false);
                 if(mItemClickListener!=null) {
                     Bundle args = new Bundle();
-                    args.putInt(ConstsAndUtils.TAG_TR_POSITION, mItemPosition);
-                    args.putString(ConstsAndUtils.TAG_TITLE, listItem.getTitle());
-                    args.putString(ConstsAndUtils.TAG_DETAILS, listItem.getDetails());
-                    args.putString(ConstsAndUtils.TAG_THUMBURL, listItem.getThumbnailUrl());
-                    args.putString(ConstsAndUtils.TAG_FULLSIZEURL, listItem.getFullsizeUrl());
+                    args.putInt(ConstsAndUtils.TRANS_POSITION, mItemPosition);
+                    args.putString(ConstsAndUtils.TITLE, listItem.getTitle());
+                    args.putString(ConstsAndUtils.DETAILS, listItem.getDetails());
+                    args.putString(ConstsAndUtils.THUMBURL, listItem.getThumbnailUrl());
+                    args.putString(ConstsAndUtils.FULLSIZEURL, listItem.getFullsizeUrl());
                     view.setTag(args);
                     view.performClick();
                     mItemClickListener.onClick(view);
@@ -328,7 +287,6 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         }
     }
 
-
     private ImageListItem getFirstImageItem(){
         for(int i=0; i<mItems.size(); i++){
             ImageListItem item = mItems.get(i);
@@ -346,8 +304,6 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         }
         return null;
     }
-
-
 
     ImageListItem.ListItemPageParams getLastItemPageParams(){
         ImageListItem item = getLastImageItem();
@@ -368,15 +324,14 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
             ImageListItem.ListItemPageParams pageParams = item.getPageParams();
             Date dt = pageParams.getDate();
             if(dt != null) {
-                int savedCurrentPageNumber = prefs.getInt(ConstsAndUtils.TAG_PAGE_TO_VIEW,1);
-                if(savedCurrentPageNumber!=pageParams.getPage()){
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putLong(ConstsAndUtils.TAG_DATE_TO_VIEW, dt.getTime());
-                    editor.putInt(ConstsAndUtils.TAG_PAGE_TO_VIEW, pageParams.getPage());
-                    editor.putInt(ConstsAndUtils.TAG_NUMBER_ON_PAGE, pageParams.getNumberOnPage());
-                    editor.apply();
-                    return ConstsAndUtils.DateToStr_dd_mmmm_yyyy(dt);
-                }
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putLong(ConstsAndUtils.DATE_TO_VIEW, dt.getTime());
+                editor.putInt(ConstsAndUtils.PAGE_TO_VIEW, pageParams.getPage());
+                editor.putInt(ConstsAndUtils.NUMBER_ON_PAGE, pageParams.getNumberOnPage());
+                editor.apply();
+                return String.format(Locale.getDefault(),"%s (pg %d)",
+                        ConstsAndUtils.DateToStr_dd_mmmm_yyyy(dt),
+                        pageParams.getPage());
             }
         }
         return "";

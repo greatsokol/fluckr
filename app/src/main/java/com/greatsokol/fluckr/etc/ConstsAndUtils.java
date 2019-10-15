@@ -11,19 +11,19 @@ import java.util.TimeZone;
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 
 public abstract class ConstsAndUtils {
-    public final static String TAG_ARGS = "ARGS";
-    public final static String TAG_TR_POSITION = "TR_POSITION";
-    public final static String TAG_TR_NAME = "TR_NAME";
-    public final static String TAG_TITLE = "TITLE";
-    public final static String TAG_DETAILS = "DETAILS";
-    public final static String TAG_THUMBURL = "THUMBURL";
-    public final static String TAG_FULLSIZEURL = "FULLSIZEURL";
-    public final static String TAG_VIEWASGRID = "VIEWASGRID";
-    public final static String TAG_READY = "READY";
-    public final static String TAG_SEARCH_FOR = "SEARCH_FOR";
-    public final static String TAG_DATE_TO_VIEW = "DATE_VIEW";
-    public final static String TAG_PAGE_TO_VIEW = "PAGE_VIEW";
-    public final static String TAG_NUMBER_ON_PAGE = "NUMBER_ON_PAGE";
+    public final static String ARGS = "ARGS";
+    public final static String TRANS_POSITION = "TR_POSITION";
+    public final static String TRANS_NAME = "TR_NAME";
+    public final static String TITLE = "TITLE";
+    public final static String DETAILS = "DETAILS";
+    public final static String THUMBURL = "THUMBURL";
+    public final static String FULLSIZEURL = "FULLSIZEURL";
+    public final static String VIEWASGRID = "VIEWASGRID";
+    public final static String READY = "READY";
+    public final static String SEARCH_PHRASE = "SEARCH_PHRASE";
+    public final static String DATE_TO_VIEW = "DATE_VIEW";
+    public final static String PAGE_TO_VIEW = "PAGE_VIEW";
+    public final static String NUMBER_ON_PAGE = "NUMBER_ON_PAGE";
     public final static int NO_POSITION = -1;
     public final static int NO_PAGE = -1;
 

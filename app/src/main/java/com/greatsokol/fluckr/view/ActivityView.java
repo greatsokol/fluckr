@@ -55,13 +55,13 @@ public class ActivityView extends AppCompatActivity {
         mProgress = findViewById(R.id.progressBar);
 
         Intent intent = getIntent();
-        ViewCompat.setTransitionName(mImageView, intent.getStringExtra(ConstsAndUtils.TAG_TR_NAME));
+        ViewCompat.setTransitionName(mImageView, intent.getStringExtra(ConstsAndUtils.TRANS_NAME));
 
-        mArgs = intent.getBundleExtra(ConstsAndUtils.TAG_ARGS);
+        mArgs = intent.getBundleExtra(ConstsAndUtils.ARGS);
         assert mArgs != null;
         setTextLabels(mArgs);
 
-        final String thumbnailPath = mArgs.getString(ConstsAndUtils.TAG_THUMBURL);
+        final String thumbnailPath = mArgs.getString(ConstsAndUtils.THUMBURL);
         assert thumbnailPath != null;
 
         Target target = new Target() {
@@ -88,7 +88,7 @@ public class ActivityView extends AppCompatActivity {
 
         // run higher resolution picture
         if (savedInstanceState != null) {
-            if (savedInstanceState.getInt(ConstsAndUtils.TAG_READY, 0) == FLAG_ALREADY_LOADED_HIGH_RES)
+            if (savedInstanceState.getInt(ConstsAndUtils.READY, 0) == FLAG_ALREADY_LOADED_HIGH_RES)
                 loadHigherResolution(); // load without waiting for shared element transition ends
         } else {
             // load after shared element transition ends
@@ -194,10 +194,10 @@ public class ActivityView extends AppCompatActivity {
 
 
     private void setTextLabels(Bundle params){
-        final String title = params.getString(ConstsAndUtils.TAG_TITLE);
+        final String title = params.getString(ConstsAndUtils.TITLE);
         setTitle(title);
 
-        String details = params.getString(ConstsAndUtils.TAG_DETAILS);
+        String details = params.getString(ConstsAndUtils.DETAILS);
         assert details != null;
         if (details.trim().equals("")) details = title;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -262,7 +262,7 @@ public class ActivityView extends AppCompatActivity {
 
 
     void loadHigherResolution(){//final boolean animate){
-        String fullSizeUrl = mArgs.getString(ConstsAndUtils.TAG_FULLSIZEURL);
+        String fullSizeUrl = mArgs.getString(ConstsAndUtils.FULLSIZEURL);
         if(fullSizeUrl==null || fullSizeUrl.isEmpty())return;
 
         Target target = new Target() {
@@ -310,7 +310,7 @@ public class ActivityView extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         // save flag to load picture without waiting shared elements transition
-        outState.putInt(ConstsAndUtils.TAG_READY, FLAG_ALREADY_LOADED_HIGH_RES);
+        outState.putInt(ConstsAndUtils.READY, FLAG_ALREADY_LOADED_HIGH_RES);
         super.onSaveInstanceState(outState);
     }
 

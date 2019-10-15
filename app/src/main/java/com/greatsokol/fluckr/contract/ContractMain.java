@@ -20,7 +20,8 @@ public interface ContractMain {
     }
 
     interface ImageListPresenter {
-        void onViewCreate(ContractMain.ViewMain view, boolean loadInitial, Date savedDate, int savedPage, int savedItemNumber);
+        void onViewCreate(ContractMain.ViewMain view, boolean firstLoad,
+                          Date date, int page, int itemNumber);
         void onViewDestroy();
         void onScrolledDown();
         void onScrolledUp();
