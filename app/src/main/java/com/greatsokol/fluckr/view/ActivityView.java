@@ -254,6 +254,8 @@ public class ActivityView extends AppCompatActivity {
     public void finishAfterTransition() {
         mImageView.setImageBitmap(mThumbnail);
         mImageView.reset(false);
+        mImageView.setImageMatrix(mImageView.getMatrix()); //trick
+
         setResult(0);
         super.finishAfterTransition();
     }

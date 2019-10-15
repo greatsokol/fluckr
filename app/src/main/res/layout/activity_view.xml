@@ -41,16 +41,17 @@
         android:id="@+id/imageViewBig"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:adjustViewBounds="true"
+
+
         android:contentDescription="@string/imageviewcontentexplaination"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
 
-        app:zoomage_restrictBounds="false"
-        app:zoomage_animateOnReset="false"
-        app:zoomage_autoResetMode="UNDER"
+        app:zoomage_restrictBounds="true"
+        app:zoomage_animateOnReset="true"
+        app:zoomage_autoResetMode="ALWAYS"
         app:zoomage_autoCenter="true"
         app:zoomage_zoomable="true"
         app:zoomage_translatable="true"
