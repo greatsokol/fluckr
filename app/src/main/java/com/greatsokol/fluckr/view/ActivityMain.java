@@ -25,7 +25,6 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.greatsokol.fluckr.FluckrApp;
 import com.greatsokol.fluckr.R;
 import com.greatsokol.fluckr.contract.ContractMain;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
@@ -34,24 +33,16 @@ import com.greatsokol.fluckr.etc.PaginationListenerOnFling;
 import com.greatsokol.fluckr.etc.PaginationListenerOnScroll;
 import com.greatsokol.fluckr.presenter.ImageListPresenter;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 
-public class ActivityMain extends AppCompatActivity
-        implements ContractMain.ViewMain, View.OnClickListener {
+public class ActivityMain extends AppCompatActivity implements ContractMain.ViewMain {
 
     private RecyclerView mRecyclerView;
     private int mTransitionPosition;
     private boolean mActivityViewStarted = false;
     private Toolbar mToolbar;
     private ContractMain.ImageListPresenter mPresenter;
-
-    private ImageListAdapter getTodayListAdapter(){ return ((FluckrApp)getApplication()).getTodayListAdapter();}
-    private ImageListAdapter getSearchAdapter(){ return ((FluckrApp)getApplication()).getSearchAdapter();}
-    private ImageListAdapter getActiveAdapter(){ return
-            mSearchFor == null ||
-            mSearchFor.equals("") ? getTodayListAdapter() : getSearchAdapter();}
     private String mSearchFor = "";
 
     @Override
@@ -65,18 +56,17 @@ public class ActivityMain extends AppCompatActivity
 
         loadInstanceSettings(savedInstanceState);
 
-        setInsets();
-        setLayout();
-
-        mPresenter = new ImageListPresenter();
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         Date date = new Date(prefs.getLong(ConstsAndUtils.DATE_TO_VIEW,
                         ConstsAndUtils.DecDate(ConstsAndUtils.CurrentGMTDate()).getTime()));
         int page = prefs.getInt(ConstsAndUtils.PAGE_TO_VIEW,1);
         int itemNumber = prefs.getInt(ConstsAndUtils.NUMBER_ON_PAGE,1);
-        boolean firstLoad = getActiveAdapter().getItemCount()==0;
-        mPresenter.onViewCreate(this, firstLoad, date, page, itemNumber);
 
+        mPresenter = new ImageListPresenter();
+        mPresenter.onViewCreate(this, date, page, itemNumber);
+
+        setInsets();
+        setLayout();
 
         // shared element transition trick:
         final RecyclerView.LayoutManager lm = mRecyclerView.getLayoutManager();
@@ -114,11 +104,11 @@ public class ActivityMain extends AppCompatActivity
         }
     }
 
+
     private void saveInstanceSettings(Bundle settings){
         settings.putInt(ConstsAndUtils.TRANS_POSITION, mTransitionPosition);
         settings.putString(ConstsAndUtils.SEARCH_PHRASE, mSearchFor);
     }
-
 
 
 
@@ -161,7 +151,7 @@ public class ActivityMain extends AppCompatActivity
 
         final boolean viewAsGrid = settings_getViewAsGrid();
         final int spanCount = getSpanCount(viewAsGrid);
-        final ImageListAdapter adapter = getActiveAdapter();
+        final ImageListAdapter adapter = mPresenter.getAdapter();
 
         adapter.setViewAsGrid(viewAsGrid);
         adapter.setSpanCount(spanCount);
@@ -189,7 +179,7 @@ public class ActivityMain extends AppCompatActivity
         mRecyclerView.addOnScrollListener(new PaginationListenerOnScroll(layoutManager) {
             @Override
             protected void onScrolled(int firstVisibleItemPosition) {
-                String title = getActiveAdapter().saveNavigationSettings(
+                String title = adapter.saveNavigationSettings(
                         getPreferences(MODE_PRIVATE),
                         firstVisibleItemPosition);
                 if(!title.equals(""))
@@ -217,7 +207,7 @@ public class ActivityMain extends AppCompatActivity
     }
 
     private void stopRequestLoading(boolean clear){
-        getActiveAdapter().stopLoadingRequest(clear);
+        mPresenter.getAdapter().stopLoadingRequest(clear);
     }
 
     @Override
@@ -254,9 +244,9 @@ public class ActivityMain extends AppCompatActivity
                 if(queryText.trim().equals("")) return false;
                 stopRequestLoading(false);
                 mSearchFor = queryText;
-                getSearchAdapter().clear();
+                mPresenter.getAdapter().clear();
                 setLayout();
-                mPresenter.onViewCreate(ActivityMain.this, true,null, 0, 0);
+                //mPresenter.onViewCreate(ActivityMain.this, true,null, 0, 0);
                 return true;
             }
 
@@ -282,22 +272,10 @@ public class ActivityMain extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        getTodayListAdapter().setOnItemClickListener(this);
-        getSearchAdapter().setOnItemClickListener(this);
-    }
+
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        getTodayListAdapter().setOnItemClickListener(null);
-        getSearchAdapter().setOnItemClickListener(null);
-    }
-
-        @Override
-    public void onClick(View view) {
+    public void onItemClick(View view) {
         Bundle args = (Bundle) view.getTag();
         if (args!=null && !mActivityViewStarted) {
             View imageView = view.findViewById(R.id.imageview);
@@ -349,44 +327,9 @@ public class ActivityMain extends AppCompatActivity
     }
 
 
-
-    @Override
-    public void onImageListDownloaded(ArrayList<ImageListItem> items, boolean addAtBottom, int restorePosition) {
-        if(addAtBottom)
-            getActiveAdapter().addItemsAtBottom(items, restorePosition);
-        else
-            getActiveAdapter().addItemsUpper(items);
-    }
-
     @Override
     public void onFailure(String message) {
         Snackbar.make(mRecyclerView, message, Snackbar.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onStartLoading(boolean addProgressbarAtBottom) {
-        getActiveAdapter().startLoading(addProgressbarAtBottom);
-    }
-
-    @Override
-    public void onStopLoading() {
-        getActiveAdapter().stopLoading();
-    }
-
-
-    @Override
-    public String getSearchPhrase() {
-        return mSearchFor;
-    }
-
-    @Override
-    public ImageListItem.ListItemPageParams getLastItemPageParams() {
-        return getActiveAdapter().getLastItemPageParams();
-    }
-
-    @Override
-    public ImageListItem.ListItemPageParams getFirstItemPageParams() {
-        return getActiveAdapter().getFirstItemPageParams();
     }
 
 

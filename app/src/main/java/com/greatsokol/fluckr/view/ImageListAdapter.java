@@ -45,7 +45,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         mItems = items;
     }
 
-    void setOnItemClickListener(View.OnClickListener listener){
+    public void setOnItemClickListener(View.OnClickListener listener){
         mItemClickListener = listener;
     }
 
@@ -101,7 +101,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
     }
 
 
-    void addItemsAtBottom(List<ImageListItem> items, int restorePosition) {
+    public void addItemsAtBottom(List<ImageListItem> items, int restorePosition) {
         mItems.addAll(items);
         int itemsSize = items.size();
         int positionStart = mItems.size() - itemsSize;
@@ -113,7 +113,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
 
 
 
-    void addItemsUpper(List<ImageListItem> items) {
+    public void addItemsUpper(List<ImageListItem> items) {
         if(items.size()==0) return;
 
         int removed = __removeItemsOfType(ImageListItem.VIEW_TYPE_PLACEHOLDER, false, false);
@@ -150,7 +150,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         });
     }
 
-    void startLoading(boolean addProgressbarAtBottom) {
+    public void startLoading(boolean addProgressbarAtBottom) {
         if(addProgressbarAtBottom){
             mItems.add(new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
             __notifyItemInserted(mItems.size() - 1);
@@ -187,7 +187,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         return removed;
     }
 
-    void stopLoading() {
+    public void stopLoading() {
         __removeItemsOfType(ImageListItem.VIEW_TYPE_LOADING, true, true);
     }
 
@@ -305,13 +305,13 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         return null;
     }
 
-    ImageListItem.ListItemPageParams getLastItemPageParams(){
+    public ImageListItem.ListItemPageParams getLastItemPageParams(){
         ImageListItem item = getLastImageItem();
         if(item == null) return null;
         return item.getPageParams();
     }
 
-    ImageListItem.ListItemPageParams getFirstItemPageParams(){
+    public ImageListItem.ListItemPageParams getFirstItemPageParams(){
         ImageListItem item = getFirstImageItem();
         if(item == null) return null;
         return item.getPageParams();
