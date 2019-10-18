@@ -1,26 +1,30 @@
 package com.greatsokol.fluckr.contract;
 
-import android.view.View;
+import com.greatsokol.fluckr.models.api.Photos;
+import com.greatsokol.fluckr.views.ImageListItem;
 
-import com.greatsokol.fluckr.model.api.Photos;
-import com.greatsokol.fluckr.view.ImageListAdapter;
-
+import java.util.ArrayList;
 import java.util.Date;
 
 public interface ContractMain {
 
     interface ViewMain {
-        void onItemClick(View view);
+        void onImageListDownloaded(ArrayList<ImageListItem> items, boolean addAtBottom, int restorePosition);
         void onFailure(String message);
+        void onStartLoading(boolean addProgressbarAtBottom);
+        void onStopLoading();
+
+        String getSearchPhrase();
+        ImageListItem.ListItemPageParams getLastItemPageParams();
+        ImageListItem.ListItemPageParams getFirstItemPageParams();
     }
 
     interface ImageListPresenter {
-        ImageListAdapter getAdapter();
-        void onViewCreate(ContractMain.ViewMain view, Date date, int page, int itemNumber);
+        void onViewCreate(ContractMain.ViewMain view, boolean firstLoad,
+                          Date date, int page, int itemNumber);
         void onViewDestroy();
         void onScrolledDown();
         void onScrolledUp();
-        void setSearchPhrase(String searchPhrase);
     }
 
     interface Model{

@@ -1,7 +1,7 @@
-package com.greatsokol.fluckr.view;
+package com.greatsokol.fluckr.views;
 
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
-import com.greatsokol.fluckr.model.api.Photo;
+import com.greatsokol.fluckr.models.api.Photo;
 
 import java.util.Date;
 

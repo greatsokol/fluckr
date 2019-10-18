@@ -1,5 +1,5 @@
 
-package com.greatsokol.fluckr.model.api;
+package com.greatsokol.fluckr.models.api;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

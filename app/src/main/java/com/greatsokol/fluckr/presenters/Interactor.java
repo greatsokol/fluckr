@@ -1,8 +1,8 @@
-package com.greatsokol.fluckr.presenter;
+package com.greatsokol.fluckr.presenters;
 
-import com.greatsokol.fluckr.model.api.Photo;
-import com.greatsokol.fluckr.model.api.Photos;
-import com.greatsokol.fluckr.view.ImageListItem;
+import com.greatsokol.fluckr.models.api.Photo;
+import com.greatsokol.fluckr.models.api.Photos;
+import com.greatsokol.fluckr.views.ImageListItem;
 
 import java.util.ArrayList;
 import java.util.Date;

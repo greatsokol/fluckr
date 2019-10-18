@@ -1,8 +1,8 @@
-package com.greatsokol.fluckr.model;
+package com.greatsokol.fluckr.models;
 
 import com.greatsokol.fluckr.contract.ContractMain;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
-import com.greatsokol.fluckr.model.api.FlickrImageList;
+import com.greatsokol.fluckr.models.api.FlickrImageList;
 
 import java.util.Date;
 

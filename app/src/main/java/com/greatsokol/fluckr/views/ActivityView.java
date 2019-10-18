@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr.view;
+package com.greatsokol.fluckr.views;
 
 import android.content.Intent;
 import android.graphics.Bitmap;

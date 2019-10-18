@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr.view;
+package com.greatsokol.fluckr.views;
 
 import android.content.Context;
 import android.content.Intent;
@@ -31,18 +31,29 @@ import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.etc.ImageGridLayoutManager;
 import com.greatsokol.fluckr.etc.PaginationListenerOnFling;
 import com.greatsokol.fluckr.etc.PaginationListenerOnScroll;
-import com.greatsokol.fluckr.presenter.ImageListPresenter;
+import com.greatsokol.fluckr.presenters.ImageListPresenter;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 
-public class ActivityMain extends AppCompatActivity implements ContractMain.ViewMain {
+public class ActivityMain extends AppCompatActivity
+        implements ContractMain.ViewMain, View.OnClickListener {
+
+    private ImageListAdapter mAdapter;
+    private ImageListAdapter mSearchAdapter;
 
     private RecyclerView mRecyclerView;
     private int mTransitionPosition;
     private boolean mActivityViewStarted = false;
     private Toolbar mToolbar;
     private ContractMain.ImageListPresenter mPresenter;
+
+    private ImageListAdapter getTodayListAdapter(){ return mAdapter;}
+    private ImageListAdapter getSearchAdapter(){ return mSearchAdapter;}
+    private ImageListAdapter getActiveAdapter(){ return
+            mSearchFor == null ||
+            mSearchFor.equals("") ? getTodayListAdapter() : getSearchAdapter();}
     private String mSearchFor = "";
 
     @Override
@@ -54,19 +65,23 @@ public class ActivityMain extends AppCompatActivity implements ContractMain.View
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
 
+        mAdapter = new ImageListAdapter(new ArrayList<ImageListItem>());
+        mSearchAdapter = new ImageListAdapter(new ArrayList<ImageListItem>());
+
         loadInstanceSettings(savedInstanceState);
 
+        setInsets();
+        setLayout();
+
+        mPresenter = new ImageListPresenter();
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         Date date = new Date(prefs.getLong(ConstsAndUtils.DATE_TO_VIEW,
                         ConstsAndUtils.DecDate(ConstsAndUtils.CurrentGMTDate()).getTime()));
         int page = prefs.getInt(ConstsAndUtils.PAGE_TO_VIEW,1);
         int itemNumber = prefs.getInt(ConstsAndUtils.NUMBER_ON_PAGE,1);
+        boolean firstLoad = getActiveAdapter().getItemCount()==0;
+        mPresenter.onViewCreate(this, firstLoad, date, page, itemNumber);
 
-        mPresenter = new ImageListPresenter();
-        mPresenter.onViewCreate(this, date, page, itemNumber);
-
-        setInsets();
-        setLayout();
 
         // shared element transition trick:
         final RecyclerView.LayoutManager lm = mRecyclerView.getLayoutManager();
@@ -104,11 +119,11 @@ public class ActivityMain extends AppCompatActivity implements ContractMain.View
         }
     }
 
-
     private void saveInstanceSettings(Bundle settings){
         settings.putInt(ConstsAndUtils.TRANS_POSITION, mTransitionPosition);
         settings.putString(ConstsAndUtils.SEARCH_PHRASE, mSearchFor);
     }
+
 
 
 
@@ -151,7 +166,7 @@ public class ActivityMain extends AppCompatActivity implements ContractMain.View
 
         final boolean viewAsGrid = settings_getViewAsGrid();
         final int spanCount = getSpanCount(viewAsGrid);
-        final ImageListAdapter adapter = mPresenter.getAdapter();
+        final ImageListAdapter adapter = getActiveAdapter();
 
         adapter.setViewAsGrid(viewAsGrid);
         adapter.setSpanCount(spanCount);
@@ -179,7 +194,7 @@ public class ActivityMain extends AppCompatActivity implements ContractMain.View
         mRecyclerView.addOnScrollListener(new PaginationListenerOnScroll(layoutManager) {
             @Override
             protected void onScrolled(int firstVisibleItemPosition) {
-                String title = adapter.saveNavigationSettings(
+                String title = getActiveAdapter().saveNavigationSettings(
                         getPreferences(MODE_PRIVATE),
                         firstVisibleItemPosition);
                 if(!title.equals(""))
@@ -207,7 +222,7 @@ public class ActivityMain extends AppCompatActivity implements ContractMain.View
     }
 
     private void stopRequestLoading(boolean clear){
-        mPresenter.getAdapter().stopLoadingRequest(clear);
+        getActiveAdapter().stopLoadingRequest(clear);
     }
 
     @Override
@@ -244,9 +259,9 @@ public class ActivityMain extends AppCompatActivity implements ContractMain.View
                 if(queryText.trim().equals("")) return false;
                 stopRequestLoading(false);
                 mSearchFor = queryText;
-                mPresenter.getAdapter().clear();
+                getSearchAdapter().clear();
                 setLayout();
-                //mPresenter.onViewCreate(ActivityMain.this, true,null, 0, 0);
+                mPresenter.onViewCreate(ActivityMain.this, true,null, 0, 0);
                 return true;
             }
 
@@ -272,10 +287,22 @@ public class ActivityMain extends AppCompatActivity implements ContractMain.View
         return super.onOptionsItemSelected(item);
     }
 
-
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getTodayListAdapter().setOnItemClickListener(this);
+        getSearchAdapter().setOnItemClickListener(this);
+    }
 
     @Override
-    public void onItemClick(View view) {
+    protected void onStop() {
+        super.onStop();
+        getTodayListAdapter().setOnItemClickListener(null);
+        getSearchAdapter().setOnItemClickListener(null);
+    }
+
+        @Override
+    public void onClick(View view) {
         Bundle args = (Bundle) view.getTag();
         if (args!=null && !mActivityViewStarted) {
             View imageView = view.findViewById(R.id.imageview);
@@ -327,9 +354,44 @@ public class ActivityMain extends AppCompatActivity implements ContractMain.View
     }
 
 
+
+    @Override
+    public void onImageListDownloaded(ArrayList<ImageListItem> items, boolean addAtBottom, int restorePosition) {
+        if(addAtBottom)
+            getActiveAdapter().addItemsAtBottom(items, restorePosition);
+        else
+            getActiveAdapter().addItemsUpper(items);
+    }
+
     @Override
     public void onFailure(String message) {
         Snackbar.make(mRecyclerView, message, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onStartLoading(boolean addProgressbarAtBottom) {
+        getActiveAdapter().startLoading(addProgressbarAtBottom);
+    }
+
+    @Override
+    public void onStopLoading() {
+        getActiveAdapter().stopLoading();
+    }
+
+
+    @Override
+    public String getSearchPhrase() {
+        return mSearchFor;
+    }
+
+    @Override
+    public ImageListItem.ListItemPageParams getLastItemPageParams() {
+        return getActiveAdapter().getLastItemPageParams();
+    }
+
+    @Override
+    public ImageListItem.ListItemPageParams getFirstItemPageParams() {
+        return getActiveAdapter().getFirstItemPageParams();
     }
 
 
