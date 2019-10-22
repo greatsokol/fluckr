@@ -44,7 +44,7 @@ public class ActivityMain extends AppCompatActivity
     private ImageListAdapter mSearchAdapter;
 
     private RecyclerView mRecyclerView;
-    private int mTransitionPosition;
+    //private int mTransitionPosition;
     private boolean mActivityViewStarted = false;
     private Toolbar mToolbar;
     private ContractMain.ImageListPresenter mPresenter;
@@ -84,7 +84,7 @@ public class ActivityMain extends AppCompatActivity
 
 
         // shared element transition trick:
-        final RecyclerView.LayoutManager lm = mRecyclerView.getLayoutManager();
+        /*final RecyclerView.LayoutManager lm = mRecyclerView.getLayoutManager();
         assert lm != null;
         if(mTransitionPosition != ConstsAndUtils.NO_POSITION) {
             new Handler().postDelayed(new Runnable() {
@@ -93,7 +93,7 @@ public class ActivityMain extends AppCompatActivity
                     lm.scrollToPosition(mTransitionPosition);
                 }
             }, 500);
-        }
+        } */
     }
 
     @Override
@@ -111,16 +111,16 @@ public class ActivityMain extends AppCompatActivity
 
     private void loadInstanceSettings(Bundle settings){
         if (settings != null) {
-            mTransitionPosition = settings.getInt(ConstsAndUtils.TRANS_POSITION);
+            //mTransitionPosition = settings.getInt(ConstsAndUtils.TRANS_POSITION);
             mSearchFor = settings.getString(ConstsAndUtils.SEARCH_PHRASE);
         } else{
-            mTransitionPosition = ConstsAndUtils.NO_POSITION;
+            //mTransitionPosition = ConstsAndUtils.NO_POSITION;
             mSearchFor = "";
         }
     }
 
     private void saveInstanceSettings(Bundle settings){
-        settings.putInt(ConstsAndUtils.TRANS_POSITION, mTransitionPosition);
+        //settings.putInt(ConstsAndUtils.TRANS_POSITION, mTransitionPosition);
         settings.putString(ConstsAndUtils.SEARCH_PHRASE, mSearchFor);
     }
 
@@ -294,7 +294,7 @@ public class ActivityMain extends AppCompatActivity
         if (args!=null && !mActivityViewStarted) {
             View imageView = view.findViewById(R.id.imageview);
             if (imageView != null) {
-                mTransitionPosition = args.getInt(ConstsAndUtils.TRANS_POSITION);
+                //mTransitionPosition = args.getInt(ConstsAndUtils.TRANS_POSITION);
                 mActivityViewStarted = true;
                 Intent intent = new Intent(ActivityMain.this, ActivityView.class);
                 String transitionName = ViewCompat.getTransitionName(imageView);
@@ -317,7 +317,7 @@ public class ActivityMain extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mActivityViewStarted = false;
-        mTransitionPosition = ConstsAndUtils.NO_POSITION;
+        //mTransitionPosition = ConstsAndUtils.NO_POSITION;
     }
 
     void restoreSearchViewState(MenuItem searchItem, String query){

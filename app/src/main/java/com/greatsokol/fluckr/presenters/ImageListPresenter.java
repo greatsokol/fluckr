@@ -43,6 +43,7 @@ public class ImageListPresenter implements ContractMain.ImageListPresenter {
                             itemNumber);
                     stopLoading();
                     onScrolledUp(); //<---- load upper page if exists
+                    onScrolledDown(); //<---- load lower page if exists
                 }
 
                 @Override

@@ -107,7 +107,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         int positionStart = mItems.size() - itemsSize;
         notifyItemRangeInserted(positionStart, itemsSize);
         if(restorePosition != ConstsAndUtils.NO_POSITION){
-
+            mRecyclerView.scrollToPosition(restorePosition);
         }
     }
 
