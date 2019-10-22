@@ -176,19 +176,6 @@ public class ActivityMain extends AppCompatActivity
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
 
-        mRecyclerView.setOnFlingListener(new PaginationListenerOnFling(layoutManager) {
-            @Override
-            protected void loadNextPage() {
-                mPresenter.onScrolledDown();
-            }
-
-            @Override
-            protected void loadPrevPage() {
-                mPresenter.onScrolledUp();
-            }
-        });
-
-
 
         mRecyclerView.clearOnScrollListeners();
         mRecyclerView.addOnScrollListener(new PaginationListenerOnScroll(layoutManager) {

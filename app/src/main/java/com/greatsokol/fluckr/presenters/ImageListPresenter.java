@@ -66,27 +66,19 @@ public class ImageListPresenter implements ContractMain.ImageListPresenter {
     public void onScrolledDown() {
         if(mView==null)return;
         if(isLoadingNow)return;
-        startLoading(true);
-
         ImageListItem.ListItemPageParams pageParams = mView.getLastItemPageParams();
-        if(pageParams==null) {
-            stopLoading();
-            return;
-        }
+        if(pageParams==null)return;
         int page = pageParams.getPage();
         Date date = pageParams.getDate();
         int totalPages = pageParams.getPagesTotal();
-        if(page==ConstsAndUtils.NO_PAGE || date == null || totalPages==ConstsAndUtils.NO_PAGE) {
-            stopLoading();
+        if(page==ConstsAndUtils.NO_PAGE || date == null || totalPages==ConstsAndUtils.NO_PAGE)
             return;
-        }
-
         page++;
         if(page > totalPages){
             date = ConstsAndUtils.DecDate(date);
             page = 1;
         }
-
+        startLoading(true);
         final Date fdate = date;
         mModel.loadPage(fdate, page, mView.getSearchPhrase(), new ContractMain.Model.OnResponseCallback() {
             @Override
@@ -111,29 +103,24 @@ public class ImageListPresenter implements ContractMain.ImageListPresenter {
     public void onScrolledUp() {
         if(mView==null)return;
         if(isLoadingNow)return;
-        startLoading(false);
+
         ImageListItem.ListItemPageParams pageParams = mView.getFirstItemPageParams();
-        if(pageParams==null) {
-            stopLoading();
+        if(pageParams==null)
             return;
-        }
         int page = pageParams.getPage();
         Date date = pageParams.getDate();
-        if(page==ConstsAndUtils.NO_PAGE || date == null) {
-            stopLoading();
+        if(page==ConstsAndUtils.NO_PAGE || date == null)
             return;
-        }
 
         page--;
         if(page<=0){
             date = ConstsAndUtils.IncDate(date);
-            if(ConstsAndUtils.IsToday(date)) {
-                stopLoading();
+            if(ConstsAndUtils.IsToday(date))
                 return;
-            }
             page=99999; // Max page will be returned;
         }
 
+        startLoading(false);
         final Date fdate = date;
         mModel.loadPage(fdate, page, mView.getSearchPhrase(), new ContractMain.Model.OnResponseCallback() {
             @Override
