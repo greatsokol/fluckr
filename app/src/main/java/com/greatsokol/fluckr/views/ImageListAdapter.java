@@ -160,11 +160,11 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
 
     public void startLoading(boolean addProgressbarAtBottom) {
         if(addProgressbarAtBottom){
-            mItems.add(new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
-            __notifyItemInserted(mItems.size() - 1);
+            //mItems.add(new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
+            //__notifyItemInserted(mItems.size() - 1);
         } else {
-            mItems.add(0, new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
-            __notifyItemInserted(0);
+            //mItems.add(0, new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
+            //__notifyItemInserted(0);
         }
     }
 
@@ -196,7 +196,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
     }
 
     public void stopLoading() {
-        __removeItemsOfType(ImageListItem.VIEW_TYPE_LOADING, true, true);
+        //__removeItemsOfType(ImageListItem.VIEW_TYPE_LOADING, true, true);
     }
 
     void clear() {
