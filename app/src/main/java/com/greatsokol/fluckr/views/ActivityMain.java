@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Parcelable;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -26,10 +25,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.greatsokol.fluckr.R;
-import com.greatsokol.fluckr.contract.ContractMain;
+import com.greatsokol.fluckr.contract.MainContract;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.etc.ImageGridLayoutManager;
-import com.greatsokol.fluckr.etc.PaginationListenerOnFling;
 import com.greatsokol.fluckr.etc.PaginationListenerOnScroll;
 import com.greatsokol.fluckr.presenters.ImageListPresenter;
 
@@ -38,7 +36,7 @@ import java.util.Date;
 
 
 public class ActivityMain extends AppCompatActivity
-        implements ContractMain.ViewMain, View.OnClickListener {
+        implements MainContract.ViewMain, View.OnClickListener {
 
     private ImageListAdapter mAdapter;
     private ImageListAdapter mSearchAdapter;
@@ -47,7 +45,7 @@ public class ActivityMain extends AppCompatActivity
     //private int mTransitionPosition;
     private boolean mActivityViewStarted = false;
     private Toolbar mToolbar;
-    private ContractMain.ImageListPresenter mPresenter;
+    private MainContract.ImageListPresenter mPresenter;
 
     private ImageListAdapter getTodayListAdapter(){ return mAdapter;}
     private ImageListAdapter getSearchAdapter(){ return mSearchAdapter;}
@@ -79,8 +77,7 @@ public class ActivityMain extends AppCompatActivity
                         ConstsAndUtils.DecDate(ConstsAndUtils.CurrentGMTDate()).getTime()));
         int page = prefs.getInt(ConstsAndUtils.PAGE_TO_VIEW,1);
         int itemNumber = prefs.getInt(ConstsAndUtils.NUMBER_ON_PAGE,1);
-        boolean firstLoad = getActiveAdapter().getItemCount()==0;
-        mPresenter.onViewCreate(this, firstLoad, date, page, itemNumber);
+        mPresenter.onViewCreate(this, date, page, itemNumber);
 
 
         // shared element transition trick:
@@ -248,7 +245,7 @@ public class ActivityMain extends AppCompatActivity
                 mSearchFor = queryText;
                 getSearchAdapter().clear();
                 setLayout();
-                mPresenter.onViewCreate(ActivityMain.this, true,null, 0, 0);
+                mPresenter.onViewCreate(ActivityMain.this, null, 0, 0);
                 return true;
             }
 

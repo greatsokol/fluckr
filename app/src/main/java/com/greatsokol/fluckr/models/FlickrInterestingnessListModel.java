@@ -1,6 +1,6 @@
 package com.greatsokol.fluckr.models;
 
-import com.greatsokol.fluckr.contract.ContractMain;
+import com.greatsokol.fluckr.contract.MainContract;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.models.api.FlickrImageList;
 
@@ -12,7 +12,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class FlickrInterestingnessListModel implements ContractMain.Model {
+public class FlickrInterestingnessListModel implements MainContract.Model {
     private Retrofit retrofit
             = new Retrofit.Builder()
                 .baseUrl("https://www.flickr.com")

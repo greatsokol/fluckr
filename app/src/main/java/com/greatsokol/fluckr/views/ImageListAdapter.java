@@ -1,14 +1,17 @@
 package com.greatsokol.fluckr.views;
 
+import android.animation.StateListAnimator;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -101,44 +104,49 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
     }
 
 
-    public void addItemsAtBottom(List<ImageListItem> items, int restorePosition) {
-        mItems.addAll(items);
-        int itemsSize = items.size();
+    public void addItemsAtBottom(List<ImageListItem> newItems, int restorePosition) {
+        mItems.addAll(newItems);
+        int itemsSize = newItems.size();
         int positionStart = mItems.size() - itemsSize;
         notifyItemRangeInserted(positionStart, itemsSize);
         if(restorePosition != ConstsAndUtils.NO_POSITION){
-            mRecyclerView.scrollToPosition(restorePosition);
+            //mRecyclerView.scrollToPosition(restorePosition);
         }
     }
 
 
 
-    public void addItemsUpper(List<ImageListItem> items) {
-        if(items.size()==0) return;
+    public void addItemsUpper(List<ImageListItem> newItems) {
+        if(newItems.size()==0) return;
 
         int removed = __removeItemsOfType(ImageListItem.VIEW_TYPE_PLACEHOLDER, false, false);
-        ImageListItem firstItem = items.get(0);
-        int index = firstItem.getViewType()==ImageListItem.VIEW_TYPE_DATE ? 1 : 0;
+        ImageListItem firstItem = newItems.get(0);
+        int headerIndex = firstItem.getViewType()==ImageListItem.VIEW_TYPE_DATE ? 1 : 0;
 
-        int c = items.size() - index - removed;
-        if(c>0) {
-            c = c % mSpanCount;
-            if (c != 0) {
-                c = mSpanCount - c;
-                for (int i = 0; i < c; i++) {
-                    items.add(index,
+        int countOfNew = newItems.size() - headerIndex - removed;
+        if(countOfNew>0) {
+            int remainder = countOfNew % mSpanCount;
+            if (remainder != 0) {
+                int countOfPlaceholders = mSpanCount - remainder;
+                for (int i = 0; i < countOfPlaceholders; i++) {
+                    newItems.add(headerIndex,
                             new ImageListItem( // empty placeholder
                                     ImageListItem.VIEW_TYPE_PLACEHOLDER,
                                     firstItem.getPageParams().getDate(),
                                     firstItem.getPageParams().getPagesTotal(),
                                     firstItem.getPageParams().getPage()));
                 }
+
+                Log.d("DEBUG ADD UPPER ",
+                        String.format("mSpanCount %d; removed %d; index = %d; countOfNew=%d; countOfPlaceholders=%d",
+                                mSpanCount, removed, headerIndex, countOfNew, countOfPlaceholders));
             }
         }
 
-        mItems.addAll(0, items);
-        if(removed>0)notifyItemRangeChanged(items.size()-removed, removed);
-        notifyItemRangeInserted(0, items.size()-removed);
+
+        mItems.addAll(0, newItems);
+        if(removed>0)notifyItemRangeChanged(newItems.size()-removed, removed);
+        notifyItemRangeInserted(0, newItems.size()-removed);
     }
 
     private void __notifyItemInserted(final int position){
@@ -173,7 +181,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         view.startAnimation(anim);
     }
 
-    private synchronized int __removeItemsOfType(int itemType, boolean notify, boolean all){
+    private int __removeItemsOfType(int itemType, boolean notify, boolean all){
         int removed = 0;
         for (int i = 0; i < mItems.size(); i++) {
             int type = getItemViewType(i);

@@ -1,6 +1,6 @@
 package com.greatsokol.fluckr.presenters;
 
-import com.greatsokol.fluckr.contract.ContractMain;
+import com.greatsokol.fluckr.contract.MainContract;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.models.api.Photos;
 import com.greatsokol.fluckr.views.ImageListItem;
@@ -8,52 +8,49 @@ import com.greatsokol.fluckr.models.FlickrInterestingnessListModel;
 
 import java.util.Date;
 
-public class ImageListPresenter implements ContractMain.ImageListPresenter {
-    private ContractMain.ViewMain mView;
-    private ContractMain.Model mModel;
+public class ImageListPresenter implements MainContract.ImageListPresenter {
+    private MainContract.ViewMain mView;
+    private MainContract.Model mModel;
     private boolean isLoadingNow;
 
     private void startLoading(boolean addProgressbarAtBottom){
         isLoadingNow = true;
-        if(mView==null)return;
-        mView.onStartLoading(addProgressbarAtBottom);
+        if(mView!=null)
+            mView.onStartLoading(addProgressbarAtBottom);
     }
 
     private void stopLoading(){
         isLoadingNow = false;
-        if(mView==null)return;
-        mView.onStopLoading();
+        if(mView!=null)
+            mView.onStopLoading();
     }
 
     @Override
-    public void onViewCreate(ContractMain.ViewMain view, boolean firstLoad,
-                             final Date date, final int page, final int itemNumber) {
+    public void onViewCreate(MainContract.ViewMain view, final Date date, final int page, final int itemNumber) {
         mView = view;
         mModel = new FlickrInterestingnessListModel();
-        if(firstLoad) {
-            isLoadingNow = true;
-            view.onStartLoading(true);
-            mModel.loadPage(date, page, mView.getSearchPhrase(), new ContractMain.Model.OnResponseCallback() {
-                @Override
-                public void onResponse(Photos photos) {
-                    if(mView==null)return;
-                    mView.onImageListDownloaded(
-                            Interactor.Translate(date, photos),
-                            true,
-                            itemNumber);
-                    stopLoading();
-                    onScrolledUp(); //<---- load upper page if exists
-                    onScrolledDown(); //<---- load lower page if exists
-                }
 
-                @Override
-                public void onFailure(String message) {
-                    if(mView==null)return;
-                    mView.onFailure(message);
-                    stopLoading();
-                }
-            });
-        }
+        isLoadingNow = true;
+        view.onStartLoading(true);
+        mModel.loadPage(date, page, mView.getSearchPhrase(), new MainContract.Model.OnResponseCallback() {
+            @Override
+            public void onResponse(Photos photos) {
+                if(mView==null)return;
+                mView.onImageListDownloaded(
+                        Interactor.Translate(date, photos),true, itemNumber);
+                stopLoading();
+                onScrolledUp(); //<---- load upper page if exists
+                onScrolledDown(); //<---- load lower page if exists
+            }
+
+            @Override
+            public void onFailure(String message) {
+                if(mView==null)return;
+                mView.onFailure(message);
+                stopLoading();
+            }
+        });
+
     }
 
     @Override
@@ -81,7 +78,7 @@ public class ImageListPresenter implements ContractMain.ImageListPresenter {
         }
         startLoading(true);
         final Date fdate = date;
-        mModel.loadPage(fdate, page, mView.getSearchPhrase(), new ContractMain.Model.OnResponseCallback() {
+        mModel.loadPage(fdate, page, mView.getSearchPhrase(), new MainContract.Model.OnResponseCallback() {
             @Override
             public void onResponse(Photos photos) {
                 if(mView==null)return;
@@ -123,7 +120,7 @@ public class ImageListPresenter implements ContractMain.ImageListPresenter {
 
         startLoading(false);
         final Date fdate = date;
-        mModel.loadPage(fdate, page, mView.getSearchPhrase(), new ContractMain.Model.OnResponseCallback() {
+        mModel.loadPage(fdate, page, mView.getSearchPhrase(), new MainContract.Model.OnResponseCallback() {
             @Override
             public void onResponse(Photos photos) {
                 if(mView==null)return;

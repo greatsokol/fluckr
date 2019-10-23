@@ -6,7 +6,7 @@ import com.greatsokol.fluckr.views.ImageListItem;
 import java.util.ArrayList;
 import java.util.Date;
 
-public interface ContractMain {
+public interface MainContract {
 
     interface ViewMain {
         void onImageListDownloaded(ArrayList<ImageListItem> items, boolean addAtBottom, int restorePosition);
@@ -20,8 +20,7 @@ public interface ContractMain {
     }
 
     interface ImageListPresenter {
-        void onViewCreate(ContractMain.ViewMain view, boolean firstLoad,
-                          Date date, int page, int itemNumber);
+        void onViewCreate(MainContract.ViewMain view, Date date, int page, int itemNumber);
         void onViewDestroy();
         void onScrolledDown();
         void onScrolledUp();
