@@ -3,16 +3,23 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/card_view_margin"
-    android:id="@+id/listitem"
+    android:id="@+id/list_item"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground">
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/imageview"
+        android:id="@+id/image_view"
         android:layout_width="match_parent"
         android:layout_height="@dimen/image_height"
         android:scaleType="centerCrop"
         android:adjustViewBounds="true"/>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
 
 </androidx.cardview.widget.CardView>

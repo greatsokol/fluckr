@@ -24,9 +24,7 @@
                 android:id="@+id/toolbar_progress_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
-                android:indeterminateTintMode="src_in"
-                android:layout_gravity="right"/>
+                android:layout_gravity="end"/>
 
         </androidx.appcompat.widget.Toolbar>
 

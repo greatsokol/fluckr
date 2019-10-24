@@ -1,7 +1,8 @@
 package com.greatsokol.fluckr.views;
 
-import android.animation.StateListAnimator;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
@@ -11,7 +12,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,6 +23,7 @@ import com.greatsokol.fluckr.R;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.etc.ThumbnailTransformation;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -67,12 +68,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
     @NonNull
     @Override
     public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if(viewType == ImageListItem.VIEW_TYPE_LOADING) {
-            return new ProgressHolder(
-                    LayoutInflater.from(parent.getContext()).
-                            inflate(R.layout.listitem_loading, parent, false));
-        }
-        else if(viewType == ImageListItem.VIEW_TYPE_IMAGE){
+        if(viewType == ImageListItem.VIEW_TYPE_IMAGE){
             return new ViewHolder(
                     LayoutInflater.from(parent.getContext()).
                             inflate(mViewAsGrid?
@@ -190,7 +186,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
                 if(notify)notifyItemRemoved(i);
                 i--;
                 removed++;
-            } else if(!all && type != ImageListItem.VIEW_TYPE_LOADING) break;
+            } else if(!all) break;
         }
         return removed;
     }
@@ -213,15 +209,17 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         TextView textViewTitle;
         TextView textViewDetails;
         ImageView imageView;
+        View progressBar;
         int mItemPosition;
         ImageListItem listItem;
 
         ViewHolder(View itemView) {
             super(itemView);
-            textViewTitle = itemView.findViewById(R.id.textviewTitle);
-            textViewDetails = itemView.findViewById(R.id.textviewDetails);
-            imageView = itemView.findViewById(R.id.imageview);
+            textViewTitle = itemView.findViewById(R.id.text_view_title);
+            textViewDetails = itemView.findViewById(R.id.text_view_details);
+            imageView = itemView.findViewById(R.id.image_view);
             textViewDate = itemView.findViewById(R.id.textviewDate);
+            progressBar = itemView.findViewById(R.id.progress_bar);
             itemView.setOnTouchListener(this);
         }
 
@@ -244,11 +242,33 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
                 }
             }
             if(imageView!=null){
-                //Picasso.get().setIndicatorsEnabled(true);
+                Target target = new Target() {
+                    @Override
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                        progressBar.setVisibility(View.GONE);
+                        imageView.setImageBitmap(bitmap);
+                        imageView.setTag(null);
+                    }
+
+                    @Override
+                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                        imageView.setTag(null);
+                        progressBar.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+                        imageView.setImageBitmap(null);
+                        progressBar.setVisibility(View.VISIBLE);
+                    }
+                };
+
+                imageView.setTag(target); // making strong reference
                 Picasso.get().
                         load(listItem.getThumbnailUrl()).
                         transform(new ThumbnailTransformation(150, 150)).
-                        into(imageView);
+                        into(target);
+
                 final String transitionName = "itemImage" + "_" + getClass().getName() + "_" + position;
                 ViewCompat.setTransitionName(imageView, transitionName);
             }
@@ -296,20 +316,12 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
     }
 
     private ImageListItem getFirstImageItem(){
-        for(int i=0; i<mItems.size(); i++){
-            ImageListItem item = mItems.get(i);
-            if(item.getViewType() != ImageListItem.VIEW_TYPE_LOADING)
-                return item;
-        }
+        if(mItems.size()>0) return mItems.get(0);
         return null;
     }
 
     private ImageListItem getLastImageItem(){
-        for(int i=mItems.size()-1; i>=0; i--){
-            ImageListItem item = mItems.get(i);
-            if(item.getViewType() != ImageListItem.VIEW_TYPE_LOADING)
-                return item;
-        }
+        if(mItems.size()>0) return mItems.get(mItems.size()-1);
         return null;
     }
 

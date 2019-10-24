@@ -291,7 +291,7 @@ public class ActivityMain extends AppCompatActivity
     public void onClick(View view) {
         Bundle args = (Bundle) view.getTag();
         if (args!=null && !mActivityViewStarted) {
-            View imageView = view.findViewById(R.id.imageview);
+            View imageView = view.findViewById(R.id.image_view);
             if (imageView != null) {
                 //mTransitionPosition = args.getInt(ConstsAndUtils.TRANS_POSITION);
                 mActivityViewStarted = true;

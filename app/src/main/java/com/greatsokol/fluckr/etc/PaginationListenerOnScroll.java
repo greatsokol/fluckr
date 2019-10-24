@@ -33,7 +33,7 @@ public abstract class PaginationListenerOnScroll extends RecyclerView.OnScrollLi
             mLastVisibleItemPostionSaved != lastVisibleItemPosition){
             mFirstVisibleItemPostionSaved = firstVisibleItemPosition;
             mLastVisibleItemPostionSaved = lastVisibleItemPosition;
-            onScrolled(lastVisibleItemPosition);
+            onScrolled(firstVisibleItemPosition);
         }
     }
 

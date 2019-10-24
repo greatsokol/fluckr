@@ -6,7 +6,7 @@
     <changeClipBounds/>
     <changeImageTransform>
         <targets>
-            <target android:targetId="@+id/imageview"/>
+            <target android:targetId="@+id/image_view"/>
             <target android:targetId="@+id/imageViewBig"/>
         </targets>
     </changeImageTransform>

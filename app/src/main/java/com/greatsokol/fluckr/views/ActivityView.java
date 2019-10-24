@@ -112,84 +112,6 @@ public class ActivityView extends AppCompatActivity {
                 }
             });
         }
-
-        /*
-        mImageView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                int action = motionEvent.getAction();
-                switch (action & MotionEvent.ACTION_MASK) {
-                    case MotionEvent.ACTION_UP: {
-                        view.performClick();
-                        return false;
-                    }
-                    case MotionEvent.ACTION_DOWN: {
-                        ClipData dragData = ClipData.newPlainText("dfsdfsdf","");
-                        view.startDrag(dragData,
-                                new MyDragShadowBuilder(view,
-                                        motionEvent.getX(),
-                                        motionEvent.getY()),
-                                    view,0);
-                        return false;
-                    }
-                }
-                return true;
-            }
-        });
-
-
-        mImageView.setOnDragListener(new View.OnDragListener() {
-            private int mStartY;
-            private int mStartX;
-            private final float coeff = 1.5f;
-            @Override
-            public boolean onDrag(View view, DragEvent dragEvent) {
-                final int action = dragEvent.getAction();
-                final float height = view.getHeight();
-                final float width = view.getWidth();
-                final int deltaY = Math.abs((int)(mStartY-dragEvent.getY()));
-                final int deltaX = Math.abs((int)(mStartX-dragEvent.getX()));
-                switch(action) {
-                    case DragEvent.ACTION_DRAG_STARTED:
-                        view.setVisibility(View.INVISIBLE);
-                        mStartY = (int)dragEvent.getY();
-                        mStartX = (int)dragEvent.getX();
-                        return true;
-
-                    case DragEvent.ACTION_DRAG_LOCATION:
-
-                        float deltaY_coeff = coeff * deltaY;
-                        deltaY_coeff = deltaY_coeff > height ? height : deltaY_coeff;
-                        float alphaY = 1f - 1f * (deltaY_coeff / height);
-
-                        float deltaX_coeff = coeff * deltaX;
-                        deltaX_coeff = deltaX_coeff > height ? height : deltaX_coeff;
-                        float alphaX = 1f - 1f * (deltaX_coeff / width);
-
-
-                        mRootView.setAlpha(alphaY < alphaX? alphaY : alphaX);
-                        return true;
-
-                    case DragEvent.ACTION_DRAG_ENTERED:
-                    case DragEvent.ACTION_DRAG_EXITED:
-                    case DragEvent.ACTION_DROP:
-                        return false;
-
-                    case DragEvent.ACTION_DRAG_ENDED:
-                        view.setVisibility(View.VISIBLE);
-                        mRootView.setAlpha(1f);
-                        int thresholdX = (int)(width * 0.5f);
-                        int thresholdY = (int)(height * 0.5f);
-                        if(deltaY > thresholdY || deltaX > thresholdX)
-                            finishAfterTransition();
-                        return true;
-                }
-
-                return true;
-            }
-        });
-
-        */
     }
 
 
@@ -201,10 +123,10 @@ public class ActivityView extends AppCompatActivity {
         assert details != null;
         if (details.trim().equals("")) details = title;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            ((TextView) findViewById(R.id.textviewDetails)).
+            ((TextView) findViewById(R.id.text_view_details)).
                     setText(Html.fromHtml(details, Html.FROM_HTML_MODE_LEGACY));
         } else {
-            ((TextView) findViewById(R.id.textviewDetails)).
+            ((TextView) findViewById(R.id.text_view_details)).
                     setText(Html.fromHtml(details));
         }
     }
@@ -268,10 +190,8 @@ public class ActivityView extends AppCompatActivity {
         Target target = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                //if(animate)
-                  //  ImageViewAnimatedChange(mImageView, bitmap);
-                //else
-                    mImageView.setImageBitmap(bitmap);
+                mImageView.setImageBitmap(bitmap);
+                mImageView.setTag(null);
                 mProgress.setVisibility(View.GONE);
             }
 
@@ -280,6 +200,7 @@ public class ActivityView extends AppCompatActivity {
                 String message = e.getMessage();
                 if(message != null && !message.isEmpty())
                     Snackbar.make(mRootView, message, Snackbar.LENGTH_LONG);
+                mImageView.setTag(null);
                 mProgress.setVisibility(View.GONE);
             }
 
@@ -313,21 +234,4 @@ public class ActivityView extends AppCompatActivity {
         outState.putInt(ConstsAndUtils.READY, FLAG_ALREADY_LOADED_HIGH_RES);
         super.onSaveInstanceState(outState);
     }
-
-    /*private static void ImageViewAnimatedChange(final ImageView v, final Bitmap newImage) {
-        final Animation animOut = AnimationUtils.loadAnimation(v.getContext(), android.R.anim.fade_out);
-        final Animation animIn  = AnimationUtils.loadAnimation(v.getContext(), android.R.anim.fade_in);
-        animOut.setAnimationListener(new Animation.AnimationListener()
-        {
-            @Override public void onAnimationStart(Animation animation) {}
-            @Override public void onAnimationRepeat(Animation animation) {}
-            @Override public void onAnimationEnd(Animation animation)
-            {
-                v.setImageBitmap(newImage);
-                v.startAnimation(animIn);
-            }
-        });
-        v.startAnimation(animOut);
-    }*/
-
 }

@@ -70,7 +70,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintHeight_max="200dp">
         <TextView
-            android:id="@+id/textviewDetails"
+            android:id="@+id/text_view_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autoLink="all|web|map|email"

@@ -9,7 +9,6 @@ public class ImageListItem {
 
     static final int VIEW_TYPE_UNKNOWN = -2;
     static final int VIEW_TYPE_PLACEHOLDER = -1;
-    public static final int VIEW_TYPE_LOADING = 0;
     static final int VIEW_TYPE_IMAGE = 1;
     public static final int VIEW_TYPE_DATE = 2;
 
