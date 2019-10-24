@@ -51,8 +51,8 @@ public class ActivityView extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         setInsets();
 
-        mImageView = findViewById(R.id.imageViewBig);
-        mProgress = findViewById(R.id.progressBar);
+        mImageView = findViewById(R.id.image_view_big);
+        mProgress = findViewById(R.id.progress_bar);
 
         Intent intent = getIntent();
         ViewCompat.setTransitionName(mImageView, intent.getStringExtra(ConstsAndUtils.TRANS_NAME));
@@ -156,7 +156,7 @@ public class ActivityView extends AppCompatActivity {
 
 
 
-        final ScrollView scrollView = findViewById(R.id.scrollView);
+        final ScrollView scrollView = findViewById(R.id.scroll_view);
         ViewCompat.setOnApplyWindowInsetsListener(scrollView, new OnApplyWindowInsetsListener() {
             @Override
             public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {

@@ -154,16 +154,6 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         });
     }
 
-    public void startLoading(boolean addProgressbarAtBottom) {
-        if(addProgressbarAtBottom){
-            //mItems.add(new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
-            //__notifyItemInserted(mItems.size() - 1);
-        } else {
-            //mItems.add(0, new ImageListItem(ImageListItem.VIEW_TYPE_LOADING));
-            //__notifyItemInserted(0);
-        }
-    }
-
 
     @Override
     public void onBindViewHolder(@NonNull BaseViewHolder holder, int position) {
@@ -191,10 +181,6 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         return removed;
     }
 
-    public void stopLoading() {
-        //__removeItemsOfType(ImageListItem.VIEW_TYPE_LOADING, true, true);
-    }
-
     void clear() {
         mItems.clear();
         notifyDataSetChanged();
@@ -218,7 +204,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
             textViewTitle = itemView.findViewById(R.id.text_view_title);
             textViewDetails = itemView.findViewById(R.id.text_view_details);
             imageView = itemView.findViewById(R.id.image_view);
-            textViewDate = itemView.findViewById(R.id.textviewDate);
+            textViewDate = itemView.findViewById(R.id.text_view_date);
             progressBar = itemView.findViewById(R.id.progress_bar);
             itemView.setOnTouchListener(this);
         }

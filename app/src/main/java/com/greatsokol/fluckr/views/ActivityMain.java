@@ -62,7 +62,7 @@ public class ActivityMain extends AppCompatActivity
         mToolbar = findViewById(R.id.toolbar_actionbar);
         mToolbarProgressBar = mToolbar.findViewById(R.id.toolbar_progress_bar);
         setSupportActionBar(mToolbar);
-        mRecyclerView = findViewById(R.id.recyclerView);
+        mRecyclerView = findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
 
         mAdapter = new ImageListAdapter(new ArrayList<ImageListItem>());

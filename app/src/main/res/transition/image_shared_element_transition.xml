@@ -7,7 +7,7 @@
     <changeImageTransform>
         <targets>
             <target android:targetId="@+id/image_view"/>
-            <target android:targetId="@+id/imageViewBig"/>
+            <target android:targetId="@+id/image_view_big"/>
         </targets>
     </changeImageTransform>
     <changeBounds/>
