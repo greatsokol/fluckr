@@ -40,6 +40,7 @@ public class ActivityMain extends AppCompatActivity
 
     private ImageListAdapter mAdapter;
     private ImageListAdapter mSearchAdapter;
+    private View mToolbarProgressBar;
 
     private RecyclerView mRecyclerView;
     //private int mTransitionPosition;
@@ -59,6 +60,7 @@ public class ActivityMain extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mToolbar = findViewById(R.id.toolbar_actionbar);
+        mToolbarProgressBar = mToolbar.findViewById(R.id.toolbar_progress_bar);
         setSupportActionBar(mToolbar);
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
@@ -353,13 +355,13 @@ public class ActivityMain extends AppCompatActivity
     }
 
     @Override
-    public void onStartLoading(boolean addProgressbarAtBottom) {
-        getActiveAdapter().startLoading(addProgressbarAtBottom);
+    public void onStartLoading() {
+        mToolbarProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onStopLoading() {
-        getActiveAdapter().stopLoading();
+        mToolbarProgressBar.setVisibility(View.GONE);
     }
 
 

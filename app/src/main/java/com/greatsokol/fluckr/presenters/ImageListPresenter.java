@@ -13,10 +13,10 @@ public class ImageListPresenter implements MainContract.ImageListPresenter {
     private MainContract.Model mModel;
     private boolean isLoadingNow;
 
-    private void startLoading(boolean addProgressbarAtBottom){
+    private void startLoading(){
         isLoadingNow = true;
         if(mView!=null)
-            mView.onStartLoading(addProgressbarAtBottom);
+            mView.onStartLoading();
     }
 
     private void stopLoading(){
@@ -31,7 +31,7 @@ public class ImageListPresenter implements MainContract.ImageListPresenter {
         mModel = new FlickrInterestingnessListModel();
 
         isLoadingNow = true;
-        view.onStartLoading(true);
+        view.onStartLoading();
         mModel.loadPage(date, page, mView.getSearchPhrase(), new MainContract.Model.OnResponseCallback() {
             @Override
             public void onResponse(Photos photos) {
@@ -76,7 +76,7 @@ public class ImageListPresenter implements MainContract.ImageListPresenter {
             date = ConstsAndUtils.DecDate(date);
             page = 1;
         }
-        startLoading(true);
+        startLoading();
         final Date fdate = date;
         mModel.loadPage(fdate, page, mView.getSearchPhrase(), new MainContract.Model.OnResponseCallback() {
             @Override
@@ -118,7 +118,7 @@ public class ImageListPresenter implements MainContract.ImageListPresenter {
             page=99999; // Max page will be returned;
         }
 
-        startLoading(false);
+        startLoading();
         final Date fdate = date;
         mModel.loadPage(fdate, page, mView.getSearchPhrase(), new MainContract.Model.OnResponseCallback() {
             @Override

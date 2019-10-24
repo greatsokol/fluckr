@@ -11,7 +11,7 @@ public interface MainContract {
     interface ViewMain {
         void onImageListDownloaded(ArrayList<ImageListItem> items, boolean addAtBottom, int restorePosition);
         void onFailure(String message);
-        void onStartLoading(boolean addProgressbarAtBottom);
+        void onStartLoading();
         void onStopLoading();
 
         String getSearchPhrase();
