@@ -51,7 +51,7 @@
 
         app:zoomage_restrictBounds="true"
         app:zoomage_animateOnReset="true"
-        app:zoomage_autoResetMode="ALWAYS"
+        app:zoomage_autoResetMode="UNDER"
         app:zoomage_autoCenter="true"
         app:zoomage_zoomable="true"
         app:zoomage_translatable="true"
