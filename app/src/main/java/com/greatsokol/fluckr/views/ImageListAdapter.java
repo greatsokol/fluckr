@@ -344,7 +344,6 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
     }
 
     void stopLoadingRequest(boolean clear){
-        stopLoading();
         if(clear)clear();
     }
 
