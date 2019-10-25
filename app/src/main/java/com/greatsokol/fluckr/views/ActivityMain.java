@@ -39,7 +39,7 @@ public class ActivityMain extends AppCompatActivity
         implements MainContract.ViewMain, View.OnClickListener {
 
     private ImageListAdapter mAdapter;
-    private ImageListAdapter mSearchAdapter;
+    //private ImageListAdapter mSearchAdapter;
     private View mToolbarProgressBar;
 
     private RecyclerView mRecyclerView;
@@ -49,10 +49,11 @@ public class ActivityMain extends AppCompatActivity
     private MainContract.ImageListPresenter mPresenter;
 
     private ImageListAdapter getTodayListAdapter(){ return mAdapter;}
-    private ImageListAdapter getSearchAdapter(){ return mSearchAdapter;}
-    private ImageListAdapter getActiveAdapter(){ return
-            mSearchFor == null ||
-            mSearchFor.equals("") ? getTodayListAdapter() : getSearchAdapter();}
+    private ImageListAdapter getActiveAdapter(){ return mAdapter; }
+    //private ImageListAdapter getSearchAdapter(){ return mSearchAdapter;}
+    //private ImageListAdapter getActiveAdapter(){ return
+      //      mSearchFor == null ||
+        //    mSearchFor.equals("") ? getTodayListAdapter() : getSearchAdapter();}
     private String mSearchFor = "";
 
     @Override
@@ -66,7 +67,7 @@ public class ActivityMain extends AppCompatActivity
         mRecyclerView.setHasFixedSize(true);
 
         mAdapter = new ImageListAdapter(new ArrayList<ImageListItem>());
-        mSearchAdapter = new ImageListAdapter(new ArrayList<ImageListItem>());
+        //mSearchAdapter = new ImageListAdapter(new ArrayList<ImageListItem>());
 
         loadInstanceSettings(savedInstanceState);
 
@@ -245,7 +246,7 @@ public class ActivityMain extends AppCompatActivity
                 if(queryText.trim().equals("")) return false;
                 stopRequestLoading(false);
                 mSearchFor = queryText;
-                getSearchAdapter().clear();
+                getActiveAdapter().clear();
                 setLayout();
                 mPresenter.onViewCreate(ActivityMain.this, null, 0, 0);
                 return true;
@@ -277,14 +278,14 @@ public class ActivityMain extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         getTodayListAdapter().setOnItemClickListener(this);
-        getSearchAdapter().setOnItemClickListener(this);
+        //getSearchAdapter().setOnItemClickListener(this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         getTodayListAdapter().setOnItemClickListener(null);
-        getSearchAdapter().setOnItemClickListener(null);
+        //getSearchAdapter().setOnItemClickListener(null);
     }
 
         @Override
