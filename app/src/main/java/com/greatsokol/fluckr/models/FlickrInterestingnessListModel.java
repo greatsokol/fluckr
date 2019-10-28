@@ -29,10 +29,10 @@ public class FlickrInterestingnessListModel implements MainContract.Model {
                             final Date date,
                             final int page,
                             final OnResponseCallback onResponseCallback){
-
+        final String APIKEY = "dcfa7bcdfe436387cefa172c2d3dc2ae";
         if(searchFor.isEmpty())
             interestingness.getList(
-                "dcfa7bcdfe436387cefa172c2d3dc2ae",
+                    APIKEY,
                 ConstsAndUtils.DateToStr_yyyy_mm_dd(date),
                 45,
                 page,
@@ -54,7 +54,7 @@ public class FlickrInterestingnessListModel implements MainContract.Model {
                 });
         else
             search.getList(
-                    "dcfa7bcdfe436387cefa172c2d3dc2ae",
+                    APIKEY,
                     searchFor,
                     45,
                     page,

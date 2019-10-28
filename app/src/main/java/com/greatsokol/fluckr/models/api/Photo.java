@@ -305,6 +305,6 @@ public class Photo {
         if(url_k!=null)if(!url_k.equals(""))return url_k;
         if(url_h!=null)if(!url_h.equals(""))return url_h;
         if(url_b!=null)if(!url_b.equals(""))return url_b;
-        return null;
+        return getThumbnailUrl();
     }
 }
