@@ -23,15 +23,17 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.greatsokol.fluckr.R;
+import com.greatsokol.fluckr.contract.ViewContract;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.etc.ThumbnailTransformation;
+import com.greatsokol.fluckr.presenters.ImageViewPresenter;
 import com.jsibbold.zoomage.ZoomageView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.util.Objects;
 
-public class ActivityView extends AppCompatActivity {
+public class ActivityView extends AppCompatActivity implements ViewContract.ViewView {
     private View mRootView;
     private ZoomageView mImageView;
     private ProgressBar mProgress;
@@ -39,6 +41,7 @@ public class ActivityView extends AppCompatActivity {
     private Bundle mArgs;
     private Bitmap mThumbnail;
     private final static int FLAG_ALREADY_LOADED_HIGH_RES = 1;
+    ImageViewPresenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,11 +56,20 @@ public class ActivityView extends AppCompatActivity {
 
         mImageView = findViewById(R.id.image_view_big);
         mProgress = findViewById(R.id.progress_bar);
-
         Intent intent = getIntent();
+        mArgs = intent.getBundleExtra(ConstsAndUtils.ARGS);
+
         ViewCompat.setTransitionName(mImageView, intent.getStringExtra(ConstsAndUtils.TRANS_NAME));
 
-        mArgs = intent.getBundleExtra(ConstsAndUtils.ARGS);
+
+        mPresenter = new ImageViewPresenter();
+        mPresenter.onViewCreate(this);
+
+
+
+
+
+
         assert mArgs != null;
         setTextLabels(mArgs);
 
@@ -183,7 +195,7 @@ public class ActivityView extends AppCompatActivity {
     }
 
 
-    void loadHigherResolution(){//final boolean animate){
+    void loadHigherResolution(){
         String fullSizeUrl = mArgs.getString(ConstsAndUtils.FULLSIZEURL);
         if(fullSizeUrl==null || fullSizeUrl.isEmpty())return;
 
@@ -213,11 +225,6 @@ public class ActivityView extends AppCompatActivity {
         Picasso.get().load(fullSizeUrl).into(target);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_view, menu);
-        return true;
-    }
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
@@ -233,5 +240,38 @@ public class ActivityView extends AppCompatActivity {
         // save flag to load picture without waiting shared elements transition
         outState.putInt(ConstsAndUtils.READY, FLAG_ALREADY_LOADED_HIGH_RES);
         super.onSaveInstanceState(outState);
+    }
+
+
+    @Override
+    public void onThumbLoaded(Bitmap image) {
+        mThumbnail = image;
+        mImageView.setImageBitmap(mThumbnail);
+        startPostponedEnterTransition();
+    }
+
+    @Override
+    public void onImageLoaded(Bitmap image) {
+
+    }
+
+    @Override
+    public void onFailed(String message) {
+
+    }
+
+    @Override
+    public int getThumbnailSize() {
+        return ConstsAndUtils.pxFromDp(getResources(), 300);
+    }
+
+    @Override
+    public String getThumbnailUrl() {
+        return mArgs.getString(ConstsAndUtils.THUMBURL);
+    }
+
+    @Override
+    public String getHighResolutionUrl() {
+        return mArgs.getString(ConstsAndUtils.FULLSIZEURL);
     }
 }

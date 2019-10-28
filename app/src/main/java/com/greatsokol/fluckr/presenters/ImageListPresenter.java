@@ -8,8 +8,8 @@ import com.greatsokol.fluckr.models.FlickrInterestingnessListModel;
 
 import java.util.Date;
 
-public class ImageListPresenter implements MainContract.ImageListPresenter {
-    private MainContract.ViewMain mView;
+public class ImageListPresenter implements MainContract.Presenter {
+    private MainContract.MainView mView;
     private MainContract.Model mModel;
     private boolean isLoadingNow;
 
@@ -26,7 +26,7 @@ public class ImageListPresenter implements MainContract.ImageListPresenter {
     }
 
     @Override
-    public void onViewCreate(MainContract.ViewMain view, final Date date, final int page, final int itemNumber) {
+    public void onViewCreate(MainContract.MainView view, final Date date, final int page, final int itemNumber) {
         mView = view;
         mModel = new FlickrInterestingnessListModel();
 

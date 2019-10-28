@@ -36,7 +36,7 @@ import java.util.Date;
 
 
 public class ActivityMain extends AppCompatActivity
-        implements MainContract.ViewMain, View.OnClickListener {
+        implements MainContract.MainView, View.OnClickListener {
 
     private ImageListAdapter mAdapter;
     //private ImageListAdapter mSearchAdapter;
@@ -46,7 +46,7 @@ public class ActivityMain extends AppCompatActivity
     //private int mTransitionPosition;
     private boolean mActivityViewStarted = false;
     private Toolbar mToolbar;
-    private MainContract.ImageListPresenter mPresenter;
+    private MainContract.Presenter mPresenter;
 
     private ImageListAdapter getTodayListAdapter(){ return mAdapter;}
     private ImageListAdapter getActiveAdapter(){ return mAdapter; }

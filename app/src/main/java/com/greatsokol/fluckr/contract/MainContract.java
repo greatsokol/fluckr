@@ -8,7 +8,7 @@ import java.util.Date;
 
 public interface MainContract {
 
-    interface ViewMain {
+    interface MainView {
         void onImageListDownloaded(ArrayList<ImageListItem> items, boolean addAtBottom, int restorePosition);
         void onFailure(String message);
         void onStartLoading();
@@ -19,8 +19,8 @@ public interface MainContract {
         ImageListItem.ListItemPageParams getFirstItemPageParams();
     }
 
-    interface ImageListPresenter {
-        void onViewCreate(MainContract.ViewMain view, Date date, int page, int itemNumber);
+    interface Presenter {
+        void onViewCreate(MainView view, Date date, int page, int itemNumber);
         void onViewDestroy();
         void onScrolledDown();
         void onScrolledUp();
