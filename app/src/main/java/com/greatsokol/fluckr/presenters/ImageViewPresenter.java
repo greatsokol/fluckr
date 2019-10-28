@@ -7,7 +7,11 @@ import com.greatsokol.fluckr.models.ImageLoader;
 
 public class ImageViewPresenter implements ViewContract.Presenter, ViewContract.Model.onImageLoadedListener {
     private ViewContract.ViewView mView;
+    private ImageLoader mImageLoader;
 
+    public ImageViewPresenter(){
+        mImageLoader = new ImageLoader(this);
+    }
 
 
     @Override
@@ -17,20 +21,14 @@ public class ImageViewPresenter implements ViewContract.Presenter, ViewContract.
 
     @Override
     public void loadThumbnail() {
-        if(mView != null) {
-            String thumbnailUrl = mView.getThumbnailUrl();
-            ImageLoader loader = new ImageLoader();
-            loader.loadThumbnail(thumbnailUrl, mView.getThumbnailSize(), this);
-        }
+        if(mView != null)
+            mImageLoader.loadThumbnail(mView.getThumbnailUrl(), mView.getThumbnailSize());
     }
 
     @Override
     public void loadHighResolutionImage() {
-        if(mView != null) {
-            String thumbnailUrl = mView.getHighResolutionUrl();
-            ImageLoader loader = new ImageLoader();
-            loader.loadImage(thumbnailUrl, this);
-        }
+        if(mView != null)
+            mImageLoader.loadImage(mView.getHighResolutionUrl());
     }
 
     @Override

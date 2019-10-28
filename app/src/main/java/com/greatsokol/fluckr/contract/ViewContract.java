@@ -32,8 +32,8 @@ public interface ViewContract {
     }
 
     interface Model{
-        void loadThumbnail(String url, int thumbnailSize, final onImageLoadedListener listener);
-        void loadImage(String url, final onImageLoadedListener listener);
+        void loadThumbnail(String url, int thumbnailSize);
+        void loadImage(String url);
         interface onImageLoadedListener{
             void onStartLoad();
             void onThumbnailLoaded(Bitmap image);

@@ -9,19 +9,11 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 public class ImageLoader implements ViewContract.Model {
-    private Target mTarget; // hard link needed
+    private Target mThumbnailTarget; // hard reference needed
+    private Target mHighResolutionTarget;
 
-    private void implLoadImage(String url, int thumbnailSize, Target target) {
-        if(thumbnailSize>0)
-            Picasso.get().load(url).transform(new ThumbnailTransformation(thumbnailSize, thumbnailSize)).into(target);
-        else
-            Picasso.get().load(url).into(target);
-    }
-
-
-    @Override
-    public void loadThumbnail(String url, int thumbnailSize, final onImageLoadedListener listener) {
-        mTarget = new Target() {
+    public ImageLoader(final onImageLoadedListener listener){
+        mThumbnailTarget = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 listener.onThumbnailLoaded(bitmap);
@@ -37,12 +29,8 @@ public class ImageLoader implements ViewContract.Model {
                 listener.onStartLoad();
             }
         };
-        implLoadImage(url, thumbnailSize, mTarget);
-    }
 
-    @Override
-    public void loadImage(String url, final onImageLoadedListener listener) {
-        mTarget = new Target() {
+        mHighResolutionTarget = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 listener.onHighResolutionImageLoaded(bitmap);
@@ -58,6 +46,28 @@ public class ImageLoader implements ViewContract.Model {
                 listener.onStartLoad();
             }
         };
-        implLoadImage(url, 0, mTarget);
+    }
+
+    private void implLoadImage(String url, int thumbnailSize, Target target) {
+        if(thumbnailSize>0)
+            Picasso.get().
+                    load(url).
+                    transform(new ThumbnailTransformation(thumbnailSize, thumbnailSize)).
+                    into(target);
+        else
+            Picasso.get().
+                    load(url).
+                    into(target);
+    }
+
+
+    @Override
+    public void loadThumbnail(String url, int thumbnailSize) {
+        implLoadImage(url, thumbnailSize, mThumbnailTarget);
+    }
+
+    @Override
+    public void loadImage(String url) {
+        implLoadImage(url, 0, mHighResolutionTarget);
     }
 }

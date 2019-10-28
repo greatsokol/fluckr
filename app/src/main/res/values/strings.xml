@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Flickr popular today</string>
+    <string name="app_name">Flickrterest</string>
     <string name="menuItemViewasGrid">Change list view</string>
     <string name="imageviewcontentexplaination">imageviewcontentexplaination</string>
     <string name="AppBarTransitionName">AppBarTransitionName</string>

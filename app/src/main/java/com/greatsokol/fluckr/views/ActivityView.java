@@ -13,6 +13,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.OnApplyWindowInsetsListener;
@@ -47,7 +48,9 @@ public class ActivityView extends AppCompatActivity implements ViewContract.View
         mToolbar = findViewById(R.id.toolbar_actionbar);
         mRootView = findViewById(R.id.constraint);
         setSupportActionBar(mToolbar);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null)
+            actionBar.setDisplayHomeAsUpEnabled(true);
         setInsets();
 
         mImageView = findViewById(R.id.image_view_big);

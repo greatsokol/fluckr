@@ -4,7 +4,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,11 +44,11 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
     private View.OnClickListener mItemClickListener;
 
 
-    public ImageListAdapter(ArrayList<ImageListItem> items) {
+    ImageListAdapter(ArrayList<ImageListItem> items) {
         mItems = items;
     }
 
-    public void setOnItemClickListener(View.OnClickListener listener){
+    void setOnItemClickListener(View.OnClickListener listener){
         mItemClickListener = listener;
     }
 
@@ -99,8 +98,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         return mItems==null? 0 : mItems.size();
     }
 
-
-    public void addItemsAtBottom(List<ImageListItem> newItems, int restorePosition) {
+    void addItemsAtBottom(List<ImageListItem> newItems, int restorePosition) {
         mItems.addAll(newItems);
         int itemsSize = newItems.size();
         int positionStart = mItems.size() - itemsSize;
@@ -110,9 +108,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         }
     }
 
-
-
-    public void addItemsUpper(List<ImageListItem> newItems) {
+    void addItemsUpper(List<ImageListItem> newItems) {
         if(newItems.size()==0) return;
 
         int removed = __removeItemsOfType(ImageListItem.VIEW_TYPE_PLACEHOLDER, false, false);
@@ -145,16 +141,6 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         notifyItemRangeInserted(0, newItems.size()-removed);
     }
 
-    private void __notifyItemInserted(final int position){
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                notifyItemInserted(position);
-            }
-        });
-    }
-
-
     @Override
     public void onBindViewHolder(@NonNull BaseViewHolder holder, int position) {
         holder.onBind(position);
@@ -163,7 +149,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
 
     private void setFadeAnimation(View view) {
         AlphaAnimation anim = new AlphaAnimation(0.0f, 1.0f);
-        anim.setDuration(500);
+        anim.setDuration(1000);
         view.startAnimation(anim);
     }
 
@@ -290,16 +276,6 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         }
     }
 
-    public class ProgressHolder extends BaseViewHolder {
-        ProgressHolder(View itemView) {
-            super(itemView);
-        }
-
-        @Override
-        protected void clear() {
-
-        }
-    }
 
     private ImageListItem getFirstImageItem(){
         if(mItems.size()>0) return mItems.get(0);
@@ -311,13 +287,13 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         return null;
     }
 
-    public ImageListItem.ListItemPageParams getLastItemPageParams(){
+    ImageListItem.ListItemPageParams getLastItemPageParams(){
         ImageListItem item = getLastImageItem();
         if(item == null) return null;
         return item.getPageParams();
     }
 
-    public ImageListItem.ListItemPageParams getFirstItemPageParams(){
+    ImageListItem.ListItemPageParams getFirstItemPageParams(){
         ImageListItem item = getFirstImageItem();
         if(item == null) return null;
         return item.getPageParams();
