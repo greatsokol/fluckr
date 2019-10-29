@@ -8,7 +8,6 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 
@@ -36,11 +35,11 @@ import java.util.Date;
 
 
 public class ActivityMain extends AppCompatActivity
-        implements MainContract.MainView, View.OnClickListener {
+        implements MainContract.View, android.view.View.OnClickListener {
 
     private ImageListAdapter mAdapter;
     //private ImageListAdapter mSearchAdapter;
-    private View mToolbarProgressBar;
+    private android.view.View mToolbarProgressBar;
 
     private RecyclerView mRecyclerView;
     //private int mTransitionPosition;
@@ -128,13 +127,13 @@ public class ActivityMain extends AppCompatActivity
 
 
     private void setInsets(){
-        findViewById(R.id.constraint).setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        findViewById(R.id.constraint).setSystemUiVisibility(android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         final int toolbarHeight = mToolbar.getLayoutParams().height;
 
         ViewCompat.setOnApplyWindowInsetsListener(mToolbar, new OnApplyWindowInsetsListener(){
             @Override
-            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+            public WindowInsetsCompat onApplyWindowInsets(android.view.View v, WindowInsetsCompat insets) {
                 ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
                 lp.setMargins(  insets.getSystemWindowInsetLeft(),
                                 insets.getSystemWindowInsetTop(),
@@ -148,7 +147,7 @@ public class ActivityMain extends AppCompatActivity
 
         ViewCompat.setOnApplyWindowInsetsListener(mRecyclerView, new OnApplyWindowInsetsListener() {
             @Override
-            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+            public WindowInsetsCompat onApplyWindowInsets(android.view.View v, WindowInsetsCompat insets) {
                 v.setPadding(
                         insets.getSystemWindowInsetLeft() + v.getPaddingLeft(),
                         insets.getSystemWindowInsetTop() + toolbarHeight ,
@@ -235,7 +234,7 @@ public class ActivityMain extends AppCompatActivity
             @Override
             public boolean onQueryTextSubmit(String queryText) {
                 // hide keyboard:
-                View v = getCurrentFocus();
+                android.view.View v = getCurrentFocus();
                 if(v!=null){
                     InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                     assert imm != null;
@@ -289,10 +288,10 @@ public class ActivityMain extends AppCompatActivity
     }
 
         @Override
-    public void onClick(View view) {
+    public void onClick(android.view.View view) {
         Bundle args = (Bundle) view.getTag();
         if (args!=null && !mActivityViewStarted) {
-            View imageView = view.findViewById(R.id.image_view);
+            android.view.View imageView = view.findViewById(R.id.image_view);
             if (imageView != null) {
                 //mTransitionPosition = args.getInt(ConstsAndUtils.TRANS_POSITION);
                 mActivityViewStarted = true;
@@ -357,12 +356,12 @@ public class ActivityMain extends AppCompatActivity
 
     @Override
     public void onStartLoading() {
-        mToolbarProgressBar.setVisibility(View.VISIBLE);
+        mToolbarProgressBar.setVisibility(android.view.View.VISIBLE);
     }
 
     @Override
     public void onStopLoading() {
-        mToolbarProgressBar.setVisibility(View.GONE);
+        mToolbarProgressBar.setVisibility(android.view.View.GONE);
     }
 
 

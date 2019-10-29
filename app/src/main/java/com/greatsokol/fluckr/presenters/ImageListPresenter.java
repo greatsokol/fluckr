@@ -4,12 +4,12 @@ import com.greatsokol.fluckr.contracts.MainContract;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.models.api.Photos;
 import com.greatsokol.fluckr.views.ImageListItem;
-import com.greatsokol.fluckr.models.FlickrInterestingnessListModel;
+import com.greatsokol.fluckr.models.FlickrInterestingnessList;
 
 import java.util.Date;
 
 public class ImageListPresenter implements MainContract.Presenter {
-    private MainContract.MainView mView;
+    private MainContract.View mView;
     private MainContract.Model mModel;
     private boolean isLoadingNow;
 
@@ -26,9 +26,9 @@ public class ImageListPresenter implements MainContract.Presenter {
     }
 
     @Override
-    public void onViewCreate(MainContract.MainView view, final Date date, final int page, final int itemNumber) {
+    public void onViewCreate(MainContract.View view, final Date date, final int page, final int itemNumber) {
         mView = view;
-        mModel = new FlickrInterestingnessListModel();
+        mModel = new FlickrInterestingnessList();
 
         isLoadingNow = true;
         view.onStartLoading();

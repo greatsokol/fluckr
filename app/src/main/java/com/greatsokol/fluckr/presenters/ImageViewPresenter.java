@@ -6,7 +6,7 @@ import com.greatsokol.fluckr.contracts.ViewContract;
 import com.greatsokol.fluckr.models.ImageLoader;
 
 public class ImageViewPresenter implements ViewContract.Presenter, ViewContract.Model.onImageLoadedListener {
-    private ViewContract.ViewView mView;
+    private ViewContract.View mView;
     private ImageLoader mImageLoader;
 
     public ImageViewPresenter(){
@@ -15,7 +15,7 @@ public class ImageViewPresenter implements ViewContract.Presenter, ViewContract.
 
 
     @Override
-    public void attachView(ViewContract.ViewView view) {
+    public void attachView(ViewContract.View view) {
         mView = view;
     }
 

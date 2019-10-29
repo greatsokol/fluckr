@@ -12,7 +12,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class FlickrInterestingnessListModel implements MainContract.Model {
+public class FlickrInterestingnessList implements MainContract.Model {
     private Retrofit retrofit
             = new Retrofit.Builder()
                 .baseUrl("https://www.flickr.com")

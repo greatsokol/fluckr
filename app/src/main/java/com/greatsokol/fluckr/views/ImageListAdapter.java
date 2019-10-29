@@ -41,7 +41,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
     void setSpanCount(int spanCount){mSpanCount = spanCount;}
 
 
-    private View.OnClickListener mItemClickListener;
+    private View.OnClickListener itemClickListener;
 
 
     ImageListAdapter(ArrayList<ImageListItem> items) {
@@ -49,7 +49,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
     }
 
     void setOnItemClickListener(View.OnClickListener listener){
-        mItemClickListener = listener;
+        itemClickListener = listener;
     }
 
     @Override
@@ -104,7 +104,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         int positionStart = mItems.size() - itemsSize;
         notifyItemRangeInserted(positionStart, itemsSize);
         if(restorePosition != ConstsAndUtils.NO_POSITION){
-            //mRecyclerView.scrollToPosition(restorePosition);
+            mRecyclerView.smoothScrollToPosition(restorePosition);
         }
     }
 
@@ -181,8 +181,9 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         TextView textViewTitle;
         TextView textViewDetails;
         ImageView imageView;
+        boolean imageLoaded;
         View progressBar;
-        int mItemPosition;
+        int itemPosition;
         ImageListItem listItem;
 
         ViewHolder(View itemView) {
@@ -201,7 +202,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         @Override
         public void onBind(int position) {
             super.onBind(position);
-            mItemPosition = position;
+            itemPosition = position;
             listItem = getItem(position);
             assert listItem!=null;
             if(textViewTitle!=null)
@@ -220,6 +221,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
                         progressBar.setVisibility(View.GONE);
                         imageView.setImageBitmap(bitmap);
                         imageView.setTag(null);
+                        imageLoaded = true;
                     }
 
                     @Override
@@ -230,6 +232,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
 
                     @Override
                     public void onPrepareLoad(Drawable placeHolderDrawable) {
+                        imageLoaded = false;
                         imageView.setImageBitmap(null);
                         progressBar.setVisibility(View.VISIBLE);
                     }
@@ -260,16 +263,16 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
             } else
             if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
                 view.setPressed(false);
-                if(mItemClickListener!=null) {
+                view.performClick();
+                if(itemClickListener !=null && imageLoaded) {
                     Bundle args = new Bundle();
-                    args.putInt(ConstsAndUtils.TRANS_POSITION, mItemPosition);
+                    args.putInt(ConstsAndUtils.TRANS_POSITION, itemPosition);
                     args.putString(ConstsAndUtils.TITLE, listItem.getTitle());
                     args.putString(ConstsAndUtils.DETAILS, listItem.getDetails());
                     args.putString(ConstsAndUtils.THUMBURL, listItem.getThumbnailUrl());
                     args.putString(ConstsAndUtils.FULLSIZEURL, listItem.getFullsizeUrl());
                     view.setTag(args);
-                    view.performClick();
-                    mItemClickListener.onClick(view);
+                    itemClickListener.onClick(view);
                 }
             } else view.setPressed(true);
             return false;

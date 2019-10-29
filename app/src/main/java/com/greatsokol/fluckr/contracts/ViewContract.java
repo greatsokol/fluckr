@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 
 public interface ViewContract {
 
-    interface ViewView {
+    interface View {
         void onThumbnailLoaded(Bitmap image);
         void onImageLoaded(Bitmap image);
         void onLoadFailed(String message);
@@ -23,7 +23,7 @@ public interface ViewContract {
     }
 
     interface Presenter {
-        void attachView(ViewView view);
+        void attachView(View view);
         void loadThumbnail();
         void loadHighResolutionImage();
         void setTitle();

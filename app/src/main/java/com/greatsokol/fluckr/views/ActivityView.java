@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.text.Html;
 import android.transition.Transition;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
@@ -27,8 +26,12 @@ import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.presenters.ImageViewPresenter;
 import com.jsibbold.zoomage.ZoomageView;
 
-public class ActivityView extends AppCompatActivity implements ViewContract.ViewView {
-    private View mRootView;
+
+
+
+
+public class ActivityView extends AppCompatActivity implements ViewContract.View {
+    private android.view.View mRootView;
     private ZoomageView mImageView;
     private ProgressBar mProgress;
     private Toolbar mToolbar;
@@ -100,14 +103,14 @@ public class ActivityView extends AppCompatActivity implements ViewContract.View
     }
 
     private void setInsets() {
-        findViewById(R.id.constraint).setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        findViewById(R.id.constraint).setSystemUiVisibility(android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
 
         final int toolbarHeight = mToolbar.getLayoutParams().height;
 
         ViewCompat.setOnApplyWindowInsetsListener(mToolbar, new OnApplyWindowInsetsListener(){
             @Override
-            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+            public WindowInsetsCompat onApplyWindowInsets(android.view.View v, WindowInsetsCompat insets) {
                 ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
                 lp.setMargins(  insets.getSystemWindowInsetLeft(),
                                 insets.getSystemWindowInsetTop(),
@@ -122,7 +125,7 @@ public class ActivityView extends AppCompatActivity implements ViewContract.View
         final ScrollView scrollView = findViewById(R.id.scroll_view);
         ViewCompat.setOnApplyWindowInsetsListener(scrollView, new OnApplyWindowInsetsListener() {
             @Override
-            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+            public WindowInsetsCompat onApplyWindowInsets(android.view.View v, WindowInsetsCompat insets) {
                 boolean land = ConstsAndUtils.isLandscape(getResources());
                 v.setPadding(v.getPaddingLeft(),
                         land ? toolbarHeight + insets.getSystemWindowInsetTop() : v.getPaddingTop(),
@@ -223,11 +226,11 @@ public class ActivityView extends AppCompatActivity implements ViewContract.View
 
     @Override
     public void showProgressBar() {
-        mProgress.setVisibility(View.VISIBLE);
+        mProgress.setVisibility(android.view.View.VISIBLE);
     }
 
     @Override
     public void hideProgressBar() {
-        mProgress.setVisibility(View.GONE);
+        mProgress.setVisibility(android.view.View.GONE);
     }
 }

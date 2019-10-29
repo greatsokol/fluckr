@@ -25,7 +25,7 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta2'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta3'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.google.android.material:material:1.0.0'
@@ -34,5 +34,10 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.6.2'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.jsibbold:zoomage:1.3.0'
-
+    // ядро библиотеки
+    implementation 'com.github.stephanenicolas.toothpick:toothpick-runtime:2.1.0'
+    // плюшки для Android
+    implementation 'com.github.stephanenicolas.toothpick:smoothie:2.1.0'
+    // процессор аннотаций для кодогенерации
+    annotationProcessor 'com.github.stephanenicolas.toothpick:toothpick-compiler:2.1.0'
 }
