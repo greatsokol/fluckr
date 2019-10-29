@@ -2,7 +2,7 @@ package com.greatsokol.fluckr.presenters;
 
 import android.graphics.Bitmap;
 
-import com.greatsokol.fluckr.contract.ViewContract;
+import com.greatsokol.fluckr.contracts.ViewContract;
 import com.greatsokol.fluckr.models.ImageLoader;
 
 public class ImageViewPresenter implements ViewContract.Presenter, ViewContract.Model.onImageLoadedListener {

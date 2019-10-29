@@ -22,12 +22,10 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.greatsokol.fluckr.R;
-import com.greatsokol.fluckr.contract.ViewContract;
+import com.greatsokol.fluckr.contracts.ViewContract;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.presenters.ImageViewPresenter;
 import com.jsibbold.zoomage.ZoomageView;
-
-import java.util.Objects;
 
 public class ActivityView extends AppCompatActivity implements ViewContract.ViewView {
     private View mRootView;

@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr.contract;
+package com.greatsokol.fluckr.contracts;
 
 import android.graphics.Bitmap;
 

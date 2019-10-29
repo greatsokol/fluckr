@@ -1,4 +1,4 @@
-package com.greatsokol.fluckr.contract;
+package com.greatsokol.fluckr.contracts;
 
 import com.greatsokol.fluckr.models.api.Photos;
 import com.greatsokol.fluckr.views.ImageListItem;

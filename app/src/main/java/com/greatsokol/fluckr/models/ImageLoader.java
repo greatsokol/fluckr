@@ -3,7 +3,7 @@ package com.greatsokol.fluckr.models;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
-import com.greatsokol.fluckr.contract.ViewContract;
+import com.greatsokol.fluckr.contracts.ViewContract;
 import com.greatsokol.fluckr.etc.ThumbnailTransformation;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;

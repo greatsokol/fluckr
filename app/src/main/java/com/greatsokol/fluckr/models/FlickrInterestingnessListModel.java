@@ -1,6 +1,6 @@
 package com.greatsokol.fluckr.models;
 
-import com.greatsokol.fluckr.contract.MainContract;
+import com.greatsokol.fluckr.contracts.MainContract;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.models.api.FlickrImageList;
 

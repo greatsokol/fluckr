@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.greatsokol.fluckr.R;
-import com.greatsokol.fluckr.contract.MainContract;
+import com.greatsokol.fluckr.contracts.MainContract;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.etc.ImageGridLayoutManager;
 import com.greatsokol.fluckr.etc.PaginationListenerOnScroll;

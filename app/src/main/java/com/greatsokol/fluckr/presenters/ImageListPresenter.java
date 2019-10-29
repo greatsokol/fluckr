@@ -1,6 +1,6 @@
 package com.greatsokol.fluckr.presenters;
 
-import com.greatsokol.fluckr.contract.MainContract;
+import com.greatsokol.fluckr.contracts.MainContract;
 import com.greatsokol.fluckr.etc.ConstsAndUtils;
 import com.greatsokol.fluckr.models.api.Photos;
 import com.greatsokol.fluckr.views.ImageListItem;
