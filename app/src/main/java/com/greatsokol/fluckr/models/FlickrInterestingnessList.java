@@ -30,15 +30,13 @@ public class FlickrInterestingnessList implements MainContract.Model {
                             final int page,
                             final OnResponseCallback onResponseCallback){
         final String APIKEY = "dcfa7bcdfe436387cefa172c2d3dc2ae";
+        final String EXTRAS = "description,url_t,url_m,url_n,url_b,url_k,url_h";
+        final String JSON = "json";
+        final int PERPAGE = 45;
+        final int NOJSONCALLBACK = 1;
         if(searchFor.isEmpty())
-            interestingness.getList(
-                    APIKEY,
-                ConstsAndUtils.DateToStr_yyyy_mm_dd(date),
-                45,
-                page,
-                "description,url_t,url_m,url_n,url_b,url_k,url_h",
-                "json",
-                1).enqueue(
+            interestingness.getList(APIKEY, ConstsAndUtils.DateToStr_yyyy_mm_dd(date),
+                                    PERPAGE, page, EXTRAS, JSON, NOJSONCALLBACK).enqueue(
                         new Callback<FlickrImageList>() {
                             @Override
                             public void onResponse(Call<FlickrImageList> call, Response<FlickrImageList> response) {
@@ -53,14 +51,7 @@ public class FlickrInterestingnessList implements MainContract.Model {
                             }
                 });
         else
-            search.getList(
-                    APIKEY,
-                    searchFor,
-                    45,
-                    page,
-                    "description,url_t,url_m,url_n,url_b,url_k,url_h",
-                    "json",
-                    1).enqueue(
+            search.getList(APIKEY, searchFor, PERPAGE, page, EXTRAS, JSON, NOJSONCALLBACK).enqueue(
                         new Callback<FlickrImageList>() {
                             @Override
                             public void onResponse(Call<FlickrImageList> call, Response<FlickrImageList> response) {
