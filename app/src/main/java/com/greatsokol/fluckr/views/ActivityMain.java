@@ -167,7 +167,8 @@ public class ActivityMain extends AppCompatActivity
         Parcelable recycleViewSavedState = lm!=null ? lm.onSaveInstanceState() : null;
 
         final boolean viewAsGrid = settings_getViewAsGrid();
-        final int spanCount = getSpanCount(viewAsGrid);
+        final int spanCount = getResources().
+                getInteger(viewAsGrid ? R.integer.span_for_grid : R.integer.span_for_linear);
         final ImageListAdapter adapter = getActiveAdapter();
 
         adapter.setViewAsGrid(viewAsGrid);
@@ -209,11 +210,6 @@ public class ActivityMain extends AppCompatActivity
 
         if (recycleViewSavedState!=null)
             layoutManager.onRestoreInstanceState(recycleViewSavedState);
-    }
-
-    protected int getSpanCount(boolean viewAsGrid){
-        return getResources().
-                getInteger(viewAsGrid ? R.integer.span_for_grid : R.integer.span_for_linear);
     }
 
     private void stopRequestLoading(boolean clear){
