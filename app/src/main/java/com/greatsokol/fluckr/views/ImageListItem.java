@@ -18,7 +18,7 @@ public class ImageListItem {
     private String mThumbnailUrl;
     private String mFullsizeUrl;
 
-    public class ListItemPageParams {
+    public static class ListItemPageParams {
         private int mNumberOnPage;
         private int mPage;
         private int mPagesTotal;

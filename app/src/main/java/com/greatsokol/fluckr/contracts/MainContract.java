@@ -13,17 +13,14 @@ public interface MainContract {
         void onFailure(String message);
         void onStartLoading();
         void onStopLoading();
-
         String getSearchPhrase();
-        ImageListItem.ListItemPageParams getLastItemPageParams();
-        ImageListItem.ListItemPageParams getFirstItemPageParams();
     }
 
     interface Presenter {
-        void onViewCreate(View view, Date date, int page, int itemNumber);
+        void onViewCreate(View view, final ImageListItem.ListItemPageParams pageParams);
         void onViewDestroy();
-        void onScrolledDown();
-        void onScrolledUp();
+        void onScrolledDown(ImageListItem.ListItemPageParams params);
+        void onScrolledUp(ImageListItem.ListItemPageParams params);
     }
 
     interface Model{

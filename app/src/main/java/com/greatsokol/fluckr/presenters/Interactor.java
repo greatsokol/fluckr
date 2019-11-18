@@ -12,6 +12,7 @@ class Interactor {
     private Interactor(){}
 
     static ArrayList<ImageListItem> Translate(Date date, Photos flickrPhotos){
+        if(flickrPhotos == null) return null;
         List<Photo> PhotosArray = flickrPhotos.getPhoto();
         int page = flickrPhotos.getPage();
         ArrayList<ImageListItem> imageListItems = new ArrayList<>();

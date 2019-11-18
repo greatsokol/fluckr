@@ -26,21 +26,25 @@ public class ImageListPresenter implements MainContract.Presenter {
     }
 
     @Override
-    public void onViewCreate(MainContract.View view, final Date date, final int page, final int itemNumber) {
+    public void onViewCreate(MainContract.View view, final ImageListItem.ListItemPageParams pageParams) {
         mView = view;
         mModel = new FlickrInterestingnessList();
 
+        // final Date date, final int page, final int itemNumber
+
         isLoadingNow = true;
         view.onStartLoading();
-        mModel.loadPage(date, page, mView.getSearchPhrase(), new MainContract.Model.OnResponseCallback() {
+        mModel.loadPage(pageParams.getDate(), pageParams.getPage(), mView.getSearchPhrase(), new MainContract.Model.OnResponseCallback() {
             @Override
             public void onResponse(Photos photos) {
                 if(mView==null)return;
-                mView.onImageListDownloaded(
-                        Interactor.Translate(date, photos),true, itemNumber);
+                if (photos!=null)
+                    mView.onImageListDownloaded(
+                            Interactor.Translate(pageParams.getDate(), photos),
+                            true, pageParams.getNumberOnPage());
                 stopLoading();
-                onScrolledUp(); //<---- load upper page if exists
-                onScrolledDown(); //<---- load lower page if exists
+                onScrolledUp(pageParams); //<---- load upper page if exists
+                onScrolledDown(pageParams); //<---- load lower page if exists
             }
 
             @Override
@@ -61,11 +65,9 @@ public class ImageListPresenter implements MainContract.Presenter {
     }
 
     @Override
-    public void onScrolledDown() {
-        if(mView==null)return;
+    public void onScrolledDown(ImageListItem.ListItemPageParams pageParams) {
+        if(mView==null || pageParams==null)return;
         if(isLoadingNow)return;
-        ImageListItem.ListItemPageParams pageParams = mView.getLastItemPageParams();
-        if(pageParams==null)return;
         int page = pageParams.getPage();
         Date date = pageParams.getDate();
         int totalPages = pageParams.getPagesTotal();
@@ -98,13 +100,9 @@ public class ImageListPresenter implements MainContract.Presenter {
     }
 
     @Override
-    public void onScrolledUp() {
-        if(mView==null)return;
+    public void onScrolledUp(ImageListItem.ListItemPageParams pageParams) {
+        if(mView==null || pageParams==null)return;
         if(isLoadingNow)return;
-
-        ImageListItem.ListItemPageParams pageParams = mView.getFirstItemPageParams();
-        if(pageParams==null)
-            return;
         int page = pageParams.getPage();
         Date date = pageParams.getDate();
         if(page==ConstsAndUtils.NO_PAGE || date == null)

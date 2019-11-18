@@ -3,6 +3,7 @@ package com.greatsokol.fluckr.views;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.TextUtils;
@@ -79,7 +80,9 @@ public class ActivityMain extends AppCompatActivity
                         ConstsAndUtils.DecDate(ConstsAndUtils.CurrentGMTDate()).getTime()));
         int page = prefs.getInt(ConstsAndUtils.PAGE_TO_VIEW,1);
         int itemNumber = prefs.getInt(ConstsAndUtils.NUMBER_ON_PAGE,1);
-        mPresenter.onViewCreate(this, date, page, itemNumber);
+        ImageListItem.ListItemPageParams params =
+                new ImageListItem.ListItemPageParams(itemNumber, date, page, 0);
+        mPresenter.onViewCreate(this, params);
 
 
         // shared element transition trick:
@@ -189,12 +192,18 @@ public class ActivityMain extends AppCompatActivity
 
             @Override
             protected void loadNextPage() {
-                mPresenter.onScrolledDown();
+                ImageListItem.ListItemPageParams pageParams =
+                        getActiveAdapter().getLastItemPageParams();
+                if(pageParams != null)
+                    mPresenter.onScrolledDown(pageParams);
             }
 
             @Override
             protected void loadPrevPage() {
-                mPresenter.onScrolledUp();
+                ImageListItem.ListItemPageParams pageParams =
+                        getActiveAdapter().getFirstItemPageParams();
+                if(pageParams != null)
+                    mPresenter.onScrolledUp(pageParams);
             }
         });
 
@@ -247,7 +256,8 @@ public class ActivityMain extends AppCompatActivity
                 mSearchFor = queryText;
                 getActiveAdapter().clear();
                 setLayout();
-                mPresenter.onViewCreate(ActivityMain.this, null, 0, 0);
+                mPresenter.onViewCreate(ActivityMain.this,
+                        new ImageListItem.ListItemPageParams(0,null,0,0));
                 return true;
             }
 
@@ -343,10 +353,12 @@ public class ActivityMain extends AppCompatActivity
 
     @Override
     public void onImageListDownloaded(ArrayList<ImageListItem> items, boolean addAtBottom, int restorePosition) {
-        if(addAtBottom)
-            getActiveAdapter().addItemsAtBottom(items, restorePosition);
-        else
-            getActiveAdapter().addItemsUpper(items);
+        if(items != null) {
+            if (addAtBottom)
+                getActiveAdapter().addItemsAtBottom(items, restorePosition);
+            else
+                getActiveAdapter().addItemsUpper(items);
+        }
     }
 
     @Override
@@ -369,16 +381,5 @@ public class ActivityMain extends AppCompatActivity
     public String getSearchPhrase() {
         return mSearchFor;
     }
-
-    @Override
-    public ImageListItem.ListItemPageParams getLastItemPageParams() {
-        return getActiveAdapter().getLastItemPageParams();
-    }
-
-    @Override
-    public ImageListItem.ListItemPageParams getFirstItemPageParams() {
-        return getActiveAdapter().getFirstItemPageParams();
-    }
-
 
 }
