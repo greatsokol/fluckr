@@ -44,7 +44,7 @@ public class ImageListPresenter implements MainContract.Presenter {
                             true, pageParams.getNumberOnPage());
                 stopLoading();
                 onScrolledUp(pageParams); //<---- load upper page if exists
-                onScrolledDown(pageParams); //<---- load lower page if exists
+                //onScrolledDown(pageParams); //<---- load lower page if exists
             }
 
             @Override
