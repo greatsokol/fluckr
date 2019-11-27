@@ -1,5 +1,6 @@
 package com.greatsokol.fluckr.views;
 
+import android.app.LauncherActivity;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -98,13 +99,25 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
         return mItems==null? 0 : mItems.size();
     }
 
-    void addItemsAtBottom(List<ImageListItem> newItems, int restorePosition) {
+    void addItemsAtBottom(List<ImageListItem> newItems,
+                          ImageListItem.ListItemPageParams restorationPageParams) {
         mItems.addAll(newItems);
         int itemsSize = newItems.size();
         int positionStart = mItems.size() - itemsSize;
         notifyItemRangeInserted(positionStart, itemsSize);
-        if(restorePosition != ConstsAndUtils.NO_POSITION){
-            mRecyclerView.smoothScrollToPosition(restorePosition);
+        if(restorationPageParams != null) {
+            final int position = getItemPosition(restorationPageParams.getDate(),
+                    restorationPageParams.getPage(), restorationPageParams.getNumberOnPage());
+            if (position != ConstsAndUtils.NO_POSITION) {
+                mRecyclerView.scrollToPosition(position);
+
+                /*mRecyclerView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mRecyclerView.smoothScrollToPosition(position);
+                    }
+                }, 1000); */
+            }
         }
     }
 
@@ -174,6 +187,18 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
 
     private ImageListItem getItem(int position) {
         return mItems.isEmpty() ? null : mItems.get(position);
+    }
+
+    private int getItemPosition(Date date, int page, int posAtPage) {
+        for(int i=0; i<mItems.size()-1; i++){
+            ImageListItem item = getItem(i);
+            if(item != null) {
+                ImageListItem.ListItemPageParams pageParams = item.getPageParams();
+                if (pageParams.equalparams(date, page, posAtPage))
+                    return i;
+            }
+        }
+        return ConstsAndUtils.NO_POSITION;
     }
 
     public class ViewHolder extends BaseViewHolder implements View.OnTouchListener {
@@ -306,17 +331,20 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
     String saveNavigationSettings(SharedPreferences prefs, int firstVisibleItemPosition){
         if(firstVisibleItemPosition>=0 && firstVisibleItemPosition<mItems.size()) {
             ImageListItem item = mItems.get(firstVisibleItemPosition);
-            ImageListItem.ListItemPageParams pageParams = item.getPageParams();
-            Date dt = pageParams.getDate();
-            if(dt != null) {
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putLong(ConstsAndUtils.DATE_TO_VIEW, dt.getTime());
-                editor.putInt(ConstsAndUtils.PAGE_TO_VIEW, pageParams.getPage());
-                editor.putInt(ConstsAndUtils.NUMBER_ON_PAGE, pageParams.getNumberOnPage());
-                editor.apply();
-                return String.format(Locale.getDefault(),"%s (pg %d)",
-                        ConstsAndUtils.DateToStr_dd_mmmm_yyyy(dt),
-                        pageParams.getPage());
+            if(item.getViewType() == ImageListItem.VIEW_TYPE_IMAGE) {
+                ImageListItem.ListItemPageParams pageParams = item.getPageParams();
+                Date dt = pageParams.getDate();
+                if (dt != null) {
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putLong(ConstsAndUtils.DATE_TO_VIEW, dt.getTime());
+                    editor.putInt(ConstsAndUtils.PAGE_TO_VIEW, pageParams.getPage());
+                    editor.putInt(ConstsAndUtils.NUMBER_ON_PAGE, pageParams.getNumberOnPage());
+                    editor.putInt(ConstsAndUtils.PAGES_TOTAL, pageParams.getPagesTotal());
+                    editor.apply();
+                    return String.format(Locale.getDefault(), "%s (pg %d/%d)",
+                            ConstsAndUtils.DateToStr_dd_mmmm_yyyy(dt),
+                            pageParams.getPage(), pageParams.getPagesTotal());
+                }
             }
         }
         return "";

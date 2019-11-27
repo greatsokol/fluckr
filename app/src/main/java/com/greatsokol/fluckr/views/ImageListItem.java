@@ -33,17 +33,44 @@ public class ImageListItem {
         public int getPagesTotal(){return mPagesTotal;}
         public int getPage(){return mPage;}
         public int getNumberOnPage(){return mNumberOnPage;}
+
+        public void moveParamsUp(){
+            if(mPage==ConstsAndUtils.NO_PAGE ||
+                    mDate == null) return;
+            mPage--;
+            if(mPage<=0){
+                mDate = ConstsAndUtils.IncDate(mDate);
+                if(ConstsAndUtils.IsToday(mDate)) return;
+                mPage=99999; // Max page will be returned;
+            }
+        }
+
+        public void moveParamsDown(){
+            int totalPages = mPagesTotal;
+            if(mPage==ConstsAndUtils.NO_PAGE || mDate == null ||
+                    mPagesTotal==ConstsAndUtils.NO_PAGE) return;
+            mPage++;
+            if(mPage > totalPages){
+                mDate = ConstsAndUtils.DecDate(mDate);
+                mPage = 1;
+            }
+        }
+
+        public boolean equalparams(Date date, int page, int numberOnPage){
+            return date==mDate && page==mPage && numberOnPage==mNumberOnPage;
+        }
+
     }
 
     private int mViewType = VIEW_TYPE_IMAGE;
-    ImageListItem(int viewtype) {
+    /*ImageListItem(int viewtype) {
         mViewType = viewtype;
         pageParams = new ListItemPageParams(
                 ConstsAndUtils.NO_POSITION,
                 null,
                 ConstsAndUtils.NO_PAGE,
                 ConstsAndUtils.NO_PAGE);
-    }
+    } */
     public ImageListItem(Date DateOfList, int totalPages, int PageNumber, int NumberOnPage, Photo photo) {
         mTitle = photo.getTitle();
         mDetails = photo.getDescription().getContent();

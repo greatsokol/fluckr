@@ -80,8 +80,9 @@ public class ActivityMain extends AppCompatActivity
                         ConstsAndUtils.DecDate(ConstsAndUtils.CurrentGMTDate()).getTime()));
         int page = prefs.getInt(ConstsAndUtils.PAGE_TO_VIEW,1);
         int itemNumber = prefs.getInt(ConstsAndUtils.NUMBER_ON_PAGE,1);
+        int pagesTotal = prefs.getInt(ConstsAndUtils.PAGES_TOTAL,page+1);
         ImageListItem.ListItemPageParams params =
-                new ImageListItem.ListItemPageParams(itemNumber, date, page, 0);
+                new ImageListItem.ListItemPageParams(itemNumber, date, page, pagesTotal);
         mPresenter.onViewCreate(this, params);
 
 
@@ -179,7 +180,6 @@ public class ActivityMain extends AppCompatActivity
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
 
-
         mRecyclerView.clearOnScrollListeners();
         mRecyclerView.addOnScrollListener(new PaginationListenerOnScroll(layoutManager) {
             @Override
@@ -196,7 +196,7 @@ public class ActivityMain extends AppCompatActivity
                 ImageListItem.ListItemPageParams pageParams =
                         getActiveAdapter().getLastItemPageParams();
                 if(pageParams != null)
-                    mPresenter.onScrolledDown(pageParams);
+                    mPresenter.onScrolledDown(false, pageParams);
             }
 
             @Override
@@ -204,7 +204,7 @@ public class ActivityMain extends AppCompatActivity
                 ImageListItem.ListItemPageParams pageParams =
                         getActiveAdapter().getFirstItemPageParams();
                 if(pageParams != null)
-                    mPresenter.onScrolledUp(pageParams);
+                    mPresenter.onScrolledUp(false, pageParams);
             }
         });
 
@@ -314,6 +314,10 @@ public class ActivityMain extends AppCompatActivity
                 intent.putExtra(ConstsAndUtils.TRANS_NAME, transitionName);
                 intent.putExtra(ConstsAndUtils.ARGS, args);
                 startActivityForResult(intent, 0, options.toBundle());
+
+                getActiveAdapter().
+                        saveNavigationSettings(getPreferences(MODE_PRIVATE),
+                                args.getInt(ConstsAndUtils.TRANS_POSITION));
             }
         }
     }
@@ -348,10 +352,12 @@ public class ActivityMain extends AppCompatActivity
 
 
     @Override
-    public void onImageListDownloaded(ArrayList<ImageListItem> items, boolean addAtBottom, int restorePosition) {
+    public void onImageListDownloaded(ArrayList<ImageListItem> items,
+                                      boolean addAtBottom,
+                                      ImageListItem.ListItemPageParams restorationPageParams) {
         if(items != null) {
             if (addAtBottom)
-                getActiveAdapter().addItemsAtBottom(items, restorePosition);
+                getActiveAdapter().addItemsAtBottom(items, restorationPageParams);
             else
                 getActiveAdapter().addItemsUpper(items);
         }

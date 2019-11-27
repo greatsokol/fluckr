@@ -23,6 +23,7 @@ public abstract class ConstsAndUtils {
     public final static String SEARCH_PHRASE = "SEARCH_PHRASE";
     public final static String DATE_TO_VIEW = "DATE_VIEW";
     public final static String PAGE_TO_VIEW = "PAGE_VIEW";
+    public final static String PAGES_TOTAL = "PAGES_TOTAL";
     public final static String NUMBER_ON_PAGE = "NUMBER_ON_PAGE";
     public final static int NO_POSITION = -1;
     public final static int NO_PAGE = -1;

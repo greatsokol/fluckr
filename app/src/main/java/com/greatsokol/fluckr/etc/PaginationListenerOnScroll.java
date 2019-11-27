@@ -12,7 +12,6 @@ public abstract class PaginationListenerOnScroll extends RecyclerView.OnScrollLi
     }
 
     private int mFirstVisibleItemPostionSaved;
-    private int mLastVisibleItemPostionSaved;
 
     @Override
     public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -20,8 +19,7 @@ public abstract class PaginationListenerOnScroll extends RecyclerView.OnScrollLi
 
         int visibleItemCount = layoutManager.getChildCount();
         int totalItemCount = layoutManager.getItemCount();
-        int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-        int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+        int firstVisibleItemPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
 
         if (dy > 0 && (visibleItemCount + firstVisibleItemPosition) >= totalItemCount) {
             loadNextPage();
@@ -29,10 +27,8 @@ public abstract class PaginationListenerOnScroll extends RecyclerView.OnScrollLi
             loadPrevPage();
         }
 
-        if(mFirstVisibleItemPostionSaved != firstVisibleItemPosition &&
-            mLastVisibleItemPostionSaved != lastVisibleItemPosition){
+        if(mFirstVisibleItemPostionSaved != firstVisibleItemPosition){
             mFirstVisibleItemPostionSaved = firstVisibleItemPosition;
-            mLastVisibleItemPostionSaved = lastVisibleItemPosition;
             onScrolled(firstVisibleItemPosition);
         }
     }

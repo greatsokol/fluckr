@@ -9,7 +9,9 @@ import java.util.Date;
 public interface MainContract {
 
     interface View {
-        void onImageListDownloaded(ArrayList<ImageListItem> items, boolean addAtBottom, int restorePosition);
+        void onImageListDownloaded(ArrayList<ImageListItem> items,
+                                   boolean addAtBottom,
+                                   ImageListItem.ListItemPageParams restorationPageParams);
         void onFailure(String message);
         void onStartLoading();
         void onStopLoading();
@@ -17,10 +19,11 @@ public interface MainContract {
     }
 
     interface Presenter {
-        void onViewCreate(View view, final ImageListItem.ListItemPageParams pageParams);
+        void onViewCreate(View view, ImageListItem.ListItemPageParams pageParams);
         void onViewDestroy();
-        void onScrolledDown(ImageListItem.ListItemPageParams params);
-        void onScrolledUp(ImageListItem.ListItemPageParams params);
+        void onScrolledDown(ImageListItem.ListItemPageParams pageParams);
+        void onScrolledUp(boolean firstLoad,
+                          ImageListItem.ListItemPageParams pageParams);
     }
 
     interface Model{
