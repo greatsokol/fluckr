@@ -3,7 +3,6 @@ package com.greatsokol.fluckr.views;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.TextUtils;
@@ -193,18 +192,14 @@ public class ActivityMain extends AppCompatActivity
 
             @Override
             protected void loadNextPage() {
-                ImageListItem.ListItemPageParams pageParams =
-                        getActiveAdapter().getLastItemPageParams();
-                if(pageParams != null)
-                    mPresenter.onScrolledDown(false, pageParams);
+                mPresenter.onScrolledDown(
+                        getActiveAdapter().getLastItemPageParams());
             }
 
             @Override
             protected void loadPrevPage() {
-                ImageListItem.ListItemPageParams pageParams =
-                        getActiveAdapter().getFirstItemPageParams();
-                if(pageParams != null)
-                    mPresenter.onScrolledUp(false, pageParams);
+                mPresenter.onScrolledUp(false,
+                        getActiveAdapter().getFirstItemPageParams());
             }
         });
 
