@@ -349,10 +349,11 @@ public class ActivityMain extends AppCompatActivity
     @Override
     public void onImageListDownloaded(ArrayList<ImageListItem> items,
                                       boolean addAtBottom,
+                                      boolean restorePosition,
                                       ImageListItem.ListItemPageParams restorationPageParams) {
         if(items != null) {
             if (addAtBottom)
-                getActiveAdapter().addItemsAtBottom(items, restorationPageParams);
+                getActiveAdapter().addItemsAtBottom(items, restorePosition, restorationPageParams);
             else
                 getActiveAdapter().addItemsUpper(items);
         }

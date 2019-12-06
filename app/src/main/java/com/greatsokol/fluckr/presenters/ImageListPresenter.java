@@ -26,7 +26,9 @@ public class ImageListPresenter implements MainContract.Presenter {
     }
 
     private void load(final ImageListItem.ListItemPageParams pageParams,
-                      final boolean addAtBottom, final boolean firstLoad){
+                      final boolean addAtBottom,
+                      final boolean restorePosition,
+                      final boolean firstLoad){
         startLoading();
         mModel.loadPage(
                 pageParams.getDate(),
@@ -39,7 +41,9 @@ public class ImageListPresenter implements MainContract.Presenter {
                         if (photos!=null)
                             mView.onImageListDownloaded(
                                     Interactor.Translate(pageParams.getDate(), photos),
-                                    addAtBottom, pageParams);
+                                    addAtBottom,
+                                    restorePosition,
+                                    pageParams);
                         stopLoading();
                         if(firstLoad) {
                             if (addAtBottom)
@@ -63,7 +67,7 @@ public class ImageListPresenter implements MainContract.Presenter {
                              ImageListItem.ListItemPageParams pageParams) {
         mView = view;
         mModel = new FlickrInterestingnessList();
-        load(pageParams, true, true);
+        load(pageParams, true, true, true);
     }
 
     @Override
@@ -77,7 +81,7 @@ public class ImageListPresenter implements MainContract.Presenter {
     public void onScrolledDown(ImageListItem.ListItemPageParams pageParams) {
         if(mView==null || pageParams==null || isLoadingNow)return;
         pageParams.moveParamsDown();
-        load(pageParams, true, false);
+        load(pageParams, true, false, false);
     }
 
     @Override
@@ -85,6 +89,6 @@ public class ImageListPresenter implements MainContract.Presenter {
                              ImageListItem.ListItemPageParams pageParams) {
         if(mView==null || pageParams==null || isLoadingNow)return;
         pageParams.moveParamsUp();
-        load(pageParams, false, firstLoad);
+        load(pageParams, false, false, firstLoad);
     }
 }

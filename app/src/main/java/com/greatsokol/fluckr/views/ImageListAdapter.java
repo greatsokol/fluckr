@@ -100,12 +100,13 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Base
     }
 
     void addItemsAtBottom(List<ImageListItem> newItems,
+                          boolean restorePosition,
                           ImageListItem.ListItemPageParams restorationPageParams) {
         mItems.addAll(newItems);
         int itemsSize = newItems.size();
         int positionStart = mItems.size() - itemsSize;
         notifyItemRangeInserted(positionStart, itemsSize);
-        if(restorationPageParams != null) {
+        if(restorePosition && restorationPageParams != null) {
             final int position = getItemPosition(restorationPageParams.getDate(),
                     restorationPageParams.getPage(), restorationPageParams.getNumberOnPage());
             if (position != ConstsAndUtils.NO_POSITION) {

@@ -11,6 +11,7 @@ public interface MainContract {
     interface View {
         void onImageListDownloaded(ArrayList<ImageListItem> items,
                                    boolean addAtBottom,
+                                   boolean restorePosition,
                                    ImageListItem.ListItemPageParams restorationPageParams);
         void onFailure(String message);
         void onStartLoading();
